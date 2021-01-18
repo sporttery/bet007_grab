@@ -1,7 +1,10 @@
 //从http://www.okooo.com/soccer/match/610101/history/ 开始获取数据，最小id 为 610101 开始，
 
 
-var g_cache;
+var g_cache,
+    g_team,
+    g_id_start = {},
+    g_id_finish = {};
 
 function safeHtml(d) {
     return d.replace(/[\r\n]/g, "").replace(/<head.+?<\/head>/g, "").replace(/<script.+?<\/script>/g, "").replace(/<img.+?>/g, "").replace(/<link.+?>/g, "").replace(/<style.+?<\/style>/g, "");
@@ -9,19 +12,14 @@ function safeHtml(d) {
 
 /*
 获取所有的球队
-var g_team = [];
+g_team = {};
 
 function teamCallback(teamId) {
     return function (d) {
         d = $(safeHtml(d));
         var parentName = d.find(".qdtxt span:eq(0)").text();
         var name = d.find(".team-title").text();
-        var team = {
-            teamId,
-            name,
-            parentName
-        };
-        g_team.push(team);
+        g_team[teamId]={name,parentName};
         if (teamId < 2833) {
             setTimeout(getTeam, (teamId % 10) * 100, teamId + 1);
         }
@@ -51,14 +49,18 @@ function getResult(scores) {
 function getGoalscore(scores) {
     return scores[0] > scores[1] ? 3 : scores[0] == scores[1] ? 1 : 0;
 }
+//比赛强弱
+function getStrong(hscore, ascore) {
+    return hscore > ascore ? '强' : hscore == ascore ? '平' : '弱';
+}
 
 //获取分区
-function getScoreSection(score, hookFlag) {
+function getScoreSection(score, count) {
     score = parseInt(score)
-    if (hookFlag == 33) {
-        return 10 - parseInt(score / 10);
-    } else if (hookFlag == 30) {
+    if (count < 33) {
         return 9 - parseInt(score / 10);
+    } else {
+        return 10 - parseInt(score / 10);
     }
 }
 /**
@@ -75,6 +77,10 @@ function getMatchFromTr(tr) {
     var awayId = $(tds[4]).attr("attr");
     var fullscore = $(tds[3]).text();
     var halfscore = $(tds[5]).text();
+    var leagueType = $(tr).attr("data-lt");
+    if (leagueType == "") {
+        leagueType = "league";
+    }
     var time = $(tds[1]).find(".smalltitle").text();
     if (time.length == 16) {
         time = time + ":00";
@@ -93,6 +99,7 @@ function getMatchFromTr(tr) {
         id,
         leagueId,
         leagueName,
+        leagueType,
         homeId,
         homeName,
         awayId,
@@ -137,81 +144,76 @@ function concat(arr, key, split) {
 }
 
 
-function calcBolool(data) {
-    var match = data.match;
-    var all30_h = data.all30_h;
-    var all30_a = data.all30_a;
-    var notFriendly_h = data.notFriendly_h;
-    var notFriendly_a = data.notFriendly_a;
+/**
+ * 
+ * @param {*} arr 要计算的matchlist(历史对阵)
+ * @param {*} topN 前N条数据进行计算
+ * @param {*} friend 0 没有友谊赛 1 全部比赛 2 只有友谊赛
+ */
 
-    match.matchList30 = JSON.stringify({
-        "h": all30_h,
-        "a": all30_a
-    });
-    match.matchList33 = JSON.stringify({
-        "h": notFriendly_h,
-        "a": notFriendly_a
-    });
-    match.hscore30 = sum(all30_h, "hgoalscore");
-    match.ascore30 = sum(all30_a, "hgoalscore");
-    match.hsection30 = getScoreSection(match.hscore30, 30);
-    match.asection30 = getScoreSection(match.ascore30, 30);
-    match.hscore33 = sum(notFriendly_h, "hgoalscore");
-    match.ascore33 = sum(notFriendly_a, "hgoalscore");
-    match.hsection33 = getScoreSection(match.hscore33, 30);
-    match.asection33 = getScoreSection(match.ascore33, 30);
-
-    match.hresult30 = concat(all30_h, "hresult");
-    match.aresult30 = concat(all30_a, "hresult");
-    match.hresult33 = concat(notFriendly_h, "hresult");
-    match.aresult33 = concat(notFriendly_a, "hresult");
-
-    var hnear3 = notFriendly_h.slice(0, 3);
-    var anear3 = notFriendly_a.slice(0, 3);
-    var hnear6 = notFriendly_h.slice(0, 6);
-    var anear6 = notFriendly_a.slice(0, 6);
-
-    match.hscore3 = sum(hnear3, "hgoalscore");
-    match.ascore3 = sum(anear3, "hgoalscore");
-    if (match.hscore3 > match.ascore3) {
-        match.hstrong3 = "强";
-        match.astrong3 = "弱";
-    } else if (match.hscore3 < match.ascore3) {
-        match.hstrong3 = "弱";
-        match.astrong3 = "强";
-    } else {
-        match.hstrong3 = "平";
-        match.astrong3 = "平";
-    }
-    match.hscore6 = sum(hnear6, "hgoalscore");
-    match.ascore6 = sum(anear6, "hgoalscore");
-    if (match.hscore6 > match.ascore6) {
-        match.hstrong6 = "强";
-        match.astrong6 = "弱";
-    } else if (match.hscore6 < match.ascore6) {
-        match.hstrong6 = "弱";
-        match.astrong6 = "强";
-    } else {
-        match.hstrong6 = "平";
-        match.astrong6 = "平";
+function calcBolool(arr, topN, friend) {
+    var calcArr = [];
+    if (friend == 1) { //全部比赛
+        calcArr = arr.slice(0, topN);
+    } else if (friend == 0) { //没有友谊赛
+        for (var i = 0; i < arr.length; i++) {
+            var match = arr[i];
+            if (match.leagueType != "friend") {
+                calcArr.push(match);
+            }
+            if (calcArr.length == topN) {
+                break;
+            }
+        }
+    } else { // 只有友谊赛 
+        for (var i = 0; i < arr.length; i++) {
+            var match = arr[i];
+            if (match.leagueType == "friend") {
+                calcArr.push(match);
+            }
+            if (calcArr.length == topN) {
+                break;
+            }
+        }
     }
 
-    match.hresult3 = concat(hnear3, "hresult");
-    match.aresult3 = concat(anear3, "hresult");
-    match.hresult6 = concat(hnear6, "hresult");
-    match.aresult6 = concat(anear6, "hresult");
+    score = sum(calcArr, "hgoalscore");
+    section = getScoreSection(score, topN);
+    result = concat(calcArr, "hresult");
 
+    return {
+        score,
+        section,
+        result
+    };
 
+}
+
+function getBolool(hbolool, abolool) {
+    var bolool = {};
+    for (var key in hbolool) {
+        bolool["h" + key] = hbolool[key];
+    }
+    for (var key in abolool) {
+        bolool["a" + key] = abolool[key];
+    }
+    return bolool;
 }
 
 function getMatchCallback(id, maxId) {
     return function (d) {
+        g_id_finish["_" + id] = 1;
         d = $(safeHtml(d));
         var tr = d.find(".jsThisMatch");
+
         var tds = tr.find("td");
         var leagueUrl = $(tds[0]).find("a").attr("href").split("/");
         var seasonId = leagueUrl[5];
         var lunci = d.find("#lunci");
+        if (tr.length == 0 || lunci.length == 0) {
+            console.log("id=" + id + " 这场比赛没有数据");
+            return;
+        }
         var spans = lunci.find("span");
         var seasonName = $(spans[0]).find("a:last").text();
         var round = $(spans[1]).text().trim();
@@ -223,6 +225,13 @@ function getMatchCallback(id, maxId) {
         }
 
         var match = getMatchFromTr(tr[0]);
+
+        if (match.leagueId == "") {
+            console.log("id=" + id + " 这场比赛没有数据");
+            setTimeout(getMatch, (id % 10) * 100, id + 1, maxId);
+            return;
+        }
+
         match.seasonId = seasonId;
         match.seasonName = seasonName;
         match.round = round;
@@ -242,19 +251,16 @@ function getMatchCallback(id, maxId) {
         matchtime = new Date(playtime[0], playtime[1], playtime[2], playtime[3], playtime[4], playtime[5]);
 
         if (now < matchtime.getTime()) {
-            console.log("日期已经大于今天了，结束程序");
-            $('#clickme').show();
+            console.log(match.playtime + " 日期已经大于今天了，结束程序");
+            console.log(match);
+            finish();
             return;
         }
 
 
-        //最近的30场比赛
-        var all30_h = [],
-            all30_a = [];
-        //俱乐部最近33场比赛，要去掉友谊赛
-        //国家队比赛保留友谊赛
-        var notFriendly_h = [],
-            notFriendly_a = [];
+        var all_h = [],
+            all_a = [];
+
         d.find(".homecomp").find("tr:gt(2)").each((idx, el) => {
             var matchHistory = getMatchFromTr(el);
             if (matchHistory.id == match.id) {
@@ -272,17 +278,9 @@ function getMatchCallback(id, maxId) {
                 var goalscore = getGoalscore(scores);
                 matchHistory.hresult = result;
                 matchHistory.hgoalscore = goalscore;
-            } else {
-                return true;
-            }
-            if (notFriendly_h.length != 33 && $(el).attr("data-lt") != "friend") {
-                notFriendly_h.push(matchHistory);
-            }
-            if (all30_h.length != 30) {
-                all30_h.push(matchHistory);
-            }
-            if (notFriendly_h.length == 33 && all30_h.length == 30) {
-                return false;
+
+                all_h.push(matchHistory);
+
             }
         });
 
@@ -303,31 +301,109 @@ function getMatchCallback(id, maxId) {
                 var goalscore = getGoalscore(scores);
                 matchHistory.hresult = result;
                 matchHistory.hgoalscore = goalscore;
-            } else {
-                return true;
-            }
-            if (notFriendly_a.length != 33 && $(el).attr("data-lt") != "friend") {
-                notFriendly_a.push(matchHistory);
-            }
-            if (all30_a.length != 30) {
-                all30_a.push(matchHistory);
-            }
-            if (notFriendly_a.length == 33 && all30_a.length == 30) {
-                return false;
+
+                all_a.push(matchHistory);
+
             }
         });
 
-        calcBolool({
-            match,
-            all30_h,
-            all30_a,
-            notFriendly_h,
-            notFriendly_a
-        });
+        //俱乐部最近33场比赛，要去掉友谊赛
+        //国家队比赛保留友谊赛
+
+
+        var isCountryTeamA = false,
+            isCountryTeamH = false;
+        if (typeof g_team == "object") {
+            var team = g_team[match.awayId];
+            var pname;
+            if (team) {
+                pname = team.parentName;
+                isCountryTeamA = pname.indexOf("友谊赛") != -1 || pname.indexOf("国家") != -1 || pname.indexOf("奥运") != -1 || pname.indexOf("欧洲") != -1 || pname.indexOf("亚洲") != -1 ||
+                    pname.indexOf("亚运") != -1 || pname.indexOf("美洲") != -1 || pname.indexOf("非洲") != -1 || pname.indexOf("世欧预") != -1 || pname.indexOf("世亚预") != -1 || pname.indexOf("世南美预") != -1;
+            }
+            team = g_team[match.homeId];
+            if (team) {
+                pname = team.parentName;
+                isCountryTeamH = pname.indexOf("友谊赛") != -1 || pname.indexOf("国家") != -1 || pname.indexOf("奥运") != -1 || pname.indexOf("欧洲") != -1 || pname.indexOf("亚洲") != -1 ||
+                    pname.indexOf("亚运") != -1 || pname.indexOf("美洲") != -1 || pname.indexOf("非洲") != -1 || pname.indexOf("世欧预") != -1 || pname.indexOf("世亚预") != -1 || pname.indexOf("世南美预") != -1;
+            }
+        }
+
+
+        var boloolData = {};
+        var topN = 33;
+        var hbolool = calcBolool(all_h, topN, isCountryTeamH ? 1 : 0);
+        var abolool = calcBolool(all_a, topN, isCountryTeamA ? 1 : 0);
+        hbolool.strong = getStrong(hbolool.score, abolool.score);
+        abolool.strong = getStrong(abolool.score, hbolool.score);
+
+        var bolool = getBolool(hbolool, abolool);
+        bolool.topN = topN;
+        bolool.friendly = 0;
+        boloolData["top" + topN] = bolool;
+
+
+        topN = 30;
+        hbolool = calcBolool(all_h, topN, 1);
+        abolool = calcBolool(all_a, topN, 1);
+        hbolool.strong = getStrong(hbolool.score, abolool.score);
+        abolool.strong = getStrong(abolool.score, hbolool.score);
+        bolool = getBolool(hbolool, abolool);
+        bolool.topN = topN;
+        bolool.friendly = 1;
+        boloolData["top" + topN] = bolool;
+
+        topN = 6;
+        hbolool = calcBolool(all_h, topN, isCountryTeamH ? 1 : 0);
+        abolool = calcBolool(all_a, topN, isCountryTeamH ? 1 : 0);
+        hbolool.strong = getStrong(hbolool.score, abolool.score);
+        abolool.strong = getStrong(abolool.score, hbolool.score);
+        bolool = getBolool(hbolool, abolool);
+        bolool.topN = topN;
+        bolool.friendly = 1;
+        boloolData["top" + topN] = bolool;
+
+        topN = 3;
+        hbolool = calcBolool(all_h, topN, isCountryTeamH ? 1 : 0);
+        abolool = calcBolool(all_a, topN, isCountryTeamH ? 1 : 0);
+        hbolool.strong = getStrong(hbolool.score, abolool.score);
+        abolool.strong = getStrong(abolool.score, hbolool.score);
+        bolool = getBolool(hbolool, abolool);
+        bolool.topN = topN;
+        bolool.friendly = 1;
+        boloolData["top" + topN] = bolool;
+
         if (g_cache) {
-            g_cache.value += "," + JSON.stringify(match);
+            var tr = [];
+            tr.push('<tr id="m' + match.id + '">');
+            tr.push('<td><a href="http://www.okooo.com/soccer/league/' + match.leagueId + '/" target="_blank">' + match.leagueName + '</a></td>');
+            tr.push('<td><a href="http://www.okooo.com/soccer/league/' + match.leagueId + '/schedule/' + match.seasonId + '/" target="_blank">' + match.seasonName + '</a></td>');
+            tr.push('<td>' + match.round + '</td>');
+            tr.push('<td><a href="http://www.okooo.com/soccer/match/' + match.id + '/history/" target="_blank">' + match.playtime + '</a></td>');
+            tr.push('<td><a href="http://www.okooo.com/soccer/team/' + match.homeId + '/" target="_blank">' + match.homeName + '</a></td>');
+            tr.push('<td><a href="http://www.okooo.com/soccer/match/' + match.id + '/" target="_blank">' + (match.result != "未开" ? match.fullscore + '<br/>(' + match.halfscore + ")" : "") + '</a></td>');
+            tr.push('<td><a href="http://www.okooo.com/soccer/team/' + match.awayId + '/" target="_blank">' + match.awayName + '</a></td>');
+            tr.push('<td class="odds1_' + match.id + '">--</td><td class="odds1_' + match.id + '">--</td><td class="odds1_' + match.id + '">--</td><td class="odds2_' + match.id + '">--</td><td class="odds2_' + match.id + '">--</td><td class="odds2_' + match.id + '">--</td>');
+            tr.push('<td><span class="top33" title="' + boloolData["top33"].hresult + '">' + boloolData["top33"].hscore + '</span><span class="top30" title="' + boloolData["top30"].hresult + '">' + boloolData["top30"].hscore + '</span></td>');
+            tr.push('<td><span class="top33" title="' + boloolData["top33"].aresult + '">' + boloolData["top33"].ascore + '</span><span class="top30" title="' + boloolData["top30"].aresult + '">' + boloolData["top30"].ascore + '</span></td>');
+            tr.push('<td><span class="top33">' + boloolData["top33"].hsection + '</span><span class="top30">' + boloolData["top30"].hsection + '</span></td>');
+            tr.push('<td><span class="top33">' + boloolData["top33"].asection + '</span><span class="top30">' + boloolData["top30"].asection + '</span></td>');
+            tr.push('<td><span class="top3">' + boloolData["top3"].hresult + '</span><span class="top6">' + boloolData["top6"].hresult + '</span></td>');
+            tr.push('<td><span class="top3">' + boloolData["top3"].aresult + '</span><span class="top6">' + boloolData["top6"].aresult + '</span></td>');
+            tr.push('<td><span class="top3">' + boloolData["top3"].hstrong + '</span><span class="top6">' + boloolData["top6"].hstrong + '</span></td>');
+            tr.push('<td><span class="top3">' + boloolData["top3"].astrong + '</span><span class="top6">' + boloolData["top6"].astrong + '</span></td>');
+            tr.push('</tr>');
+            g_cache.append(tr.join(''));
         } else {
-            console.log(match);
+            var matchListHistory = {
+                "h": all_h,
+                "a": all_a
+            };
+            console.log({
+                match,
+                matchListHistory,
+                bolools
+            });
         }
 
         if (id < maxId) {
@@ -335,26 +411,80 @@ function getMatchCallback(id, maxId) {
             setTimeout(getMatch, (id % 10) * 100, id + 1, maxId);
         } else {
             console.log("当前id=" + id + ",已经到了最大id=" + maxId + "，结束程序");
-            $('#clickme').show();
+            finish();
         }
     }
 }
 
 function getMatch(id, maxId) {
-    console.log("正在获取id " + id + ",最大id是 " + maxId);
-    $.ajax({
-        type: "get",
-        url: "/soccer/match/" + id + "/history/",
-        beforeSend: function (xhr) {
-            xhr.overrideMimeType("text/plain; charset=gb2312");
-        },
-        success: getMatchCallback(id, maxId)
-    })
+    if (!g_id_start["_" + id]) {
+        g_id_start["_" + id] = 1;
+        console.log("正在获取id " + id + ",最大id是 " + maxId);
+        $.ajax({
+            type: "get",
+            url: "/soccer/match/" + id + "/history/",
+            beforeSend: function (xhr) {
+                xhr.overrideMimeType("text/plain; charset=gb2312");
+            },
+            success: getMatchCallback(id, maxId)
+        })
+    } else {
+        console.log("id " + id + " 已经获取过了 ");
+    }
+}
+
+function getOddsCallback(ids, startIndex, count, bettingTypeId) {
+    return function (d) {
+        json = JSON.parse(d);
+        for (var key in json) {
+            var arr = json[key];
+            $(".odds" + bettingTypeId + "_" + key).each((idx, el) => {
+                el.innerHTML = arr[idx];
+            });
+        }
+        var newStartIndex = startIndex + count;
+        if (ids.length > newStartIndex) {
+            setTimeout(getOdds, (newStartIndex % 9) * 100, ids, newStartIndex, count);
+        }
+    };
+}
+/**
+ * 获取比赛id的bet365的欧盘和亚盘 （初盘）
+ * @param {*} ids 数组
+ * @param {*} startIndex  开始的下标
+ * @param {*} count 一次获取多少个
+ */
+function getOdds(ids, startIndex, count) {
+    var matchIds = ids.slice(startIndex, startIndex + count);
+    var postData = {
+        bettingTypeId: 1,
+        providerId: 27,
+        matchIds: matchIds.join(",")
+    };
+    $.post("/ajax/?method=data.match.odds", postData, getOddsCallback(ids, startIndex, count, postData.bettingTypeId));
+    postData.bettingTypeId = 2;
+    $.post("/ajax/?method=data.match.odds", postData, getOddsCallback(ids, startIndex, count, postData.bettingTypeId));
+}
+
+function finish() {
+    if (typeof layer != "undefined") {
+        layer.closeAll();
+    }
+    $('#clickme').show();
+    $('#controlTop').show();
+    var ids = [];
+    for (var key in g_id_start) {
+        ids.push(key.substring(1));
+    }
+    getOdds(ids, 0, 100);
 }
 
 function doit() {
     var arr = $("#value").val().split(/[^\d]+/g);
     if (arr.length == 2) {
+        if (typeof layer != "undefined") {
+            layer.load(1);
+        }
         $('#clickme').hide();
         getMatch(parseInt(arr[0]), parseInt(arr[1]));
     } else {
@@ -362,21 +492,53 @@ function doit() {
     }
 }
 
+function ckchange(obj) {
+    var topN = obj.id.replace("show", "");
+    if (obj.checked) {
+        $("." + topN).show();
+    } else {
+        $("." + topN).hide();
+    }
+}
+
 function doHook() {
+
     if (typeof jQuery == "undefined" || jQuery.fn.jquery < '2.2.4') {
         if (!document.getElementById("hasJquery")) {
             console.log("开始注入标准库1");
             var sc = document.createElement("script");
             sc.src = 'https://cdn.bootcdn.net/ajax/libs/jquery/2.2.4/jquery.min.js';
             sc.id = "hasJquery";
-            document.body.append(sc);
+            document.head.append(sc);
         }
         console.log(new Date() + " 标准库1注入未完成，等待中....");
         setTimeout(doHook, 1000);
         return;
     }
     console.log("标准库1已经完成注入");
-    document.writeln("<h1>请输入开始的id和结束的id，用\"-\"减号分开，比如 1000-1001: <input id='value' value='' /></h1><h1><a href='javascript:doit()' id='clickme' style='color:red'>点我开始</a></h1><textarea id='g_cache' rows=50 cols=250></textarea>");
-    g_cache = document.getElementById("g_cache");
+    console.log("标准库1已经完成注入");
+    if (typeof layer == "undefined") {
+        if (!document.getElementById("hasLayer")) {
+            console.log("开始注入标准库2");
+            $("head").append('<script id="hasLayer" src="https://cdn.bootcdn.net/ajax/libs/layer/2.3/layer.js"></script>');
+        }
+        console.log(new Date() + " 标准库2注入未完成，等待中....");
+        setTimeout(doHook, 1000);
+        return;
+    }
+    console.log("标准库2已经完成注入");
+
+    var msg = "<link href=\"https://cdn.bootcdn.net/ajax/libs/layer/2.3/skin/layer.css\" rel=\"stylesheet\"><style>table td{text-align:center}.top33,.top3{padding:5px 5px;}.top30,.top6{display:none;color:green;padding:5px 5px;margin-right:10px;}</style><h1>请输入开始的id和结束的id，用\"-\"减号分开，比如 1000-1001: <input id='value' value='' /></h1>";
+    msg += "<h3 id='clickme'><a href='javascript:doit()' style='color:red'>点我开始</a></h3>"
+    msg += "<h2 id='controlTop' style='display:none;'><label for='showtop33'><input type=checkbox checked='true' id='showtop33' onchange='ckchange(this)'/>近33场</label><label for='showtop30'><input type=checkbox id='showtop30' onchange='ckchange(this)'/>近30场</label>"
+    msg += "<label for='showtop3'><input type=checkbox checked='true' id='showtop3' onchange='ckchange(this)'/>近3场</label><label for='showtop6'><input type=checkbox id='showtop6' onchange='ckchange(this)'/>近6场</label><h2>"
+    msg += "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"0\">";
+    msg += "<thead><tr><th rowspan=2>赛事</th><th rowspan=2>赛季</th><th rowspan=2>轮次</th><th rowspan=2>时间</th><th rowspan=2>主队</th><th rowspan=2>比分</th><th rowspan=2>客队</th>";
+    msg += "<th colspan=3>bet365欧盘</th><th colspan=3>bet365亚盘</th><th colspan=2>积分</th><th colspan=2>分区</th><th colspan=2>近n场</th><th colspan=2>强弱</th></tr>";
+    msg += "<tr><th>胜</th><th>平</th><th>负</th><th>主</th><th>盘口</th><th>客</th><th>主</th><th>客</th><th>主</th><th>客</th><th>主</th><th>客</th><th>主</th><th>客</th></tr></thead>";
+    msg += "<tbody id=g_cache>";
+    msg += "</tbody></table>"
+    document.writeln(msg);
+    g_cache = $("#g_cache");
 }
 doHook();
