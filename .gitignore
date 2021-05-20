@@ -2,3 +2,5 @@ node_modules
 logs
 src/logs
 bin
+cn
+jsData

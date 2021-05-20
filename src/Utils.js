@@ -227,6 +227,106 @@ function formatDate(date,fmt="yyyy-MM-dd hh:mm:ss"){
     return fmt;
 }
 
+
+function getLeague(arr, isCup) {
+    var league = {};
+    league.id = arr[0];
+    league.fullname_cn = arr[1];
+    league.fullname_tr = arr[2];
+    league.fullname_en = arr[3];
+    league.type = isCup ? '1' : '2';
+    if (isCup) {
+        league.name_cn = arr[4];
+        league.name_tr = arr[5];
+        league.name_en = arr[6];
+        league.color = arr[9];
+        league.logo = arr[8];
+        league.remark = arr[10];
+    } else {
+        league.name_cn = arr[7];
+        league.name_tr = arr[8];
+        league.name_en = arr[9];
+        league.color = arr[5];
+        league.logo = arr[6];
+        league.remark = arr[10];
+    }
+    return league;
+}
+
+
+function getFiles(filepath){
+    var fileArr=[];
+    function findFile(filepath){
+        let files = fs.readdirSync(filepath);
+        files.forEach(function (item, index) {
+            let fPath = path.join(filepath,item);
+            let stat = fs.statSync(fPath);
+            if(stat.isDirectory() === true && item.split("-")[0]>"2013") {//目录只要2014年之后的
+                findFile(fPath);
+            }
+            if (stat.isFile() === true ) { 
+                fileArr.push(fPath);
+            }
+        });
+    }
+    findFile(filepath);
+    return fileArr;
+}
+
+
+async function saveFile(url, txt) {
+    var filename = url.split("?")[0];
+    if (filename[0] == '/') {
+        filename = filename.substring(1);
+    }
+    if (mkdirSync(path.dirname(filename))) {
+        fs.writeFileSync(filename, txt);
+        console.log(filename + ",保存成功");
+    }
+}
+
+async function getFile(url) {
+    var filename = url.split("?")[0];
+    if (filename[0] == '/') {
+        filename = filename.substring(1);
+    }
+    if (fs.existsSync(filename)) {
+        var content = fs.readFileSync(filename).toString();
+        if (content.indexOf("DOCTYPE") != -1) {
+            fs.unlinkSync(filename);
+            return "";
+        }
+        console.log(url + ",成功从文件中获取");
+        return content;
+    } else {
+        return "";
+    }
+}
+
+
+async function getFromUrl(page, url) {
+    var content = await page.evaluate((url) => {
+        var content = "";
+        $.ajax({
+            url: url,
+            type: 'get',
+            async: false,
+            success: function (c) {
+                content = c.replace(/\w's/g, "`s");
+            }, error: function (err) {
+                console.log(JSON.stringify(err));
+                content = "-1";
+            }
+        });
+        return content;
+    }, url);
+    if (content != "") {
+        console.log(url + ",成功从网络中获取");
+        return content;
+    }
+    return "";
+}
+
 module.exports = {
     sleep,
     addCollectionButton,
@@ -238,6 +338,11 @@ module.exports = {
     parseNumber,
     formatDate,
     downloadFile,
-    writeToFile
+    writeToFile,
+    getLeague,
+    getFiles,
+    getFile,
+    getFromUrl,
+    saveFile
 };
 

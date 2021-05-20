@@ -1,8 +1,16 @@
 const mysql = require("mysql")
+// const dbConfig = {
+//     host: 'rdst1232w056y4nu19w8o.mysql.rds.aliyuncs.com',
+//     port: 3306,
+//     user: 'adm_zw',
+//     password: '876543219',
+//     database: 'bolool'
+// };
+
 const dbConfig = {
-    host: 'rdst1232w056y4nu19w8o.mysql.rds.aliyuncs.com',
+    host: '127.0.0.1',
     port: 3306,
-    user: 'adm_zw',
+    user: 'root',
     password: '876543219',
     database: 'bolool'
 };
