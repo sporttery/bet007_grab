@@ -131,9 +131,11 @@ async function loadJsDataByUrl(page) {
         }
 
         if (urlObj.seajs && urlObj.matchjs) {
-            var seaContent = await Utils.getFile(urlObj.seajs);
-            var matchContent = await Utils.getFile(urlObj.matchjs);
-            if (seaContent == "") {
+            // var seaContent = await Utils.getFile(urlObj.seajs);
+            // var matchContent = await Utils.getFile(urlObj.matchjs);
+            //头两个文件，每次都抓取最新的
+            var seaContent ,matchContent;
+            // if (seaContent == "") {
                 seaContent = await Utils.getFromUrl(page, urlObj.seajs);
                 retry = 1;
                 while (seaContent == "-1") {
@@ -144,8 +146,8 @@ async function loadJsDataByUrl(page) {
                 if (seaContent != "") {
                     await Utils.saveFile(urlObj.seajs, seaContent);
                 }
-            }
-            if (matchContent == "") {
+            // }
+            // if (matchContent == "") {
                 matchContent = await Utils.getFromUrl(page, urlObj.matchjs);
                 retry = 1;
                 while (matchContent == "-1") {
@@ -156,7 +158,7 @@ async function loadJsDataByUrl(page) {
                 if (matchContent != "") {
                     await Utils.saveFile(urlObj.matchjs, matchContent);
                 }
-            }
+            // }
             urlObj.seaContent = seaContent;
             urlObj.matchContent = matchContent;
         }
