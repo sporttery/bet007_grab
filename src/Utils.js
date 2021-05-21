@@ -241,15 +241,20 @@ function getLeague(arr, isCup) {
         league.name_en = arr[6];
         league.color = arr[9];
         league.logo = arr[8];
-        league.remark = arr[10];
     } else {
-        league.name_cn = arr[7];
-        league.name_tr = arr[8];
-        league.name_en = arr[9];
+        if(arr.length==13){
+            league.name_cn = arr[9];
+            league.name_tr = arr[10];
+            league.name_en = arr[11];
+        }else{
+            league.name_cn = arr[7];
+            league.name_tr = arr[8];
+            league.name_en = arr[9];
+        }
         league.color = arr[5];
         league.logo = arr[6];
-        league.remark = arr[10];
     }
+    league.remark = arr[arr.length-1];
     return league;
 }
 

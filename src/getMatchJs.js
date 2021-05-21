@@ -119,7 +119,7 @@ async function loadJsDataByUrl(page) {
         retry = 1;
         while (d == "-1") {
             console.log(urlObj.url + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-            await page.waitFor(10 * 1000 * retry);
+            await page.waitForTimeout(10 * 1000 * retry);
             d = await Utils.getFromUrl(page, urlObj.url);
         }
         if (d != "") {
@@ -140,7 +140,7 @@ async function loadJsDataByUrl(page) {
                 retry = 1;
                 while (seaContent == "-1") {
                     console.log(urlObj.seajs + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                    await page.waitFor(10 * 1000 * retry);
+                    await page.waitForTimeout(10 * 1000 * retry);
                     seaContent = await Utils.getFromUrl(page, urlObj.seajs);
                 }
                 if (seaContent != "") {
@@ -152,7 +152,7 @@ async function loadJsDataByUrl(page) {
                 retry = 1;
                 while (matchContent == "-1") {
                     console.log(urlObj.matchjs + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                    await page.waitFor(10 * 1000 * retry);
+                    await page.waitForTimeout(10 * 1000 * retry);
                     matchContent = await Utils.getFromUrl(page, urlObj.matchjs);
                 }
                 if (matchContent != "") {
@@ -207,7 +207,7 @@ async function loadJsDataByUrl(page) {
                     retry = 1;
                     while (content == "-1") {
                         console.log(c_url + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                        await page.waitFor(10 * 1000 * retry);
+                        await page.waitForTimeout(10 * 1000 * retry);
                         content = await Utils.getFromUrl(page, c_url);
                     }
                     if (content != "" && content.indexOf("DOCTYPE") == -1) {
@@ -239,11 +239,11 @@ async function loadJsDataByUrl(page) {
         if (urlObj.finish) {
             var ms = (urlObj.finish.getTime() - urlObj.start.getTime());
             console.log("准备抓取[ " + urlObj.name + " ] 完成，开始于" + urlObj.start + ",结束于" + urlObj.finish + ",共耗时 " + ms + " 毫秒");
-            await page.waitFor(500);
+            await page.waitForTimeout(500);
             loadJsDataByUrl(page);
         } else {
             g_url_idx--;
-            await page.waitFor(1000);
+            await page.waitForTimeout(1000);
             loadJsDataByUrl(page);
         }
     } else {
