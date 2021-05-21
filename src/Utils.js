@@ -227,6 +227,10 @@ function formatDate(date,fmt="yyyy-MM-dd hh:mm:ss"){
     return fmt;
 }
 
+function safeHtml(d) {
+    return d.replace(/[\r\n]/g, "").replace(/<head.+?<\/head>/g, "").replace(/<script.+?<\/script>/g, "").replace(/<img.+?>/g, "").replace(/<link.+?>/g, "").replace(/<style.+?<\/style>/g, "");
+}
+
 
 function getLeague(arr, isCup) {
     var league = {};
@@ -344,6 +348,7 @@ module.exports = {
     formatDate,
     downloadFile,
     writeToFile,
+    safeHtml,
     getLeague,
     getFiles,
     getFile,
