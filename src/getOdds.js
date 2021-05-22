@@ -70,7 +70,7 @@ async function saveOdds(content) {
     }
     await DBHelper.saveModelData(matchOddsData, "t_match_odds");
 }
-
+var g_browser;
 (async function () {
     Logger.info("程序开始运行");
     const Puppeteer = require('puppeteer');
@@ -270,5 +270,14 @@ async function saveOdds(content) {
                 fs.writeFileSync(file + ".odds.finished", Utils.formatDate(new Date()));
             }
         }
+        await exit(); 
     });
 })();
+
+async function exit() {
+    await g_browser.close();
+    await DBHelper.closePool();
+    Logger.info("程序运行完毕，进入结束");
+
+    await process.exit();
+}
