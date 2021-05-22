@@ -120,5 +120,7 @@ var seasonReg = /\d{4}(-\d{4})?/g;
         console.log(file + " 解析完成 ");
         fs.writeFileSync(file + ".finished", Utils.formatDate(new Date()));
     };
+    await DBHelper.closePool();
+    console.log("程序结束，正常退出");
 })();
 
