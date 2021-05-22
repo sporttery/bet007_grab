@@ -176,7 +176,7 @@ async function saveOdds(content) {
 
             while (round <= maxRound) {
                 var url = "/League/LeagueOddsAjax?sclassId=" + leagueId + "&subSclassId=" + subId + "&matchSeason=" + season + "&round=" + round;
-                var oddsFile = "odds/" + season + "/" + leagueId + "_" + subId + "_" + round + ".js";
+                var oddsFile = "odds/" + season + "/"+(isCup?"c":"s")+ leagueId + "_" + subId + "_" + round + ".js";
                 if (fs.existsSync(oddsFile)) {
                     round ++;
                     continue;
