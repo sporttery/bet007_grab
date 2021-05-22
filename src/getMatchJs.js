@@ -9,21 +9,86 @@ var g_browser, g_url_idx = 0;
     let urls = Config.urls;
     // Logger.info(urls);
     Logger.info("程序开始运行");
-    
+
     await Puppeteer.launch({
         headless: true,
         defaultViewport: {
             width: 1920,
             height: 966
         },
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        ignoreHTTPSErrors: true,
         //ignoreDefaultArgs: ["--enable-automation"]
-        devtools: true
+        // devtools: true
 
     }).then(async browser => {
         g_browser = browser;
         let pages = await browser.pages();
         let page = pages[0];
+        await page.setUserAgent(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36"
+        );
+        await page.evaluateOnNewDocument(() => {
+            Object.defineProperty(navigator, "plugins", {
+                get: () => [
+                    {
+                        0: {
+                            type: "application/x-google-chrome-pdf",
+                            suffixes: "pdf",
+                            description: "Portable Document Format",
+                            enabledPlugin: Plugin,
+                        },
+                        description: "Portable Document Format",
+                        filename: "internal-pdf-viewer",
+                        length: 1,
+                        name: "Chrome PDF Plugin",
+                    },
+                    {
+                        0: {
+                            type: "application/pdf",
+                            suffixes: "pdf",
+                            description: "",
+                            enabledPlugin: Plugin,
+                        },
+                        description: "",
+                        filename: "mhjfbmdgcfjbbpaeojofohoefgiehjai",
+                        length: 1,
+                        name: "Chrome PDF Viewer",
+                    },
+                    {
+                        0: {
+                            type: "application/x-nacl",
+                            suffixes: "",
+                            description: "Native Client Executable",
+                            enabledPlugin: Plugin,
+                        },
+                        1: {
+                            type: "application/x-pnacl",
+                            suffixes: "",
+                            description: "Portable Native Client Executable",
+                            enabledPlugin: Plugin,
+                        },
+                        description: "",
+                        filename: "internal-nacl-plugin",
+                        length: 2,
+                        name: "Native Client",
+                    },
+                ],
+            });
 
+            window.chrome = {
+                runtime: {},
+                loadTimes: function () { },
+                csi: function () { },
+                app: {},
+            };
+            Object.defineProperty(navigator, "webdriver", {
+                get: () => false,
+            });
+            Object.defineProperty(navigator, "platform", {
+                get: () => "Win32",
+            });
+        });
         // await page.setRequestInterception(true);
         // page.on('request', interceptedRequest => {
         //     let currentUrl = interceptedRequest.url();
@@ -134,30 +199,30 @@ async function loadJsDataByUrl(page) {
             // var seaContent = await Utils.getFile(urlObj.seajs);
             // var matchContent = await Utils.getFile(urlObj.matchjs);
             //头两个文件，每次都抓取最新的
-            var seaContent ,matchContent;
+            var seaContent, matchContent;
             // if (seaContent == "") {
+            seaContent = await Utils.getFromUrl(page, urlObj.seajs);
+            retry = 1;
+            while (seaContent == "-1") {
+                console.log(urlObj.seajs + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
+                await page.waitFor(10 * 1000 * retry);
                 seaContent = await Utils.getFromUrl(page, urlObj.seajs);
-                retry = 1;
-                while (seaContent == "-1") {
-                    console.log(urlObj.seajs + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                    await page.waitFor(10 * 1000 * retry);
-                    seaContent = await Utils.getFromUrl(page, urlObj.seajs);
-                }
-                if (seaContent != "") {
-                    await Utils.saveFile(urlObj.seajs, seaContent);
-                }
+            }
+            if (seaContent != "") {
+                await Utils.saveFile(urlObj.seajs, seaContent);
+            }
             // }
             // if (matchContent == "") {
+            matchContent = await Utils.getFromUrl(page, urlObj.matchjs);
+            retry = 1;
+            while (matchContent == "-1") {
+                console.log(urlObj.matchjs + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
+                await page.waitFor(10 * 1000 * retry);
                 matchContent = await Utils.getFromUrl(page, urlObj.matchjs);
-                retry = 1;
-                while (matchContent == "-1") {
-                    console.log(urlObj.matchjs + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                    await page.waitFor(10 * 1000 * retry);
-                    matchContent = await Utils.getFromUrl(page, urlObj.matchjs);
-                }
-                if (matchContent != "") {
-                    await Utils.saveFile(urlObj.matchjs, matchContent);
-                }
+            }
+            if (matchContent != "") {
+                await Utils.saveFile(urlObj.matchjs, matchContent);
+            }
             // }
             urlObj.seaContent = seaContent;
             urlObj.matchContent = matchContent;
@@ -176,7 +241,7 @@ async function loadJsDataByUrl(page) {
             var season;
             for (var i = 0; i < arrSeason.length && i <= 6; i++) {
                 season = arrSeason[i];
-                if(season.split("-")[0]  < Config.maxSeason){
+                if (season.split("-")[0] < Config.maxSeason) {
                     continue;
                 }
                 var seasonMatchUrl;

@@ -80,13 +80,80 @@ async function saveOdds(content) {
             width: 1920,
             height: 966
         },
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        ignoreHTTPSErrors: true,
         //ignoreDefaultArgs: ["--enable-automation"]
-        devtools: true
+        // devtools: true
 
     }).then(async browser => {
         g_browser = browser;
         let pages = await browser.pages();
         let page = pages[0];
+        await page.setUserAgent(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36"
+        );
+        await page.evaluateOnNewDocument(() => {
+            Object.defineProperty(navigator, "plugins", {
+                get: () => [
+                    {
+                        0: {
+                            type: "application/x-google-chrome-pdf",
+                            suffixes: "pdf",
+                            description: "Portable Document Format",
+                            enabledPlugin: Plugin,
+                        },
+                        description: "Portable Document Format",
+                        filename: "internal-pdf-viewer",
+                        length: 1,
+                        name: "Chrome PDF Plugin",
+                    },
+                    {
+                        0: {
+                            type: "application/pdf",
+                            suffixes: "pdf",
+                            description: "",
+                            enabledPlugin: Plugin,
+                        },
+                        description: "",
+                        filename: "mhjfbmdgcfjbbpaeojofohoefgiehjai",
+                        length: 1,
+                        name: "Chrome PDF Viewer",
+                    },
+                    {
+                        0: {
+                            type: "application/x-nacl",
+                            suffixes: "",
+                            description: "Native Client Executable",
+                            enabledPlugin: Plugin,
+                        },
+                        1: {
+                            type: "application/x-pnacl",
+                            suffixes: "",
+                            description: "Portable Native Client Executable",
+                            enabledPlugin: Plugin,
+                        },
+                        description: "",
+                        filename: "internal-nacl-plugin",
+                        length: 2,
+                        name: "Native Client",
+                    },
+                ],
+            });
+
+            window.chrome = {
+                runtime: {},
+                loadTimes: function () { },
+                csi: function () { },
+                app: {},
+            };
+            Object.defineProperty(navigator, "webdriver", {
+                get: () => false,
+            });
+            Object.defineProperty(navigator, "platform", {
+                get: () => "Win32",
+            });
+        });
+
         await page.on('console', msg => console.log('PAGE LOG:', msg.text()));
 
         Logger.info("正在打开浏览器，进入球探主页");
@@ -142,7 +209,7 @@ async function saveOdds(content) {
             var nowTime = new Date();
             var sixDays = 1000 * 60 * 60 * 24 * 6;
             //如果比赛都在一周之后，就不要获取赔率了。未来比赛，未来再获取
-           
+
             if (!isCup) {
                 if (typeof arrSubLeague != "undefined") {
                     for (var j = 0; j < arrSubLeague.length; j++) {
@@ -158,8 +225,8 @@ async function saveOdds(content) {
                 }
             } else {
                 var n = false;
-                var matchData = Utils.getMatchData(jh,season,isCup,{},{},{});
-                for(var key in matchData){
+                var matchData = Utils.getMatchData(jh, season, isCup, {}, {}, {});
+                for (var key in matchData) {
                     var match = matchData[key];
                     var nTimeArr = match.playtime.split(/[-: ]/);
                     var playtime = new Date(nTimeArr[0], parseInt(nTimeArr[1]) - 1, nTimeArr[2], nTimeArr[3], nTimeArr[4], 0);
@@ -168,7 +235,7 @@ async function saveOdds(content) {
                         break;
                     }
                 }
-               
+
                 if (!n) {
                     isFinish = true;
                 }
@@ -176,9 +243,9 @@ async function saveOdds(content) {
 
             while (round <= maxRound) {
                 var url = "/League/LeagueOddsAjax?sclassId=" + leagueId + "&subSclassId=" + subId + "&matchSeason=" + season + "&round=" + round;
-                var oddsFile = "odds/" + season + "/"+(isCup?"c":"s")+ leagueId + "_" + subId + "_" + round + ".js";
+                var oddsFile = "odds/" + season + "/" + (isCup ? "c" : "s") + leagueId + "_" + subId + "_" + round + ".js";
                 if (fs.existsSync(oddsFile)) {
-                    round ++;
+                    round++;
                     continue;
                 }
                 var content = await Utils.getFromUrl(page, url);
@@ -190,7 +257,7 @@ async function saveOdds(content) {
                 }
                 if (content != "" && content.indexOf("DOCTYPE") == -1) {
                     await saveOdds(content);
-                    if(!isCup){
+                    if (!isCup) {
                         await Utils.writeToFile(content, oddsFile);
                     }
                 }
