@@ -7,6 +7,7 @@ const { Base64 } = require('js-base64');
 const logger = require('./Logger');
 const assert = require('assert');
 var request = require("request");
+const Config = require('./Config');
 
 /**
   * 异步延迟
@@ -348,7 +349,7 @@ function getFiles(filepath) {
         files.forEach(function (item, index) {
             let fPath = path.join(filepath, item);
             let stat = fs.statSync(fPath);
-            if (stat.isDirectory() === true && item.split("-")[0] > "2013") {//目录只要2014年之后的
+            if (stat.isDirectory() === true && item.split("-")[0] >= Config.maxSeason) {//目录只要2018年之后的
                 findFile(fPath);
             }
             if (stat.isFile() === true && item.indexOf(".finished") == -1) {

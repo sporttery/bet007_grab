@@ -173,9 +173,12 @@ async function loadJsDataByUrl(page) {
             var league = Utils.getLeague(isCup ? arrCup : arrLeague, isCup);
             var allJsUrl = {};
             allJsUrl[urlObj.matchjs.split("?")[0]] = urlObj.matchjs;
-
+            var season;
             for (var i = 0; i < arrSeason.length && i <= 6; i++) {
-                var season = arrSeason[i];
+                season = arrSeason[i];
+                if(season.split("-")[0]  < Config.maxSeason){
+                    continue;
+                }
                 var seasonMatchUrl;
                 if (isCup) {
                     seasonMatchUrl = "/jsData/matchResult/" + season + "/c" + league.id + ".js"
