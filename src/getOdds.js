@@ -252,7 +252,7 @@ async function saveOdds(content) {
                 retry = 1;
                 while (content == "-1") {
                     console.log(url + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                    await page.waitFor(10 * 1000 * retry);
+                    await page.waitForTimeout(10 * 1000 * retry);
                     content = await Utils.getFromUrl(page, url);
                 }
                 if (content != "" && content.indexOf("DOCTYPE") == -1) {

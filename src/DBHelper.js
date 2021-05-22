@@ -73,7 +73,7 @@ async function saveModel(model, tableName = "t_match") {
         sql += "ON DUPLICATE KEY UPDATE version=version+1";
     }
     Logger.info("执行sql:" + sql.substring(0,200));
-    Logger.info("参数 ：" + params.substring(0,200));
+    Logger.info("参数个数 ：" + params.length);
     let results = await query(sql, params);
     Logger.info("成功插入条数：" + JSON.stringify(results));
 }
@@ -112,7 +112,7 @@ async function saveModelArr(modelArr, tableName = "t_match") {
         sql += "ON DUPLICATE KEY UPDATE  version=version+1";
     }
     Logger.info("执行sql:" + sql.substring(0,200));
-    Logger.info("参数 ：" + params.substring(0,200));
+    Logger.info("参数个数 ：" + params.length);
     let results = await query(sql, params);
     Logger.info("成功插入条数：" + JSON.stringify(results));
 }
