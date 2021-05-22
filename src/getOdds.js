@@ -75,7 +75,7 @@ async function saveOdds(content) {
     Logger.info("程序开始运行");
     const Puppeteer = require('puppeteer');
     await Puppeteer.launch({
-        headless: false,
+        headless: true,
         defaultViewport: {
             width: 1920,
             height: 966

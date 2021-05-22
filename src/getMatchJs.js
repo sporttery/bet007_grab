@@ -11,7 +11,7 @@ var g_browser, g_url_idx = 0;
     Logger.info("程序开始运行");
     
     await Puppeteer.launch({
-        headless: false,
+        headless: true,
         defaultViewport: {
             width: 1920,
             height: 966
