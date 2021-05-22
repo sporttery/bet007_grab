@@ -7,39 +7,68 @@ var seasonReg = /\d{4}(-\d{4})?/g;
 var leagueIdReg = /\d+(_\d+)?.js$/g;
 var cupReg = /c\d+.js$/g
 var jh = {};
+var companyName = {
+    "8": "Bet365", "281": "Bet365",
+    "3": "Crown", "545": "Crown",
+    "31": "利记", "474": "利记",
+    "17": "明陞", "517": "明陞",
+    "12": "易胜博", "90": "易胜博",
+    "1": "澳门", "80": "澳门",
+    "35": "盈禾", "659": "盈禾",
+    "4": "立博", "82": "立博",
+    "14": "韦德", "81": "韦德",
+    "23": "金宝博"
+};
 
-
-async function saveOdds(content){
-    var oddsData={};
+var companyNameId = {
+    "Bet365": 8,
+    "Crown": 3,
+    "利记": 31,
+    "明陞": 17,
+    "易胜博": 12,
+    "澳门": 1,
+    "盈禾": 35,
+    "立博": 4,
+    "韦德": 14,
+    "金宝博": 23
+};
+async function saveOdds(content) {
+    var oddsData = {};
     eval(content);
-    var matchOddsData={};
-    for(var key in oddsData){
-        var type = key.substring(0,1);
+    var matchOddsData = {};
+
+    for (var key in oddsData) {
+        var type = key.substring(0, 1);
         var id = key.substring(2);
         var oddsArr = oddsData[key];
-        oddsArr.forEach(o=>{
-            var companyId = o[0];
-            var odds = matchOddsData[id+"_"+companyId];
-            if(!odds){
-                odds = {matchId:id,companyId:o[0],s:0,p:0,f:0,h:0,a:0,pan:'',da:0,xiao:0,dxpan:''};
-                matchOddsData[id+"_"+companyId] = odds;
+        for (var j = 0; j < oddsArr.length; j++) {
+            var o = oddsArr[j];
+            var company = companyName[o[0]];
+            if (!company) {
+                continue;
             }
-            if(type== 'O'){
+            var idkey = id + "_" + companyNameId[company];
+            var odds = matchOddsData[idkey];
+            if (!odds) {
+                odds = { id: idkey, matchId: id, company: company, s: 0, p: 0, f: 0, h: 0, a: 0, pan: '', da: 0, xiao: 0, dxpan: '' };
+                matchOddsData[idkey] = odds;
+            }
+            if (type == 'O') {
                 odds.s = o[1];
                 odds.p = o[2];
                 odds.f = o[3];
-            }else if(type == "L"){
+            } else if (type == "L") {
                 odds.h = o[1];
                 odds.pan = o[2];
                 odds.a = o[3];
-            }else if(type == "T"){
+            } else if (type == "T") {
                 odds.da = o[1];
                 odds.dxpan = o[2];
                 odds.xiao = o[3];
             }
-        });
-        
+        };
     }
+    await DBHelper.saveModelData(matchOddsData, "t_match_odds");
 }
 
 (async function () {
@@ -86,7 +115,7 @@ async function saveOdds(content){
         var files = Utils.getFiles(pathName);
         for (var i = 0; i < files.length; i++) {
             var file = files[i];
-            if (fs.existsSync(file + ".odds")) {
+            if (fs.existsSync(file + ".odds.finished")) {
                 continue;
             }
             console.log("正在获取赔率 " + file);
@@ -105,10 +134,15 @@ async function saveOdds(content){
             var isCup = file.match(cupReg);
             var round = 1, maxRound = 1;
             var isFinish = false;
+            jh = {};
             var content = await Utils.getFile(file);
+            console.log(content.length);
             eval(content);
+
             var nowTime = new Date();
             var sixDays = 1000 * 60 * 60 * 24 * 6;
+            //如果比赛都在一周之后，就不要获取赔率了。未来比赛，未来再获取
+           
             if (!isCup) {
                 if (typeof arrSubLeague != "undefined") {
                     for (var j = 0; j < arrSubLeague.length; j++) {
@@ -120,21 +154,21 @@ async function saveOdds(content){
                     }
                 } else {
                     maxRound = arrLeague[8];
-                    isFinish = tmpArr[7] == tmpArr[8];
+                    isFinish = arrLeague[7] == arrLeague[8];
                 }
             } else {
                 var n = false;
-                for (var key in jh) {
-                    if (key[0] == "G") {
-                        var matchArr = jh[key];
-                        var nTimeArr = matchArr[3].split(/[-: ]/);
-                        var playtime = new Date(nTimeArr[0], parseInt(nTimeArr[1]) - 1, nTimeArr[2], nTimeArr[3], nTimeArr[4], 0);
-                        if (playtime.getTime() - nowTime.getTime() > sixDays) {
-                            n = true;
-                            break;
-                        }
+                var matchData = Utils.getMatchData(jh,season,isCup,{},{},{});
+                for(var key in matchData){
+                    var match = matchData[key];
+                    var nTimeArr = match.playtime.split(/[-: ]/);
+                    var playtime = new Date(nTimeArr[0], parseInt(nTimeArr[1]) - 1, nTimeArr[2], nTimeArr[3], nTimeArr[4], 0);
+                    if (playtime.getTime() - nowTime.getTime() > sixDays) {
+                        n = true;
+                        break;
                     }
                 }
+               
                 if (!n) {
                     isFinish = true;
                 }
@@ -144,18 +178,21 @@ async function saveOdds(content){
                 var url = "/League/LeagueOddsAjax?sclassId=" + leagueId + "&subSclassId=" + subId + "&matchSeason=" + season + "&round=" + round;
                 var oddsFile = "odds/" + season + "/" + leagueId + "_" + subId + "_" + round + ".js";
                 if (fs.existsSync(oddsFile)) {
+                    round ++;
                     continue;
                 }
                 var content = await Utils.getFromUrl(page, url);
                 retry = 1;
                 while (content == "-1") {
                     console.log(url + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                    await page.waitForTimeout(10 * 1000 * retry);
+                    await page.waitFor(10 * 1000 * retry);
                     content = await Utils.getFromUrl(page, url);
                 }
                 if (content != "" && content.indexOf("DOCTYPE") == -1) {
                     await saveOdds(content);
-                    await Utils.writeToFile(content, oddsFile);
+                    if(!isCup){
+                        await Utils.writeToFile(content, oddsFile);
+                    }
                 }
 
                 round++;
@@ -163,7 +200,7 @@ async function saveOdds(content){
 
             console.log(file + " 获取赔率完成 ");
             if (isFinish) {
-                fs.writeFileSync(file + ".odds", Utils.formatDate(new Date()));
+                fs.writeFileSync(file + ".odds.finished", Utils.formatDate(new Date()));
             }
         }
     });

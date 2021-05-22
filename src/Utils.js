@@ -90,7 +90,7 @@ async function downloadList(imgList, dir) {
 
 }
 
-async function downloadFile(url,filePath){
+async function downloadFile(url, filePath) {
     if (url.indexOf('//') === 0) {
         url = 'http:' + url;
     }
@@ -211,7 +211,7 @@ function parseNumber(str) {
     }
 }
 
-function formatDate(date,fmt="yyyy-MM-dd hh:mm:ss"){
+function formatDate(date, fmt = "yyyy-MM-dd hh:mm:ss") {
     var o = {
         "M+": date.getMonth() + 1, //月份 
         "d+": date.getDate(), //日 
@@ -223,7 +223,7 @@ function formatDate(date,fmt="yyyy-MM-dd hh:mm:ss"){
     };
     if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
     for (var k in o)
-    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;
 }
 
@@ -246,11 +246,11 @@ function getLeague(arr, isCup) {
         league.color = arr[9];
         league.logo = arr[8];
     } else {
-        if(arr.length==13){
+        if (arr.length == 13) {
             league.name_cn = arr[9];
             league.name_tr = arr[10];
             league.name_en = arr[11];
-        }else{
+        } else {
             league.name_cn = arr[7];
             league.name_tr = arr[8];
             league.name_en = arr[9];
@@ -258,22 +258,100 @@ function getLeague(arr, isCup) {
         league.color = arr[5];
         league.logo = arr[6];
     }
-    league.remark = arr[arr.length-1];
+    league.remark = arr[arr.length - 1];
     return league;
 }
 
+function getMatchData(jh, selectSeason, isCup, g_roundNameMap, g_teamNameMap, g_leagueNameMap) {
+    var matchData = {};
+    for (var key in jh) {
+        if (key[0] != "G" && key[0] != "R") {
+            continue;
+        }
+        var matchArr = jh[key];
+        var league_type = 2;
+        var round = 0;
+        if (!isCup) {
+            league_type = 1;
+            round = key.split("_")[1];
+        } else {
+            round = g_roundNameMap[key];
+            var nArr = [];
+            matchArr.forEach(m => {
+                if (typeof m[4] == "object") {
+                    nArr.push(m[4]);
+                    nArr.push(m[5]);
+                } else {
+                    nArr.push(m);
+                }
+            });
+            matchArr = nArr;
+        }
 
-function getFiles(filepath){
-    var fileArr=[];
-    function findFile(filepath){
+        matchArr.forEach(m => {
+            var match = {};
+            if (typeof m == "object" && m.length && m.length > 8) {
+                match.id = m[0];
+                match.playtime = m[3];
+                match.homeId = m[4];
+                match.awayId = m[5];
+                match.homeName = g_teamNameMap["_" + match.homeId] || "";
+                match.awayName = g_teamNameMap["_" + match.awayId] || "";
+                match.fullscore = m[6] || "";
+                match.halfscore = m[7] || "";
+                match.homeRank = m[8];
+                match.awayRank = m[9];
+                match.status = m[2];// -1 比赛结束 0 比赛未开始 -10 比赛取消 -14 比赛推迟
+                match.leagueId = m[1];
+                match.leagueName = g_leagueNameMap["_" + match.leagueId];
+                match.leagueType = league_type;
+                match.season = selectSeason;
+                match.round = round;
+                // console.log(match);
+                if (isNaN(match.playtime)) {
+                    let scores = match.fullscore.split(/[:-]/g);
+                    if (scores.length == 2) {
+                        h_score = scores[0];
+                        a_score = scores[1];
+                        if (h_score > a_score) {
+                            match.result = "胜";
+                        } else if (h_score < a_score) {
+                            match.result = '负';
+                        } else {
+                            match.result = "平";
+                        }
+                    } else {
+                        if (match.fullscore.indexOf("取消") != -1) {
+                            match.result = "取消";
+                            match.halfscore = "取消";
+                            match.fullscore = "取消";
+                        } else if (match.fullscore.indexOf("推迟") != -1) {
+                            match.result = "推迟";
+                            match.halfscore = "推迟";
+                            match.fullscore = "推迟";
+                        } else {
+                            match.result = "";
+                        }
+                    }
+                    matchData[match.id] = match;
+                }
+            }
+        });
+    }
+    return matchData;
+}
+
+function getFiles(filepath) {
+    var fileArr = [];
+    function findFile(filepath) {
         let files = fs.readdirSync(filepath);
         files.forEach(function (item, index) {
-            let fPath = path.join(filepath,item);
+            let fPath = path.join(filepath, item);
             let stat = fs.statSync(fPath);
-            if(stat.isDirectory() === true && item.split("-")[0]>"2013") {//目录只要2014年之后的
+            if (stat.isDirectory() === true && item.split("-")[0] > "2013") {//目录只要2014年之后的
                 findFile(fPath);
             }
-            if (stat.isFile() === true ) { 
+            if (stat.isFile() === true && item.indexOf(".finished") == -1) {
                 fileArr.push(fPath);
             }
         });
@@ -336,6 +414,8 @@ async function getFromUrl(page, url) {
     return "";
 }
 
+
+
 module.exports = {
     sleep,
     addCollectionButton,
@@ -350,6 +430,7 @@ module.exports = {
     writeToFile,
     safeHtml,
     getLeague,
+    getMatchData,
     getFiles,
     getFile,
     getFromUrl,

@@ -1,5 +1,5 @@
 const mysql = require("mysql")
-const logger = require('./Logger');
+const Logger = require('./Logger');
 // const dbConfig = {
 //     host: 'rdst1232w056y4nu19w8o.mysql.rds.aliyuncs.com',
 //     port: 3306,
@@ -74,7 +74,7 @@ async function saveModel(model, tableName = "t_match") {
     }
     Logger.info("执行sql:" + sql);
     Logger.info("参数 ：" + params);
-    let results = await DBHelper.query(sql, params);
+    let results = await query(sql, params);
     Logger.info("成功插入条数：" + JSON.stringify(results));
 }
 
@@ -113,7 +113,7 @@ async function saveModelArr(modelArr, tableName = "t_match") {
     }
     Logger.info("执行sql:" + sql);
     Logger.info("参数 ：" + params);
-    let results = await DBHelper.query(sql, params);
+    let results = await query(sql, params);
     Logger.info("成功插入条数：" + JSON.stringify(results));
 }
 
@@ -130,7 +130,7 @@ async function saveModelData(modelData, tableName, privateKey = "id") {
         sql += "('" + ids.join("','") + "')";
     }
 
-    let vals = await DBHelper.query(sql);
+    let vals = await query(sql);
     if (typeof vals == "object") {
         vals.forEach(t => {
             delete modelData[t.id];

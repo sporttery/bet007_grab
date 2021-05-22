@@ -69,84 +69,12 @@ async function saveSubLeague(arrSubLeague, leagueId) {
     }
 }
 
+
+
 //[id,联赛id,状态（-1 已经结束 0 未开始），比赛时间，主队id，客队id，全场比分，半场比分，主队排名，客队排名，,,,,,,,,主队红牌(下标 18)，客队红牌(下标 19),场上说明(下标 20),,,]
 async function saveMatch(jh, selectSeason, isCup) {
-    for (var key in jh) {
-        if (key[0] != "G" && key[0] != "R") {
-            continue;
-        }
-        var matchArr = jh[key];
-        var league_type = 2;
-        var round = 0;
-        if (!isCup) {
-            league_type = 1;
-            round = key.split("_")[1];
-        } else {
-            round = g_roundNameMap[key];
-            var nArr = [];
-            matchArr.forEach(m => {
-                if (typeof m[4] == "object") {
-                    nArr.push(m[4]);
-                    nArr.push(m[5]);
-                } else {
-                    nArr.push(m);
-                }
-            });
-            matchArr = nArr;
-        }
-
-        matchData = {};
-        matchArr.forEach(m => {
-            var match = {};
-            if (typeof m == "object" && m.length && m.length > 8) {
-                match.id = m[0];
-                match.playtime = m[3];
-                match.homeId = m[4];
-                match.awayId = m[5];
-                match.homeName = g_teamNameMap["_" + match.homeId] || "";
-                match.awayName = g_teamNameMap["_" + match.awayId] || "";
-                match.fullscore = m[6] || "";
-                match.halfscore = m[7] || "";
-                match.homeRank = m[8];
-                match.awayRank = m[9];
-                match.status = m[2];// -1 比赛结束 0 比赛未开始 -10 比赛取消 -14 比赛推迟
-                match.leagueId = m[1];
-                match.leagueName = g_leagueNameMap["_" + match.leagueId];
-                match.leagueType = league_type;
-                match.season = selectSeason;
-                match.round = round;
-                // console.log(match);
-                if (match.homeName && match.awayName && match.leagueName && isNaN(match.playtime)) {
-                    let scores = match.fullscore.split(/[:-]/g);
-                    if (scores.length == 2) {
-                        h_score = scores[0];
-                        a_score = scores[1];
-                        if (h_score > a_score) {
-                            match.result = "胜";
-                        } else if (h_score < a_score) {
-                            match.result = '负';
-                        } else {
-                            match.result = "平";
-                        }
-                    } else {
-                        if (match.fullscore.indexOf("取消") != -1) {
-                            match.result = "取消";
-                            match.halfscore = "取消";
-                            match.fullscore = "取消";
-                        } else if (match.fullscore.indexOf("推迟") != -1) {
-                            match.result = "推迟";
-                            match.halfscore = "推迟";
-                            match.fullscore = "推迟";
-                        } else {
-                            match.result = "";
-                        }
-                    }
-                    matchData[match.id] = match;
-                }
-            }
-        });
-        await DBHelper.saveModelData(matchData, "t_match");
-    }
+    var matchData = Utils.getMatchData(jh, selectSeason, isCup, g_roundNameMap, g_teamNameMap, g_leagueNameMap);
+    await DBHelper.saveModelData(matchData, "t_match");
 }
 var jh = {};
 function cleanCache() {
@@ -158,7 +86,7 @@ function cleanCache() {
     jh = {};
 }
 
-var seasonReg=/\d{4}(-\d{4})?/g;
+var seasonReg = /\d{4}(-\d{4})?/g;
 
 (async function () {
     // var pathName = path.resolve(__dirname,"jsData/matchResult");
