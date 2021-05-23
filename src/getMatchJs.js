@@ -175,6 +175,7 @@ function getJsDataUrl(d) {
     exit();
     return [];
 }
+var seasonReg = /\d{4}(-\d{4})?/g;
 async function loadJsDataByUrl(page) {
     var urlObj = Config.urls[g_url_idx++];
     if (urlObj) {
@@ -269,6 +270,10 @@ async function loadJsDataByUrl(page) {
             var arrLen = arr.length;
             for (var j = 0; j < arrLen; j++) {
                 var c_url = arr[j];
+                var season = c_url.match(seasonReg)[0];
+                if (season.split("-")[0] < Config.maxSeason) {
+                    continue;
+                }
                 var content = await Utils.getFile(c_url);
                 if (content == "") {
                     content = await Utils.getFromUrl(page, c_url);
