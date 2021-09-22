@@ -1,0 +1,87 @@
+body
+{
+	font-size: 12px;
+	font-family: "微软雅黑" ，Arial,Helvetica,sans-serif;
+	color: #333;
+}
+body, ul, li
+{
+	margin: 0;
+	padding: 0;
+}
+.divtitle
+{
+	width: 96%;
+	margin: 0 auto;
+	display: block;
+	padding: 10px 0;
+	line-height: 20px;
+}
+.tytable
+{
+	border: 1px solid #d9d9d9;
+	border-bottom: none;
+	border-right: none;
+	line-height: 20px;
+}
+.trtdbrown
+{
+	height: 24px;
+}
+.trtdbrown td
+{
+	border-bottom: 1px solid #d9d9d9;
+	background: #FAE2B2;
+	color: #725B56;
+	border-right: 1px solid #d9d9d9;
+}
+.trtdwhite
+{
+	height: 36px;
+}
+.trtdwhite td
+{
+	border-bottom: 1px solid #d9d9d9;
+	border-right: 1px solid #d9d9d9;
+}
+.tyred
+{
+	color: #F82950;
+}
+.trtdwhite38
+{
+	height: 20px;
+}
+.trtdwhite38 td
+{
+	border-bottom: 1px solid #d9d9d9;
+	border-right: 1px solid #d9d9d9;
+}
+.tdleft_10px_txt
+{
+	padding-left: 3px;
+	text-align: left;
+}
+.divtitle p
+{
+	text-indent: 2em;
+	margin: 0;
+	padding-top: 8px;
+	line-height: 22px;
+}
+.redchar
+{
+	color: #ff0000;
+}
+.titlechar14
+{
+	font-weight: bold;
+	font-size: 14px;
+	color: #2A6DA6;
+}
+.tdleft8px
+{
+	padding-left: 8px;
+	text-align: left;
+	line-height: 22px;
+}

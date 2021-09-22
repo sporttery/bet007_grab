@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1, minimal-ui' name='viewport' /><meta content='yes' name='apple-mobile-web-app-capable' /><meta content='black' name='apple-mobile-web-app-status-bar-style' /><meta content='telephone=no' name='format-detection' /><script src='/Trade/Js/jquery.js?2019'></script><link rel='stylesheet' href='/Trade/Css/main2017.css?2019' /><link href="/Images/touch-icon.png" rel="apple-touch-icon-precomposed" /> <title>
+	大乐透
+</title>
+     <script type="text/javascript">
+         var LotteryType = 10051;
+     </script>
+    <style>
+        a,a:link,a:hover{text-decoration:none;color:#000000}
+        .ZcSpanNum { text-align: center; background-color: #71bd31; color: #fff; display: inline-block; width: 16px; height: 25px;  margin-right: 3px;line-height: 25px;  border-radius: 2px;font-size: 14px;}
+        .zc_sred { text-align: center; color:red; display: inline-block; width: 16px; height: 25px;  margin-right: 3px;line-height: 25px;  border-radius: 2px;font-size: 14px;}
+        .issuetxt_d{padding:3px 10px;}
+        .draw-item{padding:3px 10px;}
+        .data-item{border-bottom:1px solid #eee;padding:3px 0px;position:relative;}
+        .dignum {color: #fff; padding: 3px; width: 22px; height: 22px; line-height: 22px; font-size: 14px; display: inline-block;  text-align: center; border-radius: 20px;   margin-right: 5px;}
+        .dignum2 {color: #fff; padding: 3px; width: 22px; height: 22px; line-height: 22px; font-size: 14px; display: inline-block;  text-align: center;   margin-right: 5px;}
+        .item-arr-btn{position:absolute;right:10px;top:20px;}
+        .arrow-right {transform: rotate(225deg); -webkit-transform: rotate(225deg); width: 10px; height: 10px; margin-top: 3px;  border-color: #ccc;}
+        .dice {width: 33px;height: 33px; background: url(/Trade/Images/kj.png) no-repeat; cursor: pointer; display:inline-block;   margin-left: 2px;background-size:360px 35px; }
+        .dice_1{background-position:-2px 0px}
+.dice_2{background-position:-33px 0px}
+.dice_3{background-position:-66px 0px}
+.dice_4{background-position:-99px 0px}
+.dice_5{background-position:-132px 0px}
+.dice_6{background-position:-165px 0px}
+.dice_t{background-position:-201px 0px}
+.dice_s{background-position:-235px 0px}
+.dice_0{background-position:-302px 0px}
+.kj_num {margin-right:25px;}
+.kj_num em {margin-left: 1px;font-size: 14px;font-family: "Microsoft YaHei","微软雅黑",Arial;}
+.kj_1 em,.kj_3 em{color: #171717;}
+.kj_2 em,.kj_4 em{color: #cc0000;}
+.kj_num i {background: url(/Trade/Images/poker_ico.png); display:inline-block; }
+/*黑桃*/
+.kj_1 i {margin-left: -8.5px;width: 17px;height: 19px;background-position: -201px -18px;}
+/*红桃*/
+.kj_2 i {margin-left:-9.5px;width:19px;height:18px;background-position:-220px -19px}
+/*梅花*/
+.kj_3 i {top: 24px;margin-left: -9.5px;width: 19px;height: 20px;background-position: -242px -18px;
+}
+/*方块*/
+.kj_4 i {top: 23px;margin-left: -9.5px;width: 19px;height: 22px;background-position: -264px -17px;}
+    </style>
+</head>
+<body>
+
+<style>
+    .alertdlg{position:fixed;padding:10px; min-width:100px;background-color:#000000;color:#ffffff;text-align:center;display:none;top: 50%;left: 50%; border-radius:5px; z-index:120000; }
+</style>
+<div id="alertdlg" class="alertdlg" >
+</div>
+<script src="/Trade/Js/pageHead.js?v=5" type="text/javascript"></script>
+<script type="text/javascript">
+    function JsGetAppType(){
+        var agent =  navigator.userAgent.toLowerCase();
+        var IOS_Arr = ["iPhone", "iPod", "iPad" ];
+        var isIOS = false;
+        for(var i=0;i<IOS_Arr.length;i++)
+        {
+            if (agent.indexOf(IOS_Arr[i].toLowerCase()) != -1)
+            {
+                isIOS = true;
+                break;
+            }
+        }
+        return isIOS ? 2 : 1 ;
+    }
+    MobileBase.AppType=JsGetAppType();   //必须 。为解决缓存记录了值，改使用Js函数动态获取类型
+       MobileBase.init(); //IOS必须      
+       var isOpenApp = false;
+       function  hrefOpenInApp(href)
+       { 
+           if (isOpenApp){
+               var obj = {'urlString':href,useBrowser:false,targetName:'URL',isPageNoHeader:true};
+               rst = "javascript:MobileBase.appRoute(" + JSON.stringify(obj) + ")";
+               }else{
+               rst = href;
+           }
+           return rst;
+       }    
+       function OpenHrefByJs(shref,isret) {           
+           
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {              
+               location.href = shref  + (typeof(isret) !=  "undefined" && isret == true? (shref.indexOf("?")==-1?"?":"") + "&ret=" + encodeURIComponent(location.href) :"");
+           }
+       }
+       function OpenHrefWithTitle(shref,title) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: false,title:title };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       function OpenWithLogin(shref)
+       {          
+           LoginDlg.SuccessCallBack = function () {OpenHrefByJs(shref) };
+           LoginDlg.show();
+       }
+       function alert(msg){ //自定义alert
+           $("#alertdlg").html(msg);
+           $("#alertdlg").show();      
+           $("#alertdlg").css("margin-left", "-" + ($("#alertdlg").width()/2) + "px");
+           $("#alertdlg").css("margin-top", "-" + ($("#alertdlg").height()/2) + "px");
+           setTimeout(function(){$("#alertdlg").hide();},2000);
+       }
+       function GetQueryString(name) {
+           var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+           var r = window.location.search.substr(1).match(reg);           
+           if (r != null) return decodeURIComponent(r[2]); return null;
+       }
+       function gotoback(default_url){
+           if (isOpenApp){
+               MobileBase.appGoBack();
+           }else{
+               var reqUrl = GetQueryString("ret");
+               if (reqUrl == null || reqUrl==""){
+                   if(typeof(default_url) == "undefined" || default_url=="" )
+                       history.back();
+                   else
+                       location.href = default_url;
+               }else{
+                   location.href = reqUrl;
+               }
+           }
+       }
+       function OpenUrlByJs(shref,isUserBrowser) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: (typeof(isUserBrowser) != "undefinde" && isUserBrowser == true ? true : false), targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       //设置刷新预设页面
+       function SetPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appSetPageTag(name);
+           }
+       }
+       //刷新预设页面
+       function RefreshPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appRefreshTagPage(name);
+           }
+       }
+
+       $(document).ready(function(){
+           $("a").each(function (idx, item) {//触屏版做成快捷方式后不能用a的直接跳转，会新开窗口到浏览器的，用这种方式可以避免尴尬
+               if($(this).attr("href")!=undefined&&$(this).attr("href").indexOf(".aspx")!=-1)
+               {
+                   $(this).click(function () {
+                       location.href = $(this).attr("href");
+                       return false;
+                   });
+               }
+           });
+       });
+</script>
+   <div class="topcontainer" >
+ <div class="topbanner" >
+        <span class="topRight">
+            
+        </span>
+        <span class="topLeft">
+            <a id="goback1" class="backbtn" href="javascript:gotoback('/Trade/DrawInfo/DrawInfoMain.aspx')" >
+                <em class="arrow-left"></em>
+            </a>
+        </span>
+      <span class="top_drop toptitle topdropbtn" id="top_type">大乐透
+      </span>
+ </div>
+</div>
+<div id='topheightdiv' style='height:40px;'></div><script type='text/javascript' >$(function(){if ($('.topcontainer').length >0){  $('#topheightdiv').css('height',$('.topcontainer').height()+'px'); } });</script>
+    <div id="drawdatalist"  pageIndex="1"  hasNext="true" >
+    
+    </div>
+    <div id="dvLoadMore" style="display:none;text-align:center;" >
+    <img src="/Trade/Images/loading.gif" align='absmiddle' />&nbsp;&nbsp;&nbsp;&nbsp;正在加载中...
+   </div>
+</body>
+    <script src="/Trade/Js/BaseMath.js" ></script>
+    <script type="text/javascript">
+        function loaddata() {
+            var cur_hasNext = $("#drawdatalist").attr("hasNext");
+            var cur_pageIndex = $("#drawdatalist").attr("pageindex");
+            if (cur_hasNext == "true") {
+                $("#dvLoadMore").show();
+                $.ajax({
+                    type: "post",
+                    data: { action: "loaddata", pageIndex: cur_pageIndex },
+                    url: window.location.href,
+                    success: function (data) {
+                        var ResultObj = eval("(" + data + ")");
+                        if (ResultObj.resultCode == 100) {
+                            $("#drawdatalist").attr("pageindex", parseInt($("#drawdatalist").attr("pageindex")) + 1);
+                            $("#drawdatalist").attr("hasNext",ResultObj.body.hasNext);                     
+                            var records = ResultObj.body.records;
+                            var HTML_Arr = new Array();
+                            for (var i = 0; i < records.length; i++)
+                            {
+                                HTML_Arr.push("<div class='data-item'>");
+                                if (records[i].detailUrl)
+                                {
+                                    var url_href= "/Trade/DrawInfo/ZcOrDigitResult.aspx?issueId=" +records[i].issueId ;                                    
+                                    HTML_Arr.push("<a href='" + (typeof(hrefOpenInApp) == "function"?hrefOpenInApp(url_href):url_href) + "'>");
+                                    HTML_Arr.push("<div class='item-arr-btn'><em class='arrow-right'></em></div>");
+                                }
+                                HTML_Arr.push("<div class='issuetxt_d'>" + records[i].issueText + "</div>");
+                                if (LotteryType == 10031 || LotteryType == 10032 || LotteryType == 10033 || LotteryType == 10034){
+                                    //足彩
+                                    if (i==0 && cur_pageIndex==1)
+                                        HTML_Arr.push("<div class='draw-item'><span class='ZcSpanNum' >" + records[i].awardResults.join("</span><span class='ZcSpanNum' >") + "</span></div>");
+                                    else
+                                        HTML_Arr.push("<div class='draw-item'><span class='zc_sred' >" + records[i].awardResults.join("</span><span class='zc_sred' >") + "</span></div>");
+                                }else if (LotteryType == 10371){
+                                    //快3
+                                    //数字彩
+                                    var digItems = records[i].digitReuslts;
+                                    HTML_Arr.push("<div class='draw-item'>");
+                                    if (i==0 && cur_pageIndex==1)
+                                    {
+                                        for(var j=0;j < digItems.length;j++)
+                                        {
+                                            var digItem = digItems[j];
+                                            for(var p=0;p<digItem.items.length;p++)
+                                            {
+                                                HTML_Arr.push("<span class='dice dice_" + digItem.items[p] + "'  ></span>");
+                                            }
+                                        }
+                                    }else{
+                                        for(var j=0;j < digItems.length;j++)
+                                        {
+                                            var digItem = digItems[j];
+                                            HTML_Arr.push("<span class='dignum2' style='color:" + digItems[j].color + "' >" + digItems[j].items.join("</span><span class='dignum2' style='color:" + digItems[j].color + "'  >")  + "</span>");
+                                        }
+                                    }
+                                    HTML_Arr.push("</div>");
+                                }else if (LotteryType == 10471){
+                                    //快乐扑克3
+                                    //数字彩
+                                    var digItems = records[i].digitReuslts;
+                                    HTML_Arr.push("<div class='draw-item'>");
+                                  
+                                    for(var j=0;j < digItems.length;j++)
+                                    {
+                                        var digItem = digItems[j];
+                                        for(var p=0;p<digItem.items.length;p++)
+                                        {
+                                            HTML_Arr.push("<span class='kj_num kj_" + digItem.items[p].split("_")[0]  + "' ><i></i><em>" + digItem.items[p].split("_")[1] + "</em></span>");
+                                        }
+                                    }                                   
+                                    HTML_Arr.push("</div>");
+                                }else{
+                                    //数字彩
+                                    var digItems = records[i].digitReuslts;
+                                    HTML_Arr.push("<div class='draw-item'>");
+                                    if (i==0 && cur_pageIndex==1)
+                                    {
+                                        for(var j=0;j < digItems.length;j++)
+                                        {
+                                            var digItem = digItems[j];
+                                            HTML_Arr.push("<span class='dignum' style='background-color:" + digItems[j].color + "' >" + digItems[j].items.join("</span><span class='dignum' style='background-color:" + digItems[j].color + "'  >")  + "</span>");
+                                        }
+                                    }else{
+                                        for(var j=0;j < digItems.length;j++)
+                                        {
+                                            var digItem = digItems[j];
+                                            HTML_Arr.push("<span class='dignum2' style='color:" + digItems[j].color + "' >" + digItems[j].items.join("</span><span class='dignum2' style='color:" + digItems[j].color + "'  >")  + "</span>");
+                                        }
+                                    }
+                                    HTML_Arr.push("</div>");
+                                }
+                                if (records[i].detailUrl)
+                                {
+                                    HTML_Arr.push("</a>");
+                                }
+                                HTML_Arr.push("</div>");                                
+                            }
+                            $("#drawdatalist").append(HTML_Arr.join(""));
+                            $("#drawdatalist a").each(function (idx, item) {//触屏版做成快捷方式后不能用a的直接跳转，会新开窗口到浏览器的，用这种方式可以避免尴尬
+                                if ($(this).attr("href") != undefined && $(this).attr("href").indexOf(".aspx") != -1) {
+                                    var $events = $(this).data("events");
+                                    if (!($events && $events["click"])) {
+                                        $(this).click(function () {
+                                            location.href = $(this).attr("href");
+                                            return false;
+                                        });
+                                    }
+                                }
+                            });
+                        } else {
+                            alert(ResultObj.message);
+                        }
+                        $("#dvLoadMore").hide();
+                    },
+                    error: function (data) {
+                        console.info("error: " + data.responseText);
+                    }
+                });
+            }
+        }
+        $(function () {          
+            loaddata();
+            ScrollDo.init(document.body, null, loaddata, null, null);           
+        });
+    </script>
+</html>

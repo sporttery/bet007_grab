@@ -1,0 +1,69 @@
+﻿html { height: 100%; }
+body { height: 100%; margin: 0px; }
+.topcontainer { position: fixed; top: 0px; width: 100%; z-index: 10; }
+.topbanner { background: #479FD3; color: #fff; line-height: 50px; height: 50px; text-align: center; width: 100%; font-size: 18px; }
+    .topbanner .topLeft { display: block; float: left; position: absolute; left: 0px; /*line-height: 45px; height: 40px;*/ }
+    .topbanner .topRight { display: block; position: absolute; right: 0px; height: 40px; }
+
+.topbul { display: flex; justify-content: space-between; list-style: none; margin: 0px; padding: 0px; }
+.arrleft { display: inline-block; border-left: 1px solid #fff; border-bottom: 1px solid #fff; width: 12px; height: 12px; background-color: #479FD3; transform: rotate(45deg); margin-left: 12px; margin-top: 3px; }
+
+.toptitle { color: #fff; font-size: 18px; }
+.LoginDlg { position: fixed; background-color: #fff; height: 100%; width: 100%; top: 0px; left: 0px; z-index: 11000; }
+    .LoginDlg .topbanner { position: absolute; }
+.payDlg { position: fixed; bottom: 0px; z-index: 12000; width: 100%; background-color: #eee; display: none; }
+#payoverlay { position: fixed; background-color: #666; height: 100%; width: 100%; top: 0px; left: 0px; z-index: 2000; filter: alpha(Opacity=80); -moz-opacity: 0.8; opacity: 0.8; }
+.paydrow1 { padding: 10px 15px; }
+.paydrow2 { display: flex; justify-content: space-between; list-style: none; margin: 0px; padding: 0 10px 10px 10px; border-top: 1px solid #eee; }
+.paybtndiv { flex-grow: 1; text-align: center; padding: 0 5px; height: 40px; line-height: 40px; }
+.buy-paypwd { width: 97%; height: 40px; line-height: 40px; -webkit-appearance: none; background-color: #FFF; border: 1px solid #CCC; padding-left: 10px; border-radius: 3px; font-size: 14px; }
+.paybtn { width: 100%; height: 28px; line-height: 28px; }
+.showTopBanner .dialog-overlay { z-index: 7 !important; opacity: 0.2 !important; }
+.showTopBanner .dialog-content { width: 100%; border-radius: 0px; border: 0px; top: 50px; left: 0px; -webkit-transform: none !important; transform: none !important; max-width: 100%; }
+.showTopBanner .dialog-content-ft { display: none; }
+.showTopBanner .dialog-content-bd { padding: 0px; margin: 0px; }
+.switch .item { line-height: 35px; text-align: left; display: inline-block; border-bottom: 1px solid #F5F5F5; }
+.width50 .item { width: 50%; }
+.width33 .item { width: 33.3%; }
+.switch .selected { color: #479FD3; }
+.palybottom { position: fixed; bottom: 0px; width: 100%; z-index: 10; border-top: 1px solid #dfdfdf; background-color: #F0F0F0; height: 50px; }
+.ulboxbottom { display: -webkit-flex; display: flex; justify-content: space-between; padding: 5px 35px; list-style: none; margin: 0; }
+    .ulboxbottom li { text-align: center; }
+.btbtn { font-size: 14px; border: 1px solid #479FD3; color: #479FD3; width: 38px; height: 38px; line-height: 39px; display: inline-block; text-align: center; border-radius: 40px; background-color: #FFF; }
+.btbtnok { font-size: 14px; border: 1px solid #F06747; color: #fff; width: 38px; height: 38px; line-height: 39px; display: inline-block; text-align: center; border-radius: 40px; background-color: #F06747; }
+#buycontent { display: none; }
+.buybottom { position: fixed; bottom: 0px; width: 100%; background-color: #fff; z-index: 10; }
+.buybottomul { display: flex; justify-content: space-around; list-style: none; padding: 10px 5px; margin: 0px; font-size: 13px; }
+.times { border: 1px solid #D9D9D9; border-radius: 3px; width: 80px; text-align: center; margin: 0 10px; height: 20px; background-color: #FFF; -webkit-appearance: none; font-size: 16px; }
+.buycontentul { margin: 0px; padding: 0px; list-style: none; }
+    .buycontentul li { border-bottom: 1px solid #dfdfdf; border-right: 1px solid #dfdfdf; border-left: 1px solid #dfdfdf; background-color: #fff; padding: 6px 0px; line-height: 16px; }
+        .buycontentul li:first-child { border-top: 1px solid #dfdfdf; }
+.bgcoloreee { background-color: #eee; }
+.paytitle { height: 40px; line-height: 40px; text-align: center; }
+.dobuy { background-color: #F06747; border-radius: 3px; color: #fff; padding: 0 20px; border: none; height: 38px; font-size: 15px; }
+#notecount_total, #amount_total { color: #F06747; }
+.zhuihao { background: #fff; border-radius: 3px; color: #000; padding: 8px 10px; font-size: 14px; border: 1px solid #d0d0d0; }
+.paybtn { border-radius: 3px; color: #000; border: none; height: 36px; line-height: 36px; background-color: #fff; font-size: 14px; }
+.paycancel { background-color: #fff; border: 1px solid #D2D2D2; height: 37px; line-height: 37px; }
+.payok { background-color: #F06747; color: #FFF; }
+.bgcolor4 { background-color: #ff6a00; color: #fff; }
+.buybtnbanner { background: #eee; padding: 0px 10px; height: 49px; line-height: 49px; border-top: 1px solid #dfdfdf; }
+
+#top_odds_ico, #top_sclass_ico { display: block; width: 20px; height: 20px; margin: 14px 10px 0 0; }
+#top_odds_ico { background-image: url(/Trade/Images/t_odds.png); background-repeat: no-repeat; background-position: left; background-size: 20px 20px; }
+.arrow-moredown, .arrow-up, .arrow-left, .arrow-right { display: inline-block; border-left: 1px solid #fff; border-bottom: 1px solid #fff; -webkit-transition: all .2s linear; transition: all .2s linear; }
+.arrow-moredown { transform: rotate(-45deg); -webkit-transform: rotate(-45deg); margin-left: 3px; width: 8px; height: 8px; vertical-align: 3px; }
+.floatrow { display: -webkit-flex; display: flex; justify-content: space-between; list-style: none; }
+.arrow-left { transform: rotate(45deg); -webkit-transform: rotate(45deg); margin-left: 15px; width: 11px; height: 11px; margin-top: 3px; }
+.bluearrow { display: inline-block; width: 16px; height: 12px; background-image: url(/Trade/Images/mseled.png); background-size: 16px 12px; margin-left: 6px; }
+
+.boxTop { display: -moz-box; display: -webkit-box; display: box; -webkit-box-orient: horizontal; -moz-box-orient: horizontal; -box-orient: horizontal; -webkit-box-pack: center; -moz-box-pack: center; -box-pack: center; -webkit-box-align: center; -moz-box-align: center; -box-align: center; }
+.boxItem1 { -moz-box-flex: 1; -webkit-box-flex: 1; box-flex: 1; }
+.boxItem2 { -moz-box-flex: 2; -webkit-box-flex: 2; box-flex: 2; font-size: 12px; }
+.boxItem3 { -moz-box-flex: 3; -webkit-box-flex: 3; box-flex: 3; font-size: 12px; }
+.boxItem4 { -moz-box-flex: 4; -webkit-box-flex: 4; box-flex: 4; }
+.boxItem5 { -moz-box-flex: 5; -webkit-box-flex: 5; box-flex: 5; width: 50%; }
+        #pre_info {text-align:right;}
+        #bt_preBonus{text-align:right;}
+        .topbannerh2{height:50px;}
+.spJs { position: absolute; background-image:url(/Trade/Images/Tj/recommend_ic_odds_yp.png);background-size:2.8em 100%;display:inline-block;width:2.8em;left: -1em; height: 1em; transform: scale(0.85); line-height: 1em; padding: 2px 1px 2px 3px; color: #FFF; top: 9px; }
