@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>
+	竞彩足球
+</title><meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1, minimal-ui' name='viewport' /><meta content='yes' name='apple-mobile-web-app-capable' /><meta content='black' name='apple-mobile-web-app-status-bar-style' /><meta content='telephone=no' name='format-detection' /><script src='/Trade/Js/jquery.js?2019'></script><link rel='stylesheet' href='/Trade/Css/main2017.css?2019' /><link href="/Images/touch-icon.png" rel="apple-touch-icon-precomposed" /> 
+    <script src="/Trade/Js/BaseMath.js" type ="text/javascript"></script>
+    <link rel="stylesheet" href="/Trade/Css/dialog.css?12414117" /><link rel="stylesheet" href="/Trade/Css/ball.css?v=5"><script src="/Trade/Js/ball.js?v=1905" type ="text/javascript"></script></head>
+<body>
+     
+<style>
+    .alertdlg{position:fixed;padding:10px; min-width:100px;background-color:#000000;color:#ffffff;text-align:center;display:none;top: 50%;left: 50%; border-radius:5px; z-index:120000; }
+</style>
+<div id="alertdlg" class="alertdlg" >
+</div>
+<script src="/Trade/Js/pageHead.js?v=5" type="text/javascript"></script>
+<script type="text/javascript">
+    function JsGetAppType(){
+        var agent =  navigator.userAgent.toLowerCase();
+        var IOS_Arr = ["iPhone", "iPod", "iPad" ];
+        var isIOS = false;
+        for(var i=0;i<IOS_Arr.length;i++)
+        {
+            if (agent.indexOf(IOS_Arr[i].toLowerCase()) != -1)
+            {
+                isIOS = true;
+                break;
+            }
+        }
+        return isIOS ? 2 : 1 ;
+    }
+    MobileBase.AppType=JsGetAppType();   //必须 。为解决缓存记录了值，改使用Js函数动态获取类型
+       MobileBase.init(); //IOS必须      
+       var isOpenApp = false;
+       function  hrefOpenInApp(href)
+       { 
+           if (isOpenApp){
+               var obj = {'urlString':href,useBrowser:false,targetName:'URL',isPageNoHeader:true};
+               rst = "javascript:MobileBase.appRoute(" + JSON.stringify(obj) + ")";
+               }else{
+               rst = href;
+           }
+           return rst;
+       }    
+       function OpenHrefByJs(shref,isret) {           
+           
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {              
+               location.href = shref  + (typeof(isret) !=  "undefined" && isret == true? (shref.indexOf("?")==-1?"?":"") + "&ret=" + encodeURIComponent(location.href) :"");
+           }
+       }
+       function OpenHrefWithTitle(shref,title) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: false,title:title };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       function OpenWithLogin(shref)
+       {          
+           LoginDlg.SuccessCallBack = function () {OpenHrefByJs(shref) };
+           LoginDlg.show();
+       }
+       function alert(msg){ //自定义alert
+           $("#alertdlg").html(msg);
+           $("#alertdlg").show();      
+           $("#alertdlg").css("margin-left", "-" + ($("#alertdlg").width()/2) + "px");
+           $("#alertdlg").css("margin-top", "-" + ($("#alertdlg").height()/2) + "px");
+           setTimeout(function(){$("#alertdlg").hide();},2000);
+       }
+       function GetQueryString(name) {
+           var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+           var r = window.location.search.substr(1).match(reg);           
+           if (r != null) return decodeURIComponent(r[2]); return null;
+       }
+       function gotoback(default_url){
+           if (isOpenApp){
+               MobileBase.appGoBack();
+           }else{
+               var reqUrl = GetQueryString("ret");
+               if (reqUrl == null || reqUrl==""){
+                   if(typeof(default_url) == "undefined" || default_url=="" )
+                       history.back();
+                   else
+                       location.href = default_url;
+               }else{
+                   location.href = reqUrl;
+               }
+           }
+       }
+       function OpenUrlByJs(shref,isUserBrowser) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: (typeof(isUserBrowser) != "undefinde" && isUserBrowser == true ? true : false), targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       //设置刷新预设页面
+       function SetPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appSetPageTag(name);
+           }
+       }
+       //刷新预设页面
+       function RefreshPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appRefreshTagPage(name);
+           }
+       }
+
+       $(document).ready(function(){
+           $("a").each(function (idx, item) {//触屏版做成快捷方式后不能用a的直接跳转，会新开窗口到浏览器的，用这种方式可以避免尴尬
+               if($(this).attr("href")!=undefined&&$(this).attr("href").indexOf(".aspx")!=-1)
+               {
+                   $(this).click(function () {
+                       location.href = $(this).attr("href");
+                       return false;
+                   });
+               }
+           });
+       });
+</script>
+    
+    <div id="divPage_Main">
+        
+        <div class="topcontainer">
+            <div id="topbanner" class="topbanner">
+                
+                <span class="topRight">
+                    <span class="top_drop" id="top_odds_ico"></span><span class="top_drop" id="top_sclass_ico"></span>
+                </span>
+                <span class="topLeft">
+                    <a id="goback1" class="backbtn" href="/Trade/Index.aspx">
+                        <em class="arrow-left"></em>
+                    </a>
+                </span>
+                <span class="top_drop" id="top_type">竞彩混合过关
+                    <em class="arrow-moredown"></em>
+                </span>
+            </div>
+        </div>
+        
+        <div class="mainArea main_2">
+            
+            
+            <div class="match_item" data-id="3567001" data-stoptime="2021/5/7 22:00:00">
+                <div class="list_main">
+                    <div class="left1">
+                        <span class="matchNo">周五001</span>
+                        <font color='#CA00CA'>德乙</font>
+                        <span>22:00</span>
+                        <span class="bet_arrow_down"></span>
+                    </div>
+                    <div class="right1">
+                        <div onclick="OpenAnalysis('/Trade/Info/MatchAnalysis.aspx?sportType=1&useUIWebView=1&scheduleId=1895140');" class="analysis">
+                            <home>汉诺威96</home>
+                            <vs>VS</vs>
+                            <guest>达姆斯塔特</guest>
+                            <em class="arrow-right"></em>
+                        </div>
+                        <div class="refOdds">
+                            <div class="nullOdds">&nbsp;</div>
+                            <div class="odds1"><font color='#38adf7'>2.22</font></div>
+                            <div class="odds2"><font color='#38adf7'>3.66</font></div>
+                            <div class="odds3"><font color='#38adf7'>2.86</font></div>
+                        </div>
+                        <div class="betZone">
+                            
+                            <div class='boxTop'><div class='boxItem5'><div class='betList' data-single='0'><div class='rf'>0</div><div class='item' data-idx='0' data-playtype='0'>胜<sp>2</sp></div><div class='item' data-idx='1' data-playtype='0'>平<sp>3.65</sp></div><div class='item' data-idx='2' data-playtype='0'>负<sp>2.66</sp></div></div><div class='betList' data-single='0'><div class='rf polygoal rf_green'>-1</div><div class='item' data-idx='0' data-playtype='1'>胜<sp>3.85</sp></div><div class='item' data-idx='1' data-playtype='1'>平<sp>3.9</sp></div><div class='item' data-idx='2' data-playtype='1'>负<sp>1.58</sp></div></div></div><div class='boxItem1 oib oib_60'><div class='openItemBox' mid='3567001' schid='1895140'  data-s='1'><div class='center'>展开<br>全部</div></div></div></div>
+                            <input type="hidden" id="dan_3567001" name="hidDanV" />
+                        </div>
+                    </div>
+                </div>
+                <div class="refData" data-v="\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0031\u0033\u0022\u002c\u0022\u0031\u0030\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0031\u80dc\u0020\u0034\u5e73\u0020\u0035\u8d1f\u0022\u002c\u0022\u0035\u80dc\u0020\u0032\u5e73\u0020\u0033\u8d1f\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u4e3b\u80dc\u0031\u573a\u0020\u0020\u5e73\u5c40\u0031\u573a\u0020\u0020\u5ba2\u80dc\u0034\u573a\u0022\u005d\u007d\u005d"></div>
+            </div>
+            
+            <div class="match_item" data-id="3567002" data-stoptime="2021/5/7 22:00:00">
+                <div class="list_main">
+                    <div class="left1">
+                        <span class="matchNo">周五002</span>
+                        <font color='#006699'>俄超</font>
+                        <span>22:00</span>
+                        <span class="bet_arrow_down"></span>
+                    </div>
+                    <div class="right1">
+                        <div onclick="OpenAnalysis('/Trade/Info/MatchAnalysis.aspx?sportType=1&useUIWebView=1&scheduleId=1886799');" class="analysis">
+                            <home>PFC索治</home>
+                            <vs>VS</vs>
+                            <guest>伏尔加格勒</guest>
+                            <em class="arrow-right"></em>
+                        </div>
+                        <div class="refOdds">
+                            <div class="nullOdds">&nbsp;</div>
+                            <div class="odds1"><font color='#38adf7'>1.44</font></div>
+                            <div class="odds2"><font color='#38adf7'>4.27</font></div>
+                            <div class="odds3"><font color='#38adf7'>6.89</font></div>
+                        </div>
+                        <div class="betZone">
+                            
+                            <div class='boxTop'><div class='boxItem5'><div class='betList' data-single='0'><div class='rf'>0</div><div class='item' data-idx='0' data-playtype='0'>胜<sp>1.27</sp></div><div class='item' data-idx='1' data-playtype='0'>平<sp>4.4</sp></div><div class='item' data-idx='2' data-playtype='0'>负<sp>7.5</sp></div></div><div class='betList' data-single='0'><div class='rf polygoal rf_green'>-1</div><div class='item' data-idx='0' data-playtype='1'>胜<sp>2</sp></div><div class='item' data-idx='1' data-playtype='1'>平<sp>3.35</sp></div><div class='item' data-idx='2' data-playtype='1'>负<sp>2.85</sp></div></div></div><div class='boxItem1 oib oib_60'><div class='openItemBox' mid='3567002' schid='1886799'  data-s='1'><div class='center'>展开<br>全部</div></div></div></div>
+                            <input type="hidden" id="dan_3567002" name="hidDanV" />
+                        </div>
+                    </div>
+                </div>
+                <div class="refData" data-v="\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0034\u0022\u002c\u0022\u0031\u0035\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0034\u80dc\u0020\u0031\u5e73\u0020\u0035\u8d1f\u0022\u002c\u0022\u0032\u80dc\u0020\u0031\u5e73\u0020\u0037\u8d1f\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u4e3b\u80dc\u0033\u573a\u0020\u0020\u5e73\u5c40\u0033\u573a\u0020\u0020\u5ba2\u80dc\u0034\u573a\u0022\u005d\u007d\u005d"></div>
+            </div>
+            
+            <div class="match_item" data-id="3567006" data-stoptime="2021/5/7 22:00:00">
+                <div class="list_main">
+                    <div class="left1">
+                        <span class="matchNo">周五006</span>
+                        <font color='#FF3333'>英超</font>
+                        <span>22:00</span>
+                        <span class="bet_arrow_down"></span>
+                    </div>
+                    <div class="right1">
+                        <div onclick="OpenAnalysis('/Trade/Info/MatchAnalysis.aspx?sportType=1&useUIWebView=1&scheduleId=1904106');" class="analysis">
+                            <home>莱切斯特城</home>
+                            <vs>VS</vs>
+                            <guest>纽卡斯尔联</guest>
+                            <em class="arrow-right"></em>
+                        </div>
+                        <div class="refOdds">
+                            <div class="nullOdds">&nbsp;</div>
+                            <div class="odds1"><font color='#38adf7'>1.41</font></div>
+                            <div class="odds2"><font color='#38adf7'>4.75</font></div>
+                            <div class="odds3"><font color='#38adf7'>7.51</font></div>
+                        </div>
+                        <div class="betZone">
+                            
+                            <div class='boxTop'><div class='boxItem5'><div class='betList' data-single='0'><div class='rf'>0</div><div class='item' data-idx='0' data-playtype='0'>胜<sp>1.3</sp></div><div class='item' data-idx='1' data-playtype='0'>平<sp>4.25</sp></div><div class='item' data-idx='2' data-playtype='0'>负<sp>7</sp></div></div><div class='betList' data-single='0'><div class='rf polygoal rf_green'>-1</div><div class='item' data-idx='0' data-playtype='1'>胜<sp>2.05</sp></div><div class='item' data-idx='1' data-playtype='1'>平<sp>3.35</sp></div><div class='item' data-idx='2' data-playtype='1'>负<sp>2.75</sp></div></div></div><div class='boxItem1 oib oib_60'><div class='openItemBox' mid='3567006' schid='1904106'  data-s='1'><div class='center'>展开<br>全部</div></div></div></div>
+                            <input type="hidden" id="dan_3567006" name="hidDanV" />
+                        </div>
+                    </div>
+                </div>
+                <div class="refData" data-v="\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0033\u0022\u002c\u0022\u0031\u0037\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0036\u80dc\u0020\u0032\u5e73\u0020\u0032\u8d1f\u0022\u002c\u0022\u0032\u80dc\u0020\u0035\u5e73\u0020\u0033\u8d1f\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u4e3b\u80dc\u0037\u573a\u0020\u0020\u5e73\u5c40\u0031\u573a\u0020\u0020\u5ba2\u80dc\u0032\u573a\u0022\u005d\u007d\u005d"></div>
+            </div>
+            
+            <div class="match_item" data-id="3567007" data-stoptime="2021/5/7 22:00:00">
+                <div class="list_main">
+                    <div class="left1">
+                        <span class="matchNo">周五007</span>
+                        <font color='#006633'>西甲</font>
+                        <span>22:00</span>
+                        <span class="bet_arrow_down"></span>
+                    </div>
+                    <div class="right1">
+                        <div onclick="OpenAnalysis('/Trade/Info/MatchAnalysis.aspx?sportType=1&useUIWebView=1&scheduleId=1914123');" class="analysis">
+                            <home>皇家社会</home>
+                            <vs>VS</vs>
+                            <guest>艾尔切</guest>
+                            <em class="arrow-right"></em>
+                        </div>
+                        <div class="refOdds">
+                            <div class="nullOdds">&nbsp;</div>
+                            <div class="odds1"><font color='#38adf7'>1.54</font></div>
+                            <div class="odds2"><font color='#38adf7'>3.90</font></div>
+                            <div class="odds3"><font color='#38adf7'>6.92</font></div>
+                        </div>
+                        <div class="betZone">
+                            
+                            <div class='boxTop'><div class='boxItem5'><div class='betList' data-single='0'><div class='rf'>0</div><div class='item' data-idx='0' data-playtype='0'>胜<sp>1.36</sp></div><div class='item' data-idx='1' data-playtype='0'>平<sp>3.85</sp></div><div class='item' data-idx='2' data-playtype='0'>负<sp>6.5</sp></div></div><div class='betList' data-single='0'><div class='rf polygoal rf_green'>-1</div><div class='item' data-idx='0' data-playtype='1'>胜<sp>2.27</sp></div><div class='item' data-idx='1' data-playtype='1'>平<sp>3.25</sp></div><div class='item' data-idx='2' data-playtype='1'>负<sp>2.5</sp></div></div></div><div class='boxItem1 oib oib_60'><div class='openItemBox' mid='3567007' schid='1914123'  data-s='1'><div class='center'>展开<br>全部</div></div></div></div>
+                            <input type="hidden" id="dan_3567007" name="hidDanV" />
+                        </div>
+                    </div>
+                </div>
+                <div class="refData" data-v="\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0035\u0022\u002c\u0022\u0031\u0039\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0034\u80dc\u0020\u0032\u5e73\u0020\u0034\u8d1f\u0022\u002c\u0022\u0032\u80dc\u0020\u0033\u5e73\u0020\u0035\u8d1f\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u4e3b\u80dc\u0034\u573a\u0020\u0020\u5e73\u5c40\u0033\u573a\u0020\u0020\u5ba2\u80dc\u0033\u573a\u0022\u005d\u007d\u005d"></div>
+            </div>
+            
+            <div class="match_item" data-id="3567009" data-stoptime="2021/5/8 9:30:00">
+                <div class="list_main">
+                    <div class="left1">
+                        <span class="matchNo">周五009</span>
+                        <font color='#660033'>美职业</font>
+                        <span>09:30</span>
+                        <span class="bet_arrow_down"></span>
+                    </div>
+                    <div class="right1">
+                        <div onclick="OpenAnalysis('/Trade/Info/MatchAnalysis.aspx?sportType=1&useUIWebView=1&scheduleId=1998592');" class="analysis">
+                            <home>皇家盐湖城</home>
+                            <vs>VS</vs>
+                            <guest>圣何塞地震</guest>
+                            <em class="arrow-right"></em>
+                        </div>
+                        <div class="refOdds">
+                            <div class="nullOdds">&nbsp;</div>
+                            <div class="odds1"><font color='#38adf7'>1.90</font></div>
+                            <div class="odds2"><font color='#38adf7'>3.77</font></div>
+                            <div class="odds3"><font color='#38adf7'>3.49</font></div>
+                        </div>
+                        <div class="betZone">
+                            
+                            <div class='boxTop'><div class='boxItem5'><div class='betList' data-single='0'><div class='rf'>0</div><div class='item' data-idx='0' data-playtype='0'>胜<sp>1.74</sp></div><div class='item' data-idx='1' data-playtype='0'>平<sp>3.55</sp></div><div class='item' data-idx='2' data-playtype='0'>负<sp>3.42</sp></div></div><div class='betList' data-single='0'><div class='rf polygoal rf_green'>-1</div><div class='item' data-idx='0' data-playtype='1'>胜<sp>3.22</sp></div><div class='item' data-idx='1' data-playtype='1'>平<sp>3.65</sp></div><div class='item' data-idx='2' data-playtype='1'>负<sp>1.77</sp></div></div></div><div class='boxItem1 oib oib_60'><div class='openItemBox' mid='3567009' schid='1998592'  data-s='1'><div class='center'>展开<br>全部</div></div></div></div>
+                            <input type="hidden" id="dan_3567009" name="hidDanV" />
+                        </div>
+                    </div>
+                </div>
+                <div class="refData" data-v="\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u897f\u0033\u0022\u002c\u0022\u897f\u0032\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0035\u80dc\u0020\u0031\u5e73\u0020\u0034\u8d1f\u0022\u002c\u0022\u0036\u80dc\u0020\u0031\u5e73\u0020\u0033\u8d1f\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u4e3b\u80dc\u0032\u573a\u0020\u0020\u5e73\u5c40\u0033\u573a\u0020\u0020\u5ba2\u80dc\u0035\u573a\u0022\u005d\u007d\u005d"></div>
+            </div>
+            
+            <div class="match_item" data-id="3568005" data-stoptime="2021/5/8 19:00:00">
+                <div class="list_main">
+                    <div class="left1">
+                        <span class="matchNo">周六005</span>
+                        <font color='#CA00CA'>德乙</font>
+                        <span>19:00</span>
+                        <span class="bet_arrow_down"></span>
+                    </div>
+                    <div class="right1">
+                        <div onclick="OpenAnalysis('/Trade/Info/MatchAnalysis.aspx?sportType=1&useUIWebView=1&scheduleId=1895137');" class="analysis">
+                            <home>杜塞尔多夫</home>
+                            <vs>VS</vs>
+                            <guest>布伦斯维克</guest>
+                            <em class="arrow-right"></em>
+                        </div>
+                        <div class="refOdds">
+                            <div class="nullOdds">&nbsp;</div>
+                            <div class="odds1"><font color='#38adf7'>1.49</font></div>
+                            <div class="odds2"><font color='#38adf7'>4.18</font></div>
+                            <div class="odds3"><font color='#38adf7'>6.02</font></div>
+                        </div>
+                        <div class="betZone">
+                            
+                            <div class='boxTop'><div class='boxItem5'><div class='betList' data-single='0'><div class='rf'>0</div><div class='item' data-idx='0' data-playtype='0'>胜<sp>1.38</sp></div><div class='item' data-idx='1' data-playtype='0'>平<sp>4</sp></div><div class='item' data-idx='2' data-playtype='0'>负<sp>5.75</sp></div></div><div class='betList' data-single='0'><div class='rf polygoal rf_green'>-1</div><div class='item' data-idx='0' data-playtype='1'>胜<sp>2.28</sp></div><div class='item' data-idx='1' data-playtype='1'>平<sp>3.4</sp></div><div class='item' data-idx='2' data-playtype='1'>负<sp>2.4</sp></div></div></div><div class='boxItem1 oib oib_60'><div class='openItemBox' mid='3568005' schid='1895137'  data-s='1'><div class='center'>展开<br>全部</div></div></div></div>
+                            <input type="hidden" id="dan_3568005" name="hidDanV" />
+                        </div>
+                    </div>
+                </div>
+                <div class="refData" data-v="\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u002c\u0022\u002d\u002d\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u002c\u0022\u002d\u002d\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u005d\u007d\u005d"></div>
+            </div>
+            
+            <div class="match_item" data-id="3568024" data-stoptime="2021/5/8 23:00:00">
+                <div class="list_main">
+                    <div class="left1">
+                        <span class="matchNo">周六024</span>
+                        <font color='#FF3333'>英超</font>
+                        <span>23:00</span>
+                        <span class="bet_arrow_down"></span>
+                    </div>
+                    <div class="right1">
+                        <div onclick="OpenAnalysis('/Trade/Info/MatchAnalysis.aspx?sportType=1&useUIWebView=1&scheduleId=1904105');" class="analysis">
+                            <home>曼彻斯特城</home>
+                            <vs>VS</vs>
+                            <guest>切尔西</guest>
+                            <em class="arrow-right"></em>
+                        </div>
+                        <div class="refOdds">
+                            <div class="nullOdds">&nbsp;</div>
+                            <div class="odds1"><font color='#38adf7'>1.92</font></div>
+                            <div class="odds2"><font color='#38adf7'>3.40</font></div>
+                            <div class="odds3"><font color='#38adf7'>4.19</font></div>
+                        </div>
+                        <div class="betZone">
+                            
+                            <div class='boxTop'><div class='boxItem5'><div class='betList' data-single='0'><div class='rf'>0</div><div class='item' data-idx='0' data-playtype='0'>胜<sp>1.74</sp></div><div class='item' data-idx='1' data-playtype='0'>平<sp>3.1</sp></div><div class='item' data-idx='2' data-playtype='0'>负<sp>4</sp></div></div><div class='betList' data-single='0'><div class='rf polygoal rf_green'>-1</div><div class='item' data-idx='0' data-playtype='1'>胜<sp>3.55</sp></div><div class='item' data-idx='1' data-playtype='1'>平<sp>3.3</sp></div><div class='item' data-idx='2' data-playtype='1'>负<sp>1.77</sp></div></div></div><div class='boxItem1 oib oib_60'><div class='openItemBox' mid='3568024' schid='1904105'  data-s='1'><div class='center'>展开<br>全部</div></div></div></div>
+                            <input type="hidden" id="dan_3568024" name="hidDanV" />
+                        </div>
+                    </div>
+                </div>
+                <div class="refData" data-v="\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u002c\u0022\u002d\u002d\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u002c\u0022\u002d\u002d\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u005d\u007d\u005d"></div>
+            </div>
+            
+            
+        </div>
+
+        
+        <div class="bottomArea">
+            <table cellspacing='0' cellpadding='0'>
+                <tr>
+                    <td><span id="bt_help" class="b_btn openhelp">玩法</span></td>
+                    <td><span id="bt_clear" class="b_btn">清空</span></td>
+                    <td><span id="bt_submitChoose" class="b_btn b_red">确定</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    
+    <div id="divPage_Preview">
+        <div class="topcontainer">
+            <div class="topbanner">
+                <span class="topRight">
+                    <span class="help" onclick="openCurPageHelp()"></span>
+                </span>
+                <span class="topLeft">
+                    <span class="backbtn backtoMain" onclick="backtoMain()">
+                        <em class="arrow-left"></em>
+                    </span>
+                </span>
+                <span class="top_drop">确认计算</span>
+            </div>
+        </div>
+
+        
+        <div class="mainArea">
+            <div id="stopTimePre">截止投注：</div>
+              
+            <div id="preItemList">
+
+            </div>
+        </div>
+
+        
+        <div id="bottomLevel2"></div>
+
+        
+        <div class="bottomArea" id="preBottomArea"></div>
+    </div>
+
+    
+    <div id="divPage_Optimize"></div>
+
+    
+
+    <div id="seldialog" style="position:fixed; top:5px; left:5px; width:90%;display:none;background-color:#ffffff;padding:5px; border-radius:5px;" >
+        <div id="dialog-title1" class="dialog-title" >dddd</div>
+        <div id="dialog_content_d2"  >
+           
+        </div>
+        <div class="floatrow" >
+            <div id="dialogbtn_cancel" class="dialogbtn" >取消</div>
+            <div id="dialogbtn_ok" class="dialogbtn">确定</div>
+        </div>
+    </div>
+    <div style="height:100px;"></div>
+</body>
+</html>
+<script src="/Trade/Js/dialog.js?124124" type ="text/javascript"></script>
+<script src="/Trade/Js/common.js?v=3" type ="text/javascript"></script>
+<script src="/Trade/Js/ZdyDialog.js" type ="text/javascript"></script>
+<script>
+
+    var typeId=100;
+    var type = 2;
+    var OddsType = 2;
+    var groupId=6;
+    var playType=99;
+    var bettingCategory = 2;
+    var lotteryType=10011;
+    var MaxMatch = 6;
+    var MaxPowNum = 0;
+    var switchHtml="<div class='switch width50'><span data-v-href='Ball.aspx?gid=6&awardIndex=0&oddTypes=%u5e73%2f%u534a%2c%u534a%u7403%2c%u4e00%u7403%2c%u4e00%2f%u7403%u534a&matchNames=%u5fb7%u4e59%2c%u4fc4%u8d85%2c%u82f1%u8d85%2c%u897f%u7532%2c%u7f8e%u804c%u4e1a&type=0' class='item link '><space></space>胜平负/让球胜平负</span><span data-v-href='Ball.aspx?gid=6&awardIndex=0&oddTypes=%u5e73%2f%u534a%2c%u534a%u7403%2c%u4e00%u7403%2c%u4e00%2f%u7403%u534a&matchNames=%u5fb7%u4e59%2c%u4fc4%u8d85%2c%u82f1%u8d85%2c%u897f%u7532%2c%u7f8e%u804c%u4e1a&type=1' class='item link '><space></space>单关投注</span><span data-v-href='Ball.aspx?gid=6&awardIndex=0&oddTypes=%u5e73%2f%u534a%2c%u534a%u7403%2c%u4e00%u7403%2c%u4e00%2f%u7403%u534a&matchNames=%u5fb7%u4e59%2c%u4fc4%u8d85%2c%u82f1%u8d85%2c%u897f%u7532%2c%u7f8e%u804c%u4e1a&type=2' class='item link selected'><space></space>混合过关<em class='bluearrow'></em></span><span data-v-href='Ball.aspx?gid=6&awardIndex=0&oddTypes=%u5e73%2f%u534a%2c%u534a%u7403%2c%u4e00%u7403%2c%u4e00%2f%u7403%u534a&matchNames=%u5fb7%u4e59%2c%u4fc4%u8d85%2c%u82f1%u8d85%2c%u897f%u7532%2c%u7f8e%u804c%u4e1a&type=3' class='item link '><space></space>二选一</span><span data-v-href='Ball.aspx?gid=6&awardIndex=0&oddTypes=%u5e73%2f%u534a%2c%u534a%u7403%2c%u4e00%u7403%2c%u4e00%2f%u7403%u534a&matchNames=%u5fb7%u4e59%2c%u4fc4%u8d85%2c%u82f1%u8d85%2c%u897f%u7532%2c%u7f8e%u804c%u4e1a&type=4' class='item link '><space></space>半全场</span><span data-v-href='Ball.aspx?gid=6&awardIndex=0&oddTypes=%u5e73%2f%u534a%2c%u534a%u7403%2c%u4e00%u7403%2c%u4e00%2f%u7403%u534a&matchNames=%u5fb7%u4e59%2c%u4fc4%u8d85%2c%u82f1%u8d85%2c%u897f%u7532%2c%u7f8e%u804c%u4e1a&type=5' class='item link '><space></space>进球数</span><span data-v-href='Ball.aspx?gid=6&awardIndex=0&oddTypes=%u5e73%2f%u534a%2c%u534a%u7403%2c%u4e00%u7403%2c%u4e00%2f%u7403%u534a&matchNames=%u5fb7%u4e59%2c%u4fc4%u8d85%2c%u82f1%u8d85%2c%u897f%u7532%2c%u7f8e%u804c%u4e1a&type=6' class='item link '><space></space>比分</span><span data-v-href='' class='item'><space></space></span></div>";
+    var switchOddsHtml = "<div class='switch width33'><span data-v-key='pjop' class='item odds selected'><space></space>平均欧赔<em class='bluearrow'></em></span><span data-v-key='wlop' class='item odds '><space></space>威廉欧赔</span><span data-v-key='amop' class='item odds '><space></space>澳门欧赔</span><span data-v-key='lbop' class='item odds '><space></space>立博欧赔</span><span data-v-key='beop' class='item odds '><space></space>Bet365欧赔</span><span data-v-key='wdop' class='item odds '><space></space>伟德欧赔</span><span data-v-key='amyp' class='item odds '><space></space>澳门亚赔</span><span data-v-key='sbyp' class='item odds '><space></space>皇冠亚赔</span><span data-v-key='lbyp' class='item odds '><space></space>立博亚赔</span><span data-v-key='12yp' class='item odds '><space></space>12bet亚赔</span><span data-v-key='beyp' class='item odds '><space></space>Bet365亚赔</span><span data-v-key='ljyp' class='item odds '><space></space>利记亚赔</span><span data-v-key='amdx' class='item odds '><space></space>澳门大小</span><span data-v-key='sbdx' class='item odds '><space></space>皇冠大小</span><span data-v-key='bfzs' class='item odds '><space></space>必发指数</span><span data-v-key='tzbl' class='item odds '><space></space>支持比例</span><span data-v-href='' class='item'><space></space></span><span data-v-href='' class='item'><space></space></span></div>";
+    var sclassHtml = "<div class='switch switchSclass topSsDiv'><div class='subTitle'>奖金筛选</div><span data-v-key='0' name='award' class='item radio selected'>全部</span><span data-v-key='1' name='award' class='item radio '>1.5以下</span><span data-v-key='2' name='award' class='item radio '>1.5～2.0</span><span data-v-key='3' name='award' class='item radio '>2.0以上</span><span class='line'></span><div class='subTitle'>亚盘筛选（“<font color='#FF0000'>*</font>”为受让）</div><span data-v-key='*一球以上' name='asiaOddType' class='item checkbox '>*一球以上</span><span data-v-key='*半球' name='asiaOddType' class='item checkbox '>*半球</span><span data-v-key='*平/半' name='asiaOddType' class='item checkbox '>*平/半</span><span data-v-key='*半/一' name='asiaOddType' class='item checkbox '>*半/一</span><span data-v-key='平手' name='asiaOddType' class='item checkbox '>平手</span><span data-v-key='平/半' name='asiaOddType' class='item checkbox selected'>平/半</span><span data-v-key='半球' name='asiaOddType' class='item checkbox selected'>半球</span><span data-v-key='半/一' name='asiaOddType' class='item checkbox '>半/一</span><span data-v-key='一球' name='asiaOddType' class='item checkbox selected'>一球</span><span data-v-key='一/球半' name='asiaOddType' class='item checkbox selected'>一/球半</span><span data-v-key='球半以上' name='asiaOddType' class='item checkbox '>球半以上</span><span class='line'></span><div class='subTitle'>赛事筛选</div><span data-v-key='德乙' name='sclassName' class='item checkbox selected'>德乙(2)</span><span data-v-key='俄超' name='sclassName' class='item checkbox selected'>俄超(1)</span><span data-v-key='英超' name='sclassName' class='item checkbox selected'>英超(2)</span><span data-v-key='西甲' name='sclassName' class='item checkbox selected'>西甲(2)</span><span data-v-key='美职业' name='sclassName' class='item checkbox selected'>美职业(1)</span><span data-v-key='韩K联' name='sclassName' class='item checkbox '>韩K联(1)</span><span data-v-key='日职联' name='sclassName' class='item checkbox '>日职联(1)</span><span data-v-key='日职乙' name='sclassName' class='item checkbox '>日职乙(1)</span><span data-v-key='意甲' name='sclassName' class='item checkbox '>意甲(2)</span><span data-v-key='德甲' name='sclassName' class='item checkbox '>德甲(1)</span><span data-v-key='荷甲' name='sclassName' class='item checkbox '>荷甲(2)</span><span data-v-key='法乙' name='sclassName' class='item checkbox '>法乙(8)</span><div class='hotdv'><input id='hotmatch' type='checkbox' name='hotmatch'  ><label for='hotmatch'>仅显示热门赛事</label></div><space1></space1></div><div id='sclassBottomBtn'><ul class='floatrow sclassBottomul'><li v='3' class='r5Gray' >五大联赛</li><li v='0'>全选</li><li v='1' class='bdGray'>反选</li><li v='2'>确认</li></ul></div>";
+    var listtext = "\u005b\u007b\u0022\u006d\u0061\u0074\u0063\u0068\u0044\u0061\u0074\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0030\u0032\u0031\u002d\u0030\u0035\u002d\u0030\u0037\u0020\u661f\u671f\u4e94\u0022\u002c\u0022\u0072\u0066\u0022\u003a\u002d\u0031\u002c\u0022\u007a\u0066\u0022\u003a\u0030\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0032\u003a\u0030\u0030\u0022\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0022\u003a\u0022\u005c\u002f\u0044\u0061\u0074\u0065\u0028\u0031\u0036\u0032\u0030\u0033\u0039\u0036\u0030\u0030\u0030\u0030\u0030\u0030\u0029\u005c\u002f\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u004c\u0069\u0073\u0074\u0022\u003a\u005b\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0030\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u002c\u0033\u002e\u0036\u0035\u002c\u0032\u002e\u0036\u0036\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0031\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0033\u002e\u0038\u0035\u002c\u0033\u002e\u0039\u002c\u0031\u002e\u0035\u0038\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0032\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u0032\u002c\u0031\u0033\u002c\u0031\u0037\u002c\u0033\u0030\u002c\u0031\u0031\u002e\u0035\u002c\u0038\u002e\u0032\u0035\u002c\u0039\u002c\u0031\u0039\u002c\u0031\u0032\u002e\u0035\u002c\u0037\u002e\u0035\u002c\u0031\u0030\u002e\u0035\u002c\u0031\u0038\u002c\u0032\u0030\u002c\u0031\u0034\u002c\u0031\u0036\u002c\u0033\u0030\u002c\u0034\u0030\u002c\u0032\u0038\u002c\u0033\u0035\u002c\u0037\u0030\u002c\u0034\u0030\u002c\u0034\u0030\u002c\u0038\u0030\u002c\u0036\u0030\u002c\u0038\u0030\u002c\u0032\u0030\u0030\u002c\u0031\u0030\u0030\u002c\u0031\u0032\u0030\u002c\u0032\u0037\u002c\u0031\u0030\u0030\u002c\u0034\u0030\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0033\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u0032\u002c\u0037\u002e\u0035\u002c\u0034\u002e\u0033\u002c\u0033\u002e\u0033\u0035\u002c\u0034\u002e\u0032\u002c\u0036\u002e\u0038\u002c\u0031\u0031\u002e\u0035\u002c\u0031\u0034\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0034\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0033\u002e\u0031\u0035\u002c\u0031\u0035\u002c\u0032\u0036\u002c\u0035\u002e\u0032\u002c\u0036\u002e\u0035\u002c\u0037\u002c\u0032\u0031\u002c\u0031\u0035\u002c\u0034\u002e\u0034\u005d\u007d\u005d\u002c\u0022\u0073\u0063\u0068\u0065\u0064\u0075\u006c\u0065\u0049\u0064\u0022\u003a\u0031\u0038\u0039\u0035\u0031\u0034\u0030\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0049\u0064\u0022\u003a\u0033\u0035\u0036\u0037\u0030\u0030\u0031\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u006f\u0022\u003a\u0022\u5468\u4e94\u0030\u0030\u0031\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0061\u006d\u0065\u0022\u003a\u0022\u5fb7\u4e59\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0043\u006f\u006c\u006f\u0072\u0022\u003a\u0022\u0023\u0043\u0041\u0030\u0030\u0043\u0041\u0022\u002c\u0022\u0068\u006f\u006d\u0065\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u6c49\u8bfa\u5a01\u0039\u0036\u0022\u002c\u0022\u0067\u0075\u0065\u0073\u0074\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u8fbe\u59c6\u65af\u5854\u7279\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0065\u0077\u0073\u0022\u003a\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0031\u0033\u0022\u002c\u0022\u0031\u0030\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0031\u80dc\u0020\u0034\u5e73\u0020\u0035\u8d1f\u0022\u002c\u0022\u0035\u80dc\u0020\u0032\u5e73\u0020\u0033\u8d1f\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u4e3b\u80dc\u0031\u573a\u0020\u0020\u5e73\u5c40\u0031\u573a\u0020\u0020\u5ba2\u80dc\u0034\u573a\u0022\u005d\u007d\u005d\u002c\u0022\u006f\u0064\u0064\u0073\u0031\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0032\u002e\u0032\u0032\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0032\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0033\u002e\u0036\u0036\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0033\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0032\u002e\u0038\u0036\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u006e\u0075\u006c\u006c\u007d\u002c\u007b\u0022\u006d\u0061\u0074\u0063\u0068\u0044\u0061\u0074\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0030\u0032\u0031\u002d\u0030\u0035\u002d\u0030\u0037\u0020\u661f\u671f\u4e94\u0022\u002c\u0022\u0072\u0066\u0022\u003a\u002d\u0031\u002c\u0022\u007a\u0066\u0022\u003a\u0030\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0032\u003a\u0030\u0030\u0022\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0022\u003a\u0022\u005c\u002f\u0044\u0061\u0074\u0065\u0028\u0031\u0036\u0032\u0030\u0033\u0039\u0036\u0030\u0030\u0030\u0030\u0030\u0030\u0029\u005c\u002f\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u004c\u0069\u0073\u0074\u0022\u003a\u005b\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0030\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u002e\u0032\u0037\u002c\u0034\u002e\u0034\u002c\u0037\u002e\u0035\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0031\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u002c\u0033\u002e\u0033\u0035\u002c\u0032\u002e\u0038\u0035\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0032\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u0032\u002c\u0031\u0035\u002c\u0034\u0030\u002c\u0031\u0032\u0030\u002c\u0035\u002e\u0039\u002c\u0038\u002c\u0031\u0039\u002c\u0037\u0030\u002c\u0035\u002e\u0038\u002c\u0037\u002c\u0031\u0039\u002c\u0036\u0030\u002c\u0038\u002c\u0031\u0030\u002e\u0035\u002c\u0032\u0035\u002c\u0038\u0030\u002c\u0031\u0035\u002c\u0032\u0030\u002c\u0035\u0030\u002c\u0034\u0030\u0030\u002c\u0032\u0035\u0030\u002c\u0032\u0035\u0030\u002c\u0033\u0035\u002c\u0034\u0030\u002c\u0031\u0030\u0030\u002c\u0031\u0030\u0030\u0030\u002c\u0039\u0030\u0030\u002c\u0039\u0030\u0030\u002c\u0033\u0030\u002c\u0035\u0030\u0030\u002c\u0033\u0030\u0030\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0033\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u0032\u002c\u0035\u002c\u0033\u002e\u0036\u002c\u0033\u002e\u0034\u002c\u0035\u002e\u0032\u002c\u0039\u002e\u0035\u002c\u0031\u0037\u002c\u0032\u0035\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0034\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u002e\u0039\u0035\u002c\u0031\u0039\u002c\u0036\u0030\u002c\u0033\u002e\u0036\u002c\u0036\u002e\u0035\u002c\u0031\u0035\u002c\u0032\u0037\u002c\u0031\u0039\u002c\u0031\u0032\u005d\u007d\u005d\u002c\u0022\u0073\u0063\u0068\u0065\u0064\u0075\u006c\u0065\u0049\u0064\u0022\u003a\u0031\u0038\u0038\u0036\u0037\u0039\u0039\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0049\u0064\u0022\u003a\u0033\u0035\u0036\u0037\u0030\u0030\u0032\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u006f\u0022\u003a\u0022\u5468\u4e94\u0030\u0030\u0032\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0061\u006d\u0065\u0022\u003a\u0022\u4fc4\u8d85\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0043\u006f\u006c\u006f\u0072\u0022\u003a\u0022\u0023\u0030\u0030\u0036\u0036\u0039\u0039\u0022\u002c\u0022\u0068\u006f\u006d\u0065\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u0050\u0046\u0043\u7d22\u6cbb\u0022\u002c\u0022\u0067\u0075\u0065\u0073\u0074\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u4f0f\u5c14\u52a0\u683c\u52d2\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0065\u0077\u0073\u0022\u003a\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0034\u0022\u002c\u0022\u0031\u0035\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0034\u80dc\u0020\u0031\u5e73\u0020\u0035\u8d1f\u0022\u002c\u0022\u0032\u80dc\u0020\u0031\u5e73\u0020\u0037\u8d1f\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u4e3b\u80dc\u0033\u573a\u0020\u0020\u5e73\u5c40\u0033\u573a\u0020\u0020\u5ba2\u80dc\u0034\u573a\u0022\u005d\u007d\u005d\u002c\u0022\u006f\u0064\u0064\u0073\u0031\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0031\u002e\u0034\u0034\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0032\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0034\u002e\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0033\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0036\u002e\u0038\u0039\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u006e\u0075\u006c\u006c\u007d\u002c\u007b\u0022\u006d\u0061\u0074\u0063\u0068\u0044\u0061\u0074\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0030\u0032\u0031\u002d\u0030\u0035\u002d\u0030\u0037\u0020\u661f\u671f\u4e94\u0022\u002c\u0022\u0072\u0066\u0022\u003a\u002d\u0031\u002c\u0022\u007a\u0066\u0022\u003a\u0030\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0032\u003a\u0030\u0030\u0022\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0022\u003a\u0022\u005c\u002f\u0044\u0061\u0074\u0065\u0028\u0031\u0036\u0032\u0030\u0033\u0039\u0036\u0030\u0030\u0030\u0030\u0030\u0030\u0029\u005c\u002f\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u004c\u0069\u0073\u0074\u0022\u003a\u005b\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0030\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u002e\u0033\u002c\u0034\u002e\u0032\u0035\u002c\u0037\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0031\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u002e\u0030\u0035\u002c\u0033\u002e\u0033\u0035\u002c\u0032\u002e\u0037\u0035\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0032\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u0033\u002c\u0031\u0036\u002c\u0034\u0030\u002c\u0031\u0030\u0030\u002c\u0036\u002e\u0037\u0035\u002c\u0038\u002c\u0031\u0038\u002c\u0036\u0030\u002c\u0036\u002e\u0035\u002c\u0037\u002c\u0031\u0036\u002c\u0035\u0030\u002c\u0038\u002e\u0035\u002c\u0039\u002e\u0035\u002c\u0032\u0031\u002c\u0037\u0030\u002c\u0031\u0036\u002c\u0032\u0030\u002c\u0034\u0030\u002c\u0034\u0030\u0030\u002c\u0032\u0035\u0030\u002c\u0032\u0035\u0030\u002c\u0033\u0035\u002c\u0034\u0030\u002c\u0038\u0030\u002c\u0038\u0030\u0030\u002c\u0036\u0030\u0030\u002c\u0036\u0030\u0030\u002c\u0032\u0035\u002c\u0031\u0037\u0035\u002c\u0032\u0035\u0030\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0033\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u0033\u002c\u0035\u002e\u0035\u002c\u0033\u002e\u0039\u002c\u0033\u002e\u0035\u0035\u002c\u0034\u002e\u0038\u002c\u0038\u002c\u0031\u0033\u002c\u0032\u0031\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0034\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u002c\u0031\u0037\u002c\u0034\u0030\u002c\u0033\u002e\u0037\u0035\u002c\u0037\u002e\u0035\u002c\u0031\u0034\u002c\u0032\u0031\u002c\u0031\u0037\u002c\u0031\u0031\u005d\u007d\u005d\u002c\u0022\u0073\u0063\u0068\u0065\u0064\u0075\u006c\u0065\u0049\u0064\u0022\u003a\u0031\u0039\u0030\u0034\u0031\u0030\u0036\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0049\u0064\u0022\u003a\u0033\u0035\u0036\u0037\u0030\u0030\u0036\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u006f\u0022\u003a\u0022\u5468\u4e94\u0030\u0030\u0036\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0061\u006d\u0065\u0022\u003a\u0022\u82f1\u8d85\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0043\u006f\u006c\u006f\u0072\u0022\u003a\u0022\u0023\u0046\u0046\u0033\u0033\u0033\u0033\u0022\u002c\u0022\u0068\u006f\u006d\u0065\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u83b1\u5207\u65af\u7279\u57ce\u0022\u002c\u0022\u0067\u0075\u0065\u0073\u0074\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u7ebd\u5361\u65af\u5c14\u8054\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0065\u0077\u0073\u0022\u003a\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0033\u0022\u002c\u0022\u0031\u0037\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0036\u80dc\u0020\u0032\u5e73\u0020\u0032\u8d1f\u0022\u002c\u0022\u0032\u80dc\u0020\u0035\u5e73\u0020\u0033\u8d1f\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u4e3b\u80dc\u0037\u573a\u0020\u0020\u5e73\u5c40\u0031\u573a\u0020\u0020\u5ba2\u80dc\u0032\u573a\u0022\u005d\u007d\u005d\u002c\u0022\u006f\u0064\u0064\u0073\u0031\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0031\u002e\u0034\u0031\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0032\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0034\u002e\u0037\u0035\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0033\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0037\u002e\u0035\u0031\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u006e\u0075\u006c\u006c\u007d\u002c\u007b\u0022\u006d\u0061\u0074\u0063\u0068\u0044\u0061\u0074\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0030\u0032\u0031\u002d\u0030\u0035\u002d\u0030\u0037\u0020\u661f\u671f\u4e94\u0022\u002c\u0022\u0072\u0066\u0022\u003a\u002d\u0031\u002c\u0022\u007a\u0066\u0022\u003a\u0030\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0032\u003a\u0030\u0030\u0022\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0022\u003a\u0022\u005c\u002f\u0044\u0061\u0074\u0065\u0028\u0031\u0036\u0032\u0030\u0033\u0039\u0036\u0030\u0030\u0030\u0030\u0030\u0030\u0029\u005c\u002f\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u004c\u0069\u0073\u0074\u0022\u003a\u005b\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0030\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u002e\u0033\u0036\u002c\u0033\u002e\u0038\u0035\u002c\u0036\u002e\u0035\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0031\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u002e\u0032\u0037\u002c\u0033\u002e\u0032\u0035\u002c\u0032\u002e\u0035\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0032\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u0030\u002c\u0031\u0033\u002c\u0033\u0035\u002c\u0031\u0030\u0030\u002c\u0035\u002e\u0034\u002c\u0036\u002e\u0038\u002c\u0031\u0037\u002c\u0036\u0030\u002c\u0035\u002e\u0039\u002c\u0037\u002c\u0031\u0039\u002c\u0036\u0030\u002c\u0038\u002e\u0037\u0035\u002c\u0031\u0032\u002c\u0032\u0038\u002c\u0038\u0030\u002c\u0031\u0038\u002c\u0032\u0034\u002c\u0036\u0030\u002c\u0034\u0030\u0030\u002c\u0032\u0035\u0030\u002c\u0032\u0035\u0030\u002c\u0034\u0030\u002c\u0036\u0030\u002c\u0031\u0032\u0030\u002c\u0031\u0030\u0030\u0030\u002c\u0038\u0030\u0030\u002c\u0039\u0030\u0030\u002c\u0034\u0030\u002c\u0036\u0030\u0030\u002c\u0033\u0030\u0030\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0033\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u0030\u002c\u0034\u002e\u0032\u002c\u0033\u002e\u0032\u002c\u0033\u002e\u0036\u0035\u002c\u0035\u002e\u0038\u002c\u0031\u0033\u002c\u0032\u0030\u002c\u0033\u0035\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0034\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u002c\u0032\u0030\u002c\u0036\u0030\u002c\u0033\u002e\u0037\u0035\u002c\u0035\u002e\u0037\u0035\u002c\u0031\u0034\u002c\u0032\u0035\u002c\u0032\u0030\u002c\u0031\u0032\u005d\u007d\u005d\u002c\u0022\u0073\u0063\u0068\u0065\u0064\u0075\u006c\u0065\u0049\u0064\u0022\u003a\u0031\u0039\u0031\u0034\u0031\u0032\u0033\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0049\u0064\u0022\u003a\u0033\u0035\u0036\u0037\u0030\u0030\u0037\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u006f\u0022\u003a\u0022\u5468\u4e94\u0030\u0030\u0037\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0061\u006d\u0065\u0022\u003a\u0022\u897f\u7532\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0043\u006f\u006c\u006f\u0072\u0022\u003a\u0022\u0023\u0030\u0030\u0036\u0036\u0033\u0033\u0022\u002c\u0022\u0068\u006f\u006d\u0065\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u7687\u5bb6\u793e\u4f1a\u0022\u002c\u0022\u0067\u0075\u0065\u0073\u0074\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u827e\u5c14\u5207\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0065\u0077\u0073\u0022\u003a\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0035\u0022\u002c\u0022\u0031\u0039\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0034\u80dc\u0020\u0032\u5e73\u0020\u0034\u8d1f\u0022\u002c\u0022\u0032\u80dc\u0020\u0033\u5e73\u0020\u0035\u8d1f\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u4e3b\u80dc\u0034\u573a\u0020\u0020\u5e73\u5c40\u0033\u573a\u0020\u0020\u5ba2\u80dc\u0033\u573a\u0022\u005d\u007d\u005d\u002c\u0022\u006f\u0064\u0064\u0073\u0031\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0031\u002e\u0035\u0034\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0032\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0033\u002e\u0039\u0030\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0033\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0036\u002e\u0039\u0032\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u006e\u0075\u006c\u006c\u007d\u002c\u007b\u0022\u006d\u0061\u0074\u0063\u0068\u0044\u0061\u0074\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0030\u0032\u0031\u002d\u0030\u0035\u002d\u0030\u0037\u0020\u661f\u671f\u4e94\u0022\u002c\u0022\u0072\u0066\u0022\u003a\u002d\u0031\u002c\u0022\u007a\u0066\u0022\u003a\u0030\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0030\u0039\u003a\u0033\u0030\u0022\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0022\u003a\u0022\u005c\u002f\u0044\u0061\u0074\u0065\u0028\u0031\u0036\u0032\u0030\u0034\u0033\u0037\u0034\u0030\u0030\u0030\u0030\u0030\u0029\u005c\u002f\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u004c\u0069\u0073\u0074\u0022\u003a\u005b\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0030\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u002e\u0037\u0034\u002c\u0033\u002e\u0035\u0035\u002c\u0033\u002e\u0034\u0032\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0031\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0033\u002e\u0032\u0032\u002c\u0033\u002e\u0036\u0035\u002c\u0031\u002e\u0037\u0037\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0032\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u0036\u002c\u0031\u0032\u002c\u0032\u0030\u002c\u0034\u0030\u002c\u0038\u002e\u0035\u002c\u0037\u002e\u0032\u0035\u002c\u0031\u0030\u002c\u0032\u0035\u002c\u0039\u002e\u0035\u002c\u0037\u002c\u0031\u0031\u002e\u0035\u002c\u0032\u0035\u002c\u0031\u0035\u002c\u0031\u0032\u002e\u0035\u002c\u0031\u0038\u002c\u0034\u0030\u002c\u0033\u0030\u002c\u0032\u0036\u002c\u0034\u0030\u002c\u0031\u0030\u0030\u002c\u0037\u0030\u002c\u0038\u0035\u002c\u0037\u0030\u002c\u0036\u0030\u002c\u0038\u0030\u002c\u0033\u0030\u0030\u002c\u0032\u0035\u0030\u002c\u0032\u0035\u0030\u002c\u0033\u0030\u002c\u0032\u0030\u0030\u002c\u0037\u0030\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0033\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u0036\u002c\u0036\u002c\u0033\u002e\u0039\u002c\u0033\u002e\u0034\u002c\u0034\u002e\u0035\u002c\u0038\u002c\u0031\u0034\u002c\u0031\u0038\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0034\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u002e\u0037\u002c\u0031\u0035\u002c\u0033\u0034\u002c\u0034\u002e\u0037\u002c\u0035\u002e\u0038\u0035\u002c\u0038\u002e\u0035\u002c\u0032\u0032\u002c\u0031\u0035\u002c\u0035\u002e\u0037\u0035\u005d\u007d\u005d\u002c\u0022\u0073\u0063\u0068\u0065\u0064\u0075\u006c\u0065\u0049\u0064\u0022\u003a\u0031\u0039\u0039\u0038\u0035\u0039\u0032\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0049\u0064\u0022\u003a\u0033\u0035\u0036\u0037\u0030\u0030\u0039\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u006f\u0022\u003a\u0022\u5468\u4e94\u0030\u0030\u0039\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0061\u006d\u0065\u0022\u003a\u0022\u7f8e\u804c\u4e1a\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0043\u006f\u006c\u006f\u0072\u0022\u003a\u0022\u0023\u0036\u0036\u0030\u0030\u0033\u0033\u0022\u002c\u0022\u0068\u006f\u006d\u0065\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u7687\u5bb6\u76d0\u6e56\u57ce\u0022\u002c\u0022\u0067\u0075\u0065\u0073\u0074\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u5723\u4f55\u585e\u5730\u9707\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0065\u0077\u0073\u0022\u003a\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u897f\u0033\u0022\u002c\u0022\u897f\u0032\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u0035\u80dc\u0020\u0031\u5e73\u0020\u0034\u8d1f\u0022\u002c\u0022\u0036\u80dc\u0020\u0031\u5e73\u0020\u0033\u8d1f\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u4e3b\u80dc\u0032\u573a\u0020\u0020\u5e73\u5c40\u0033\u573a\u0020\u0020\u5ba2\u80dc\u0035\u573a\u0022\u005d\u007d\u005d\u002c\u0022\u006f\u0064\u0064\u0073\u0031\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0031\u002e\u0039\u0030\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0032\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0033\u002e\u0037\u0037\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0033\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0033\u002e\u0034\u0039\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u006e\u0075\u006c\u006c\u007d\u002c\u007b\u0022\u006d\u0061\u0074\u0063\u0068\u0044\u0061\u0074\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0030\u0032\u0031\u002d\u0030\u0035\u002d\u0030\u0038\u0020\u661f\u671f\u516d\u0022\u002c\u0022\u0072\u0066\u0022\u003a\u002d\u0031\u002c\u0022\u007a\u0066\u0022\u003a\u0030\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0031\u0039\u003a\u0030\u0030\u0022\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0022\u003a\u0022\u005c\u002f\u0044\u0061\u0074\u0065\u0028\u0031\u0036\u0032\u0030\u0034\u0037\u0031\u0036\u0030\u0030\u0030\u0030\u0030\u0029\u005c\u002f\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u004c\u0069\u0073\u0074\u0022\u003a\u005b\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0030\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u002e\u0033\u0038\u002c\u0034\u002c\u0035\u002e\u0037\u0035\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0031\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u002e\u0032\u0038\u002c\u0033\u002e\u0034\u002c\u0032\u002e\u0034\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0032\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u0033\u002c\u0031\u0034\u002c\u0033\u0030\u002c\u0038\u0030\u002c\u0036\u002e\u0035\u002c\u0037\u002e\u0037\u0035\u002c\u0031\u0034\u002c\u0035\u0030\u002c\u0036\u002e\u0037\u002c\u0036\u002e\u0039\u002c\u0031\u0035\u002c\u0034\u0030\u002c\u0031\u0030\u002c\u0031\u0031\u002c\u0032\u0031\u002c\u0036\u0030\u002c\u0032\u0030\u002c\u0032\u0031\u002c\u0034\u0030\u002c\u0033\u0030\u0030\u002c\u0031\u0035\u0030\u002c\u0031\u0035\u0030\u002c\u0034\u0030\u002c\u0035\u0030\u002c\u0038\u0030\u002c\u0038\u0030\u0030\u002c\u0036\u0030\u0030\u002c\u0036\u0030\u0030\u002c\u0033\u0030\u002c\u0034\u0030\u0030\u002c\u0032\u0030\u0030\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0033\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u0033\u002c\u0035\u002e\u0032\u002c\u0033\u002e\u0037\u0035\u002c\u0033\u002e\u0033\u0035\u002c\u0034\u002e\u0038\u002c\u0039\u002e\u0035\u002c\u0031\u0036\u002c\u0032\u0033\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0034\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u002c\u0031\u0038\u002e\u0035\u002c\u0035\u0030\u002c\u0034\u002c\u0036\u002e\u0035\u002c\u0031\u0033\u002c\u0032\u0033\u002c\u0031\u0038\u002e\u0035\u002c\u0031\u0030\u005d\u007d\u005d\u002c\u0022\u0073\u0063\u0068\u0065\u0064\u0075\u006c\u0065\u0049\u0064\u0022\u003a\u0031\u0038\u0039\u0035\u0031\u0033\u0037\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0049\u0064\u0022\u003a\u0033\u0035\u0036\u0038\u0030\u0030\u0035\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u006f\u0022\u003a\u0022\u5468\u516d\u0030\u0030\u0035\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0061\u006d\u0065\u0022\u003a\u0022\u5fb7\u4e59\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0043\u006f\u006c\u006f\u0072\u0022\u003a\u0022\u0023\u0043\u0041\u0030\u0030\u0043\u0041\u0022\u002c\u0022\u0068\u006f\u006d\u0065\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u675c\u585e\u5c14\u591a\u592b\u0022\u002c\u0022\u0067\u0075\u0065\u0073\u0074\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u5e03\u4f26\u65af\u7ef4\u514b\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0065\u0077\u0073\u0022\u003a\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u002c\u0022\u002d\u002d\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u002c\u0022\u002d\u002d\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u005d\u007d\u005d\u002c\u0022\u006f\u0064\u0064\u0073\u0031\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0031\u002e\u0034\u0039\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0032\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0034\u002e\u0031\u0038\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0033\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0036\u002e\u0030\u0032\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u006e\u0075\u006c\u006c\u007d\u002c\u007b\u0022\u006d\u0061\u0074\u0063\u0068\u0044\u0061\u0074\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0030\u0032\u0031\u002d\u0030\u0035\u002d\u0030\u0038\u0020\u661f\u671f\u516d\u0022\u002c\u0022\u0072\u0066\u0022\u003a\u002d\u0031\u002c\u0022\u007a\u0066\u0022\u003a\u0030\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u0022\u0032\u0033\u003a\u0030\u0030\u0022\u002c\u0022\u0065\u006e\u0064\u0053\u0061\u006c\u0065\u0054\u0069\u006d\u0065\u0022\u003a\u0022\u005c\u002f\u0044\u0061\u0074\u0065\u0028\u0031\u0036\u0032\u0030\u0034\u0038\u0036\u0030\u0030\u0030\u0030\u0030\u0030\u0029\u005c\u002f\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u004c\u0069\u0073\u0074\u0022\u003a\u005b\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0030\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0031\u002e\u0037\u0034\u002c\u0033\u002e\u0031\u002c\u0034\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0031\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0066\u0061\u006c\u0073\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0033\u002e\u0035\u0035\u002c\u0033\u002e\u0033\u002c\u0031\u002e\u0037\u0037\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0032\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0039\u002c\u0039\u002c\u0032\u0031\u002c\u0036\u0030\u002c\u0035\u002e\u0038\u002c\u0036\u002e\u0032\u0035\u002c\u0031\u0031\u002c\u0034\u0030\u002c\u0037\u002e\u0032\u0035\u002c\u0037\u002e\u0032\u0035\u002c\u0031\u0035\u002c\u0034\u0030\u002c\u0031\u0032\u002e\u0035\u002c\u0031\u0034\u002e\u0035\u002c\u0032\u0037\u002c\u0037\u0030\u002c\u0033\u0030\u002c\u0033\u0035\u002c\u0037\u0030\u002c\u0032\u0030\u0030\u002c\u0031\u0035\u0030\u002c\u0031\u0035\u0030\u002c\u0038\u0030\u002c\u0038\u0030\u002c\u0032\u0030\u0030\u002c\u0036\u0030\u0030\u002c\u0035\u0030\u0030\u002c\u0036\u0030\u0030\u002c\u0036\u0030\u002c\u0032\u0030\u0030\u002c\u0032\u0035\u0030\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0033\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0039\u002c\u0034\u002e\u0031\u002c\u0033\u002e\u0032\u002c\u0033\u002e\u0037\u002c\u0036\u002e\u0035\u002c\u0031\u0032\u002c\u0032\u0032\u002c\u0033\u0030\u005d\u007d\u002c\u007b\u0022\u0070\u006c\u0061\u0079\u0054\u0079\u0070\u0065\u0022\u003a\u0034\u002c\u0022\u0069\u0073\u0048\u0061\u0073\u0053\u0069\u006e\u0067\u006c\u0065\u0022\u003a\u0074\u0072\u0075\u0065\u002c\u0022\u006f\u0064\u0064\u0073\u0022\u003a\u005b\u0032\u002e\u0038\u002c\u0031\u0034\u002c\u0033\u0035\u002c\u0034\u002e\u0032\u002c\u0035\u002c\u0038\u002e\u0037\u0035\u002c\u0032\u0035\u002c\u0031\u0034\u002c\u0037\u002e\u0035\u005d\u007d\u005d\u002c\u0022\u0073\u0063\u0068\u0065\u0064\u0075\u006c\u0065\u0049\u0064\u0022\u003a\u0031\u0039\u0030\u0034\u0031\u0030\u0035\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0049\u0064\u0022\u003a\u0033\u0035\u0036\u0038\u0030\u0032\u0034\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u006f\u0022\u003a\u0022\u5468\u516d\u0030\u0032\u0034\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0061\u006d\u0065\u0022\u003a\u0022\u82f1\u8d85\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0043\u006f\u006c\u006f\u0072\u0022\u003a\u0022\u0023\u0046\u0046\u0033\u0033\u0033\u0033\u0022\u002c\u0022\u0068\u006f\u006d\u0065\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u66fc\u5f7b\u65af\u7279\u57ce\u0022\u002c\u0022\u0067\u0075\u0065\u0073\u0074\u0054\u0065\u0061\u006d\u0022\u003a\u0022\u5207\u5c14\u897f\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u004e\u0065\u0077\u0073\u0022\u003a\u005b\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u002c\u0022\u002d\u002d\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u002c\u0022\u002d\u002d\u0022\u005d\u007d\u002c\u007b\u0022\u0064\u0065\u0074\u0061\u0069\u006c\u0073\u0022\u003a\u005b\u0022\u002d\u002d\u0022\u005d\u007d\u005d\u002c\u0022\u006f\u0064\u0064\u0073\u0031\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0031\u002e\u0039\u0032\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0032\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0033\u002e\u0034\u0030\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006f\u0064\u0064\u0073\u0033\u0022\u003a\u0022\u005c\u0075\u0030\u0030\u0033\u0063\u0066\u006f\u006e\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u005c\u0075\u0030\u0030\u0032\u0037\u0023\u0033\u0038\u0061\u0064\u0066\u0037\u005c\u0075\u0030\u0030\u0032\u0037\u005c\u0075\u0030\u0030\u0033\u0065\u0034\u002e\u0031\u0039\u005c\u0075\u0030\u0030\u0033\u0063\u002f\u0066\u006f\u006e\u0074\u005c\u0075\u0030\u0030\u0033\u0065\u0022\u002c\u0022\u006d\u0061\u0074\u0063\u0068\u0054\u0069\u006d\u0065\u0054\u0065\u0078\u0074\u0022\u003a\u006e\u0075\u006c\u006c\u007d\u005d"
+   
+    window.onresize = function(){
+        if ($("#optimizeItemList").css("display")!="none")                   
+            $("#optimizeItemList").height($(window).height() - $("#optimizeItemList").offset().top - $("#optimizeBottomArea").height());	 //选号区滚动
+    }  
+
+  
+ 
+</script>
+

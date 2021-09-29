@@ -1,0 +1,209 @@
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1, minimal-ui' name='viewport' /><meta content='yes' name='apple-mobile-web-app-capable' /><meta content='black' name='apple-mobile-web-app-status-bar-style' /><meta content='telephone=no' name='format-detection' /><script src='/Trade/Js/jquery.js?2019'></script><link rel='stylesheet' href='/Trade/Css/main2017.css?2019' /><link href="/Images/touch-icon.png" rel="apple-touch-icon-precomposed" /> <title>
+	开奖结果
+</title>
+    <style>
+        body {text-align:center;margin:0;color:#414141;font-size:14px;font-family: "微软雅黑"; background-color:#E6E6E6;       }
+     div { background-color:#fff;      }
+        table {border-collapse: collapse;}
+        .ResultNum{margin-top:10px;border-bottom-width: 1px;border-bottom-style: solid;border-bottom-color: #DEDEDE;padding-bottom: 15px;        }
+        .IssueNumText{text-align:center;color:#414141;font-size:14px;}
+        .bonusmoney{}
+        .ZcSpanNum {background-color:#71bd31;color:#fff;display:inline-block;font-weight:bold;width:18px;height:25px;margin-right:3px;line-height: 25px;border-radius:2px; font-size:18px;}
+        .matchtb {width:100%;background-color: #FFF;}
+        .matchtb td { border:1px solid #DEDEDE;    }
+        .redball { background-color:#DD420F; color:#fff; padding:3px; width:22px; height:22px; line-height:22px; font-size:18px; display:inline-block; font-weight:bold; text-align:center; border-radius:20px; margin-right:5px;  }
+        .blueball {background-color:#6EA5E3; color:#fff; padding:3px; width:22px; height:22px;line-height:22px;font-size:18px;  display:inline-block; font-weight:bold;text-align:center; border-radius:20px; margin-right:5px; }
+        .saletb { width:100% ; }        
+        .saletb .saletbtitle { text-align:center;   font-weight:bold;}
+        .saletb .saletbmoney {color:#e14f13;}
+        .bonustb {width:100%;background-color: #FFF;}
+        .bonustb td {border:1px solid #DEDEDE; line-height:32px}
+		.bonustbtitle td {color: #333;line-height:32px;background-color: #F4F4F4;}
+		.linetd {background-color: #E6E6E6;	height: 8px;}
+        .halfcls{font-size:10px; color:#bfbcbc; }
+.linetd2 {background-color: #E6E6E6;height: 8px;border-top: 1px solid #DEDEDE;}
+.bonusmoney { color:#e14f13}
+.kio {background-color: #E6E6E6;padding: 10px;}
+    </style>
+</head>
+<body>
+  
+<style>
+    .alertdlg{position:fixed;padding:10px; min-width:100px;background-color:#000000;color:#ffffff;text-align:center;display:none;top: 50%;left: 50%; border-radius:5px; z-index:120000; }
+</style>
+<div id="alertdlg" class="alertdlg" >
+</div>
+<script src="/Trade/Js/pageHead.js?v=5" type="text/javascript"></script>
+<script type="text/javascript">
+    function JsGetAppType(){
+        var agent =  navigator.userAgent.toLowerCase();
+        var IOS_Arr = ["iPhone", "iPod", "iPad" ];
+        var isIOS = false;
+        for(var i=0;i<IOS_Arr.length;i++)
+        {
+            if (agent.indexOf(IOS_Arr[i].toLowerCase()) != -1)
+            {
+                isIOS = true;
+                break;
+            }
+        }
+        return isIOS ? 2 : 1 ;
+    }
+    MobileBase.AppType=JsGetAppType();   //必须 。为解决缓存记录了值，改使用Js函数动态获取类型
+       MobileBase.init(); //IOS必须      
+       var isOpenApp = false;
+       function  hrefOpenInApp(href)
+       { 
+           if (isOpenApp){
+               var obj = {'urlString':href,useBrowser:false,targetName:'URL',isPageNoHeader:true};
+               rst = "javascript:MobileBase.appRoute(" + JSON.stringify(obj) + ")";
+               }else{
+               rst = href;
+           }
+           return rst;
+       }    
+       function OpenHrefByJs(shref,isret) {           
+           
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {              
+               location.href = shref  + (typeof(isret) !=  "undefined" && isret == true? (shref.indexOf("?")==-1?"?":"") + "&ret=" + encodeURIComponent(location.href) :"");
+           }
+       }
+       function OpenHrefWithTitle(shref,title) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: false,title:title };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       function OpenWithLogin(shref)
+       {          
+           LoginDlg.SuccessCallBack = function () {OpenHrefByJs(shref) };
+           LoginDlg.show();
+       }
+       function alert(msg){ //自定义alert
+           $("#alertdlg").html(msg);
+           $("#alertdlg").show();      
+           $("#alertdlg").css("margin-left", "-" + ($("#alertdlg").width()/2) + "px");
+           $("#alertdlg").css("margin-top", "-" + ($("#alertdlg").height()/2) + "px");
+           setTimeout(function(){$("#alertdlg").hide();},2000);
+       }
+       function GetQueryString(name) {
+           var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+           var r = window.location.search.substr(1).match(reg);           
+           if (r != null) return decodeURIComponent(r[2]); return null;
+       }
+       function gotoback(default_url){
+           if (isOpenApp){
+               MobileBase.appGoBack();
+           }else{
+               var reqUrl = GetQueryString("ret");
+               if (reqUrl == null || reqUrl==""){
+                   if(typeof(default_url) == "undefined" || default_url=="" )
+                       history.back();
+                   else
+                       location.href = default_url;
+               }else{
+                   location.href = reqUrl;
+               }
+           }
+       }
+       function OpenUrlByJs(shref,isUserBrowser) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: (typeof(isUserBrowser) != "undefinde" && isUserBrowser == true ? true : false), targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       //设置刷新预设页面
+       function SetPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appSetPageTag(name);
+           }
+       }
+       //刷新预设页面
+       function RefreshPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appRefreshTagPage(name);
+           }
+       }
+
+       $(document).ready(function(){
+           $("a").each(function (idx, item) {//触屏版做成快捷方式后不能用a的直接跳转，会新开窗口到浏览器的，用这种方式可以避免尴尬
+               if($(this).attr("href")!=undefined&&$(this).attr("href").indexOf(".aspx")!=-1)
+               {
+                   $(this).click(function () {
+                       location.href = $(this).attr("href");
+                       return false;
+                   });
+               }
+           });
+       });
+</script>
+ <div class="topcontainer" >
+ <div class="topbanner" >
+        <span class="topRight">
+            
+        </span>
+        <span class="topLeft">
+            <a id="goback1" class="backbtn" href="javascript:gotoback('/Trade/DrawInfo/OtherDrawList.aspx?lotteryType=10051')" >
+                <em class="arrow-left"></em>
+            </a>
+        </span>
+      <span class="top_drop toptitle topdropbtn" id="top_type">大乐透
+      </span>
+ </div>
+</div>
+<div id='topheightdiv' style='height:40px;'></div><script type='text/javascript' >$(function(){if ($('.topcontainer').length >0){  $('#topheightdiv').css('height',$('.topcontainer').height()+'px'); } });</script>
+    <div>
+        <div class="IssueNumText" style="padding-top:10px; ">
+            第21050期 开奖时间: 2021-05-05 周三
+        </div>
+        <div class="ResultNum">
+             <span class='redball'  >09</span><span class='redball'  >22</span><span class='redball'  >32</span><span class='redball'  >33</span><span class='redball'  >35</span><span class='blueball'  >05</span><span class='blueball'  >10</span>
+        </div>
+        <div style="margin-top:10px; padding-bottom:10px" >
+            
+            <table class="saletb" >
+                <tr class="saletbtitle">
+                    <td>本期销量(元)</td><td>奖池奖金(元)</td>
+                </tr>
+                <tr class="saletbmoney">
+                    <td>332629347.00</td><td>776495378.00</td>
+                </tr>
+            </table>
+            
+        </div>
+        <div class="kio">
+             <table class='bonustb' cellspacing='0' cellpadding='0'><tr class='bonustbtitle'><td colspan='2'>奖项</td><td>中奖注数</td><td>每注奖金(元)</td></tr><tr><td rowspan='2'>一等奖</td><td>基本</td><td>7</td><td>9,324,231
+</td></tr><tr><td>追加</td><td>5</td><td>7,459,384
+</td></tr><tr><td rowspan='2'>二等奖</td><td>基本</td><td>106</td><td>126,690
+</td></tr><tr><td>追加</td><td>74</td><td>101,352
+</td></tr><tr><td >三等奖</td><td>基本</td><td>257</td><td>10,000
+</td></tr><tr><td >四等奖</td><td>基本</td><td>1102</td><td>3,000
+</td></tr><tr><td >五等奖</td><td>基本</td><td>18985</td><td>300
+</td></tr><tr><td >六等奖</td><td>基本</td><td>26635</td><td>200
+</td></tr><tr><td >七等奖</td><td>基本</td><td>39182</td><td>100
+</td></tr><tr><td >八等奖</td><td>基本</td><td>719712</td><td>15
+</td></tr><tr><td >九等奖</td><td>基本</td><td>7248581</td><td>5
+</td></tr>
+        </div>
+        <div class="kio" style="padding-top:0">
+               
+        </div>
+    </div>
+</body>
+</html>

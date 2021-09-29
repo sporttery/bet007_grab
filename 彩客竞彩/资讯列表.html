@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1, minimal-ui' name='viewport' /><meta content='yes' name='apple-mobile-web-app-capable' /><meta content='black' name='apple-mobile-web-app-status-bar-style' /><meta content='telephone=no' name='format-detection' /><script src='/Trade/Js/jquery.js?2019'></script><link rel='stylesheet' href='/Trade/Css/main2017.css?2019' /><link href="/Images/touch-icon.png" rel="apple-touch-icon-precomposed" /> <title>
+	分析
+</title>
+    <style>
+        a, a:link, a:hover { text-decoration: none; color: #333333; }
+        .topbtn { flex-grow: 1; width: 50px; text-align: center; cursor: pointer; color: #333333; }
+        .btn-selected { color: #ff6a00; border-bottom: 2px solid #ff6a00; }
+        .art-topbanner { height: 42px; line-height: 42px; background-color: #FFF; border-bottom: 1px solid #DDD; }
+        .imgcol, .art-img { width: 60px; height: 60px; }
+        .infocol { width: 200px; flex-grow: 1; padding-left: 10px; }
+        .artitem { padding: 12px; border-bottom: 1px solid #eee; }
+        .art-title { font-size: 16px; height: 46px; overflow: hidden; }
+        .art-subtitle { font-size: 12px; color: #A6A6A6; }
+        .subtitlt-right { float: right; }
+
+        /* General styles for all menus */
+        .cbp-spmenu { position: fixed; color: #333; width: 100%; height: 50px; left: 0; z-index: 1; overflow: hidden; background-color: #F7F7F7; }
+        .cbp-spmenu-top.cbp-spmenu-open { top: 92px; height: 100%; }
+
+        /* Transitions */
+
+        .cbp-spmenu,
+        .cbp-spmenu-push { -webkit-transition: all 0.6s ease; -moz-transition: all 0.6s ease; transition: all 0.6s ease; }
+
+        @media screen and (max-width: 55.1875em) {
+            .cbp-spmenu-top { top: -110px; }
+        }
+
+        .slidingmenu.active { width: 0; }
+
+            .slidingmenu.active:before { -webkit-transform: translateY(9px) rotate(45deg); -ms-transform: translateY(9px) rotate(45deg); transform: translateY(9px) rotate(45deg); }
+            .slidingmenu.active:after { -webkit-transform: translateY(-9px) rotate(-45deg); -ms-transform: translateY(-9px) rotate(-45deg); transform: translateY(-9px) rotate(-45deg); }
+        .slidingmenu { width: 24px; height: 2px; background-color: white; border-radius: 2px; position: absolute; top: 23px; right: 15px; -webkit-transition-duration: 0.5s; transition-duration: 0.5s; transiting-timing-function: swing; }
+            .slidingmenu:before,
+            .slidingmenu:after { width: 24px; height: 2px; background-color: white; border-radius: 2px; content: ""; position: absolute; right: 0; -webkit-transition-duration: 0.5s; transition-duration: 0.5s; -webkit-transition-timing-function: swing; transition-timing-function: swing; }
+            .slidingmenu:before { top: -9px; }
+            .slidingmenu:after { top: 9px; }
+        .cbp-spmenu h1 { font-size: 18px; padding: 0px; display: block; line-height: 24px; margin-top: 0px; margin-right: 0px; margin-bottom: 0; margin-left: 0px; font-weight: normal; text-align: center; color: #999; }
+        .cbp-spmenu ul { padding: 5px 10px; margin: 0px; clear: both; }
+            .cbp-spmenu ul li { list-style-type: none; width: 33%; float: left; box-sizing: border-box; margin: 6px 0; text-align: center; padding: 0 6px; }
+                .cbp-spmenu ul li a { color: #333; height: 34px; border: 1px solid #E1E1E1; border-radius: 4px; line-height: 34px; display: block; background: #fff; font-size: 18px; text-decoration: none; }
+
+    </style>
+</head>
+<body>
+ 
+<style>
+    .alertdlg{position:fixed;padding:10px; min-width:100px;background-color:#000000;color:#ffffff;text-align:center;display:none;top: 50%;left: 50%; border-radius:5px; z-index:120000; }
+</style>
+<div id="alertdlg" class="alertdlg" >
+</div>
+<script src="/Trade/Js/pageHead.js?v=5" type="text/javascript"></script>
+<script type="text/javascript">
+    function JsGetAppType(){
+        var agent =  navigator.userAgent.toLowerCase();
+        var IOS_Arr = ["iPhone", "iPod", "iPad" ];
+        var isIOS = false;
+        for(var i=0;i<IOS_Arr.length;i++)
+        {
+            if (agent.indexOf(IOS_Arr[i].toLowerCase()) != -1)
+            {
+                isIOS = true;
+                break;
+            }
+        }
+        return isIOS ? 2 : 1 ;
+    }
+    MobileBase.AppType=JsGetAppType();   //必须 。为解决缓存记录了值，改使用Js函数动态获取类型
+       MobileBase.init(); //IOS必须      
+       var isOpenApp = false;
+       function  hrefOpenInApp(href)
+       { 
+           if (isOpenApp){
+               var obj = {'urlString':href,useBrowser:false,targetName:'URL',isPageNoHeader:true};
+               rst = "javascript:MobileBase.appRoute(" + JSON.stringify(obj) + ")";
+               }else{
+               rst = href;
+           }
+           return rst;
+       }    
+       function OpenHrefByJs(shref,isret) {           
+           
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {              
+               location.href = shref  + (typeof(isret) !=  "undefined" && isret == true? (shref.indexOf("?")==-1?"?":"") + "&ret=" + encodeURIComponent(location.href) :"");
+           }
+       }
+       function OpenHrefWithTitle(shref,title) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: false,title:title };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       function OpenWithLogin(shref)
+       {          
+           LoginDlg.SuccessCallBack = function () {OpenHrefByJs(shref) };
+           LoginDlg.show();
+       }
+       function alert(msg){ //自定义alert
+           $("#alertdlg").html(msg);
+           $("#alertdlg").show();      
+           $("#alertdlg").css("margin-left", "-" + ($("#alertdlg").width()/2) + "px");
+           $("#alertdlg").css("margin-top", "-" + ($("#alertdlg").height()/2) + "px");
+           setTimeout(function(){$("#alertdlg").hide();},2000);
+       }
+       function GetQueryString(name) {
+           var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+           var r = window.location.search.substr(1).match(reg);           
+           if (r != null) return decodeURIComponent(r[2]); return null;
+       }
+       function gotoback(default_url){
+           if (isOpenApp){
+               MobileBase.appGoBack();
+           }else{
+               var reqUrl = GetQueryString("ret");
+               if (reqUrl == null || reqUrl==""){
+                   if(typeof(default_url) == "undefined" || default_url=="" )
+                       history.back();
+                   else
+                       location.href = default_url;
+               }else{
+                   location.href = reqUrl;
+               }
+           }
+       }
+       function OpenUrlByJs(shref,isUserBrowser) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: (typeof(isUserBrowser) != "undefinde" && isUserBrowser == true ? true : false), targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       //设置刷新预设页面
+       function SetPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appSetPageTag(name);
+           }
+       }
+       //刷新预设页面
+       function RefreshPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appRefreshTagPage(name);
+           }
+       }
+
+       $(document).ready(function(){
+           $("a").each(function (idx, item) {//触屏版做成快捷方式后不能用a的直接跳转，会新开窗口到浏览器的，用这种方式可以避免尴尬
+               if($(this).attr("href")!=undefined&&$(this).attr("href").indexOf(".aspx")!=-1)
+               {
+                   $(this).click(function () {
+                       location.href = $(this).attr("href");
+                       return false;
+                   });
+               }
+           });
+       });
+</script>
+ <div class="topcontainer" >
+ <div class="topbanner" >
+        <span class="topRight">
+        </span>
+        <span class="topLeft">
+            <a id="goback1" class="backbtn" href="/Trade/Index.aspx" >
+                <em class="arrow-left"></em>
+            </a>
+        </span>
+       <span class="top_drop toptitle topdropbtn" id="top_type">分析
+       </span>
+       <div id="showTop" class="slidingmenu"></div>
+        </div>
+        <div class="floatrow art-topbanner" >
+    <div class="topbtn btn-selected" data-type="0" >全部</div><div class="topbtn" data-type="4">公告</div><div class="topbtn" data-type="1">足球</div><div class="topbtn" data-type="2" >篮球</div><div class="topbtn" data-type="3">数字彩</div>
+</div>
+ </div>
+
+     <div class="cbp-spmenu  cbp-spmenu-top" id="cbp-spmenu-top">
+    <ul><h1>购彩</h1>
+    <li><a href="javascript:OpenHrefByJs('/Trade/Ball.aspx?gid=6')">竞彩足球</a></li>
+    <li><a href="javascript:OpenHrefByJs('/Trade/Ball.aspx?gid=7')">竞彩篮球</a></li>
+    <li><a href="javascript:OpenHrefByJs('/Trade/Ball.aspx?gid=4')">北京单场</a></li>
+    <li><a href="javascript:OpenHrefByJs('/Trade/Ball.aspx?type=25')">胜负过关</a></li>
+    <li><a href="javascript:OpenHrefByJs('/Trade/zucai.aspx?typeid=1')">十四场胜负</a></li>
+    <li><a href="javascript:OpenHrefByJs('/Trade/zucai.aspx?typeid=2')">任选9场</a></li>
+    <li><a href="javascript:OpenHrefByJs('/Trade/zucai.aspx?typeid=3')">六场半全场</a></li>
+    <li><a href="javascript:OpenHrefByJs('/Trade/zucai.aspx?typeid=4')">四场进球</a></li>
+    <li><a href="javascript:OpenHrefByJs('/Trade/dlt.aspx')">大乐透</a></li>
+
+    </ul>
+    <ul><h1>资讯</h1>
+    <li><a href="javascript:OpenHrefByJs('/Trade/DrawInfo/DrawInfoMain.aspx')">开奖</a></li>
+    <li><a href="javascript:OpenHrefByJs('/Trade/Info/ArticleList.aspx')">分析</a></li>
+    <li><a href="javascript:OpenHrefByJs('/Trade/TJ/TjPromote.aspx')">推荐</a></li>
+    <li><a href="javascript:OpenHrefByJs('/chart/ChartIndex.aspx?from=m')">图表</a></li>
+    <li><a href="javascript:OpenHrefByJs('/Analysis/Football.aspx')">比分</a></li>
+    </ul>
+    </div>
+<script src="/js/classie.js"></script>
+<script>
+			var 
+				menuTop = document.getElementById( 'cbp-spmenu-top' ),
+				showTop = document.getElementById( 'showTop' ),
+				body = document.body;
+
+			showTop.onclick = function() {
+				classie.toggle( this, 'active' );
+				classie.toggle( menuTop, 'cbp-spmenu-open' );
+				disableOther( 'showTop' );
+			};
+			
+			function disableOther( button ) {
+				if( button !== 'showTop' ) {
+					classie.toggle( showTop, 'disabled' );
+				}
+				
+			}
+		</script>
+
+<div id='topheightdiv' style='height:40px;'></div><script type='text/javascript' >$(function(){if ($('.topcontainer').length >0){  $('#topheightdiv').css('height',$('.topcontainer').height()+'px'); } });</script>
+<div  id="articleDataList" class="article-data-list" pageindex="1" hasNext="true" >
+
+</div>
+<div id="dvLoadMore" style="display:none;text-align:center;" >
+    <img src="/Trade/Images/loading.gif" align='absmiddle' />&nbsp;&nbsp;&nbsp;&nbsp;正在加载中...
+</div>
+</body>
+   <script src="/Trade/Js/BaseMath.js" ></script>
+   <script type="text/javascript">
+        function loaddata() {
+            var cur_hasNext = $("#articleDataList").attr("hasNext");
+            var cur_pageIndex = $("#articleDataList").attr("pageindex");
+            if (cur_hasNext == "true") {
+                $("#dvLoadMore").show();
+                $.ajax({
+                    type: "post",
+                    data: { action: "loaddata", pageIndex: cur_pageIndex },
+                    url: window.location.href,
+                    success: function (data) {
+                        var ResultObj = eval("(" + data + ")");
+                        if (ResultObj.resultCode == 100) {
+                            //console.log(ResultObj);
+                            $("#articleDataList").attr("pageindex", parseInt($("#articleDataList").attr("pageindex")) + 1);
+                            $("#articleDataList").attr("hasNext", ResultObj.body.hasNext);
+                            var records = ResultObj.body.records;
+                            var HTML_Arr = new Array();
+                            for (var i = 0; i < records.length; i++) {
+
+                                var url_href = "/Trade/Info/ArticleShow.aspx?articleID=" + records[i].articleId;
+                                HTML_Arr.push("<a href='" + (typeof(hrefOpenInApp) == "function"?hrefOpenInApp(url_href):url_href) + "'>");
+                                HTML_Arr.push("<div class='floatrow artitem' data-id='" + records[i].articleId + "' >");
+                                HTML_Arr.push("<div class='imgcol' ><img class='art-img'  src='" + records[i].imageUrl + "' /></div>"); //图
+                                HTML_Arr.push("<div class='infocol'><div class='art-title'>" + records[i].title + "</div><div class='art-subtitle' >" + records[i].lotteryName + "<span class='subtitlt-right'>" + records[i].addTime + "</span></div></div>")
+                                HTML_Arr.push("</div>");
+                                HTML_Arr.push("</a>");
+                            };
+                            $("#articleDataList").append(HTML_Arr.join(""));
+
+                            $("#articleDataList a").each(function (idx, item) {//触屏版做成快捷方式后不能用a的直接跳转，会新开窗口到浏览器的，用这种方式可以避免尴尬
+                                if ($(this).attr("href") != undefined && $(this).attr("href").indexOf(".aspx") != -1) {
+                                    var $events = $(this).data("events");
+                                    if (!($events && $events["click"])) 
+                                    {
+                                        $(this).click(function () {
+                                            location.href = $(this).attr("href");
+                                            return false;
+                                        });
+                                    }
+                                }
+                            });
+
+                        } else {
+                            alert(ResultObj.message);
+                        }
+                        $("#dvLoadMore").hide();
+                    },
+                    error: function (data) {
+                        console.info("error: " + data.responseText);
+                    }
+                });
+            }
+        }
+        $(function () {          
+            loaddata();
+            ScrollDo.init(document.body, null, loaddata, null, null);
+            $(".topbtn").click(function () {
+                window.location.href = "/Trade/Info/ArticleList.aspx?articleType=" + $(this).attr("data-type");
+            });
+        });
+    </script>
+</html>

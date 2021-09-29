@@ -1,0 +1,641 @@
+
+
+<!DOCTYPE  html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1, minimal-ui' name='viewport' /><meta content='yes' name='apple-mobile-web-app-capable' /><meta content='black' name='apple-mobile-web-app-status-bar-style' /><meta content='telephone=no' name='format-detection' /><script src='/Trade/Js/jquery.js?2019'></script><link rel='stylesheet' href='/Trade/Css/main2017.css?2019' /><link href="/Images/touch-icon.png" rel="apple-touch-icon-precomposed" /> <title>
+	超级大乐透
+</title><link rel="stylesheet" href="/Trade/Css/dialog.css" /><link rel="stylesheet" href="/Trade/Css/szc.css?v=6" />
+    <script type="text/javascript">
+        var TypeID = 20;
+        var LotteryType = 10051;
+    </script>
+    <script src="/Trade/Js/dialog.js" type ="text/javascript"></script>
+    <script src="/Trade/Js/BaseMath.js?v=2" type="text/javascript"></script>    
+    <script src="/Trade/Js/common.js?v=9" type="text/javascript"></script> 
+    <style>
+        .infocss3{width:52px;height:20px;text-align:center;line-height:20px;background:#F06747;color:#fff;float:left;}
+        .infocss6 {line-height:20px;}
+    </style> 
+</head>
+<body>
+ 
+<style>
+    .alertdlg{position:fixed;padding:10px; min-width:100px;background-color:#000000;color:#ffffff;text-align:center;display:none;top: 50%;left: 50%; border-radius:5px; z-index:120000; }
+</style>
+<div id="alertdlg" class="alertdlg" >
+</div>
+<script src="/Trade/Js/pageHead.js?v=5" type="text/javascript"></script>
+<script type="text/javascript">
+    function JsGetAppType(){
+        var agent =  navigator.userAgent.toLowerCase();
+        var IOS_Arr = ["iPhone", "iPod", "iPad" ];
+        var isIOS = false;
+        for(var i=0;i<IOS_Arr.length;i++)
+        {
+            if (agent.indexOf(IOS_Arr[i].toLowerCase()) != -1)
+            {
+                isIOS = true;
+                break;
+            }
+        }
+        return isIOS ? 2 : 1 ;
+    }
+    MobileBase.AppType=JsGetAppType();   //必须 。为解决缓存记录了值，改使用Js函数动态获取类型
+       MobileBase.init(); //IOS必须      
+       var isOpenApp = false;
+       function  hrefOpenInApp(href)
+       { 
+           if (isOpenApp){
+               var obj = {'urlString':href,useBrowser:false,targetName:'URL',isPageNoHeader:true};
+               rst = "javascript:MobileBase.appRoute(" + JSON.stringify(obj) + ")";
+               }else{
+               rst = href;
+           }
+           return rst;
+       }    
+       function OpenHrefByJs(shref,isret) {           
+           
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {              
+               location.href = shref  + (typeof(isret) !=  "undefined" && isret == true? (shref.indexOf("?")==-1?"?":"") + "&ret=" + encodeURIComponent(location.href) :"");
+           }
+       }
+       function OpenHrefWithTitle(shref,title) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: false,title:title };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       function OpenWithLogin(shref)
+       {          
+           LoginDlg.SuccessCallBack = function () {OpenHrefByJs(shref) };
+           LoginDlg.show();
+       }
+       function alert(msg){ //自定义alert
+           $("#alertdlg").html(msg);
+           $("#alertdlg").show();      
+           $("#alertdlg").css("margin-left", "-" + ($("#alertdlg").width()/2) + "px");
+           $("#alertdlg").css("margin-top", "-" + ($("#alertdlg").height()/2) + "px");
+           setTimeout(function(){$("#alertdlg").hide();},2000);
+       }
+       function GetQueryString(name) {
+           var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+           var r = window.location.search.substr(1).match(reg);           
+           if (r != null) return decodeURIComponent(r[2]); return null;
+       }
+       function gotoback(default_url){
+           if (isOpenApp){
+               MobileBase.appGoBack();
+           }else{
+               var reqUrl = GetQueryString("ret");
+               if (reqUrl == null || reqUrl==""){
+                   if(typeof(default_url) == "undefined" || default_url=="" )
+                       history.back();
+                   else
+                       location.href = default_url;
+               }else{
+                   location.href = reqUrl;
+               }
+           }
+       }
+       function OpenUrlByJs(shref,isUserBrowser) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: (typeof(isUserBrowser) != "undefinde" && isUserBrowser == true ? true : false), targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       //设置刷新预设页面
+       function SetPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appSetPageTag(name);
+           }
+       }
+       //刷新预设页面
+       function RefreshPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appRefreshTagPage(name);
+           }
+       }
+
+       $(document).ready(function(){
+           $("a").each(function (idx, item) {//触屏版做成快捷方式后不能用a的直接跳转，会新开窗口到浏览器的，用这种方式可以避免尴尬
+               if($(this).attr("href")!=undefined&&$(this).attr("href").indexOf(".aspx")!=-1)
+               {
+                   $(this).click(function () {
+                       location.href = $(this).attr("href");
+                       return false;
+                   });
+               }
+           });
+       });
+</script>
+ <div class="rmaskd"  onclick="hidemaskd()"  ></div>
+ <div id="mainplay" class="mainplay">
+     <div class="topcontainer" >
+ <div class="topbanner" >
+         <span class="topRight">
+            <span class="top_drop topdropbtn">
+                <span  id="showmenu" class="mline" >
+                    <span class="mline2"></span>
+                    
+                </span>
+            </span>
+        </span>
+         <span class="topLeft"><a class="backbtn" href="/Trade/Index.aspx" ><span class="arrleft" ></span></a></span>
+         <span class="toptitle" >超级大乐透</span>
+     <div style="position:relative;">
+     <div id="masktopdv" onclick="$(this).hide();$('#topmenulist').hide();" ></div>     
+     <div id="topmenulist"  >
+         <div class="mposition"><span class="sjiaotop"><em></em></span></div>
+         <a href="javascript:OpenPlayHelp(20,'玩法说明')" >
+         <div class="menuinfo" >玩法介绍 </div>
+         </a> 
+         <a href="javascript:OpenHrefByJs('/Trade/DrawInfo/OtherDrawList.aspx?lotteryType=10051',true)" >
+         <div class="menuinfo" style="border-bottom:none;" >开奖查询</div>
+         </a>
+        
+     </div>
+     </div>
+ </div>
+  
+ <div style="height:28px;line-height:28px;padding-left:8px; padding-right:10px;background-color:#fff; border-bottom:1px solid #E2E2E2; color:#999; font-size:12px" >
+          <span id="IssnumNum"><span id="SzcHead_LB_IssueNum">051</span></span>期截止：<span id="stoptimetext"></span> <span style="float:right;" >
+              <span id="SzcHead_Lb_PoolText">奖池滚存：776495378.00元</span></span>
+ </div>
+<script type="text/javascript" >
+    var DigObj = {"resultCode":999,"message":"停售啦"};
+    var saledata = DigObj.body;
+    var IssueStopTime = saledata.currentIssue.deadline;
+    var iTimeCount = 0;
+    function setStopText() {
+        var StopTime = new Date(IssueStopTime.replace(/-/gi,"/"));  //IOS不支持带有"-"，如：2016-01-01的日期类型，必须不"-"转为"/"
+        var timedif = StopTime - (new Date());
+        var htmlArr = new Array();
+        if (timedif > 0) {
+            var timetext = "";
+            var daylong = 60 * 60 * 24 * 1000;
+            var daycount = Math.floor(timedif / daylong); 
+            timedif = timedif % daylong;
+            if (daycount > 0) timetext += daycount + "天";
+            var hourlong = 60 * 60  * 1000;
+            var hourcount = Math.floor(timedif / hourlong);
+            timedif = timedif % hourlong;
+            var milong = 60 * 1000;
+            var micount = Math.floor(timedif / milong);
+            timedif = timedif % milong;
+            var seclong = 1000;
+            var seccount = Math.floor(timedif / seclong);
+            timetext += (hourcount>9?hourcount:"0" + hourcount)  + ":" + (micount>9?micount:"0" +micount) + ":" + (seccount>9?seccount:"0" + seccount) ;
+            document.getElementById("stoptimetext").innerHTML = timetext;
+
+        } else {
+            document.getElementById("stoptimetext").innerHTML = "已截止";
+            iTimeCount ++;
+            if (iTimeCount > 3)
+            {
+                GetNewSaleData();
+                iTimeCount = 0;
+            }            
+        }
+    };
+    setInterval(setStopText, 1000);
+    function GetNewSaleData(){
+        // 提交表单数据到后台处理
+        $.ajax({
+            type: "post",
+            data: {action:"getsaledata",typeid:20},
+            url: window.location.href ,
+            success: function (data) {
+                var ResultObj = eval("(" + data + ")");
+                if (ResultObj.resultCode == 100){
+                    if (saledata.currentIssue.id != ResultObj.body.currentIssue.id ){
+                        //已换期
+                        saledata = ResultObj.body;
+                        IssueStopTime = saledata.currentIssue.deadline;
+                    }
+                }else{
+                   // alert(ResultObj.message)
+                }                   
+            },
+            error: function (data) {              
+                console.info("error: " + data.responseText);                
+            }
+        });
+    };
+</script>
+</div>
+<div id='topheightdiv' style='height:40px;'></div><script type='text/javascript' >$(function(){if ($('.topcontainer').length >0){  $('#topheightdiv').css('height',$('.topcontainer').height()+'px'); } });</script>
+       <div style="background-color:#eee;padding:10px;" >
+        <div style="position:relative; height:30px;">
+            <div style="float:right;padding-right:15px; " ><span  style="padding:3px 5px;color:#F06747;border:1px solid #F06747;float:left; background-color:#FFF" onclick="GetRedRanDom()" >机选前区</span>
+                <span style="background:#F06747;color:#fff;padding:3px 5px;border:1px solid #F06747;float:left;" onclick="showredrd()" ><span id="redrnum" >5</span>个 ▼</span>              
+            </div>
+             <div id="redrd" class="randompanel" >                  
+                <ul class="redrandomlist">
+                    
+                         <li><span class="randombtn redbtn" num="05" >05</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="06" >06</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="07" >07</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="08" >08</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="09" >09</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="10" >10</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="11" >11</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="12" >12</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="13" >13</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="14" >14</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="15" >15</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="16" >16</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="17" >17</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="18" >18</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="19" >19</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="20" >20</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="21" >21</span></li>
+                    
+                         <li><span class="randombtn redbtn" num="22" >22</span></li>
+                    
+                </ul>     
+            </div>
+            <span class="infocss3"   >前区选号</span><span class="sjiao" ></span><span class="openredrandom infocss6" >至少选5个</span>            
+        </div>
+        <div style=" margin-top:2px;">
+            <ul class="ballbox rebballs" >
+                
+                 <li><span class="spanball" num="01" colordata="red" >01</span></li>
+                
+                 <li><span class="spanball" num="02" colordata="red" >02</span></li>
+                
+                 <li><span class="spanball" num="03" colordata="red" >03</span></li>
+                
+                 <li><span class="spanball" num="04" colordata="red" >04</span></li>
+                
+                 <li><span class="spanball" num="05" colordata="red" >05</span></li>
+                
+                 <li><span class="spanball" num="06" colordata="red" >06</span></li>
+                
+                 <li><span class="spanball" num="07" colordata="red" >07</span></li>
+                
+                 <li><span class="spanball" num="08" colordata="red" >08</span></li>
+                
+                 <li><span class="spanball" num="09" colordata="red" >09</span></li>
+                
+                 <li><span class="spanball" num="10" colordata="red" >10</span></li>
+                
+                 <li><span class="spanball" num="11" colordata="red" >11</span></li>
+                
+                 <li><span class="spanball" num="12" colordata="red" >12</span></li>
+                
+                 <li><span class="spanball" num="13" colordata="red" >13</span></li>
+                
+                 <li><span class="spanball" num="14" colordata="red" >14</span></li>
+                
+                 <li><span class="spanball" num="15" colordata="red" >15</span></li>
+                
+                 <li><span class="spanball" num="16" colordata="red" >16</span></li>
+                
+                 <li><span class="spanball" num="17" colordata="red" >17</span></li>
+                
+                 <li><span class="spanball" num="18" colordata="red" >18</span></li>
+                
+                 <li><span class="spanball" num="19" colordata="red" >19</span></li>
+                
+                 <li><span class="spanball" num="20" colordata="red" >20</span></li>
+                
+                 <li><span class="spanball" num="21" colordata="red" >21</span></li>
+                
+                 <li><span class="spanball" num="22" colordata="red" >22</span></li>
+                
+                 <li><span class="spanball" num="23" colordata="red" >23</span></li>
+                
+                 <li><span class="spanball" num="24" colordata="red" >24</span></li>
+                
+                 <li><span class="spanball" num="25" colordata="red" >25</span></li>
+                
+                 <li><span class="spanball" num="26" colordata="red" >26</span></li>
+                
+                 <li><span class="spanball" num="27" colordata="red" >27</span></li>
+                
+                 <li><span class="spanball" num="28" colordata="red" >28</span></li>
+                
+                 <li><span class="spanball" num="29" colordata="red" >29</span></li>
+                
+                 <li><span class="spanball" num="30" colordata="red" >30</span></li>
+                
+                 <li><span class="spanball" num="31" colordata="red" >31</span></li>
+                
+                 <li><span class="spanball" num="32" colordata="red" >32</span></li>
+                
+                 <li><span class="spanball" num="33" colordata="red" >33</span></li>
+                
+                 <li><span class="spanball" num="34" colordata="red" >34</span></li>
+                
+                 <li><span class="spanball" num="35" colordata="red" >35</span></li>
+                                           
+            </ul>
+        </div>
+         <div style="margin-top:10px;position:relative; height:30px"" >
+            <div style="float:right;padding-right:15px;" ><span  style="padding:3px 5px;color:#4A9FF2;float:left;border:1px solid #4A9FF2;background-color:#FFF"  onclick="GetBlueRanDom()" >机选后区</span>
+                <span style="background:#4A9FF2;color:#fff;padding:3px 5px;border:1px solid #4A9FF2;float:left;" onclick="showbluerd()" ><span id="bluernum" >2</span>个 ▼</span>
+            </div>
+             <div id="bluerd" class="randompanel randompanelb" >               
+                <ul class="bluerandomlist">
+                    
+                         <li><span class="randombtn bluebtn" num="02" >02</span></li>
+                    
+                         <li><span class="randombtn bluebtn" num="03" >03</span></li>
+                    
+                         <li><span class="randombtn bluebtn" num="04" >04</span></li>
+                    
+                         <li><span class="randombtn bluebtn" num="05" >05</span></li>
+                    
+                         <li><span class="randombtn bluebtn" num="06" >06</span></li>
+                    
+                         <li><span class="randombtn bluebtn" num="07" >07</span></li>
+                    
+                         <li><span class="randombtn bluebtn" num="08" >08</span></li>
+                    
+                         <li><span class="randombtn bluebtn" num="09" >09</span></li>
+                    
+                         <li><span class="randombtn bluebtn" num="10" >10</span></li>
+                    
+                         <li><span class="randombtn bluebtn" num="11" >11</span></li>
+                    
+                         <li><span class="randombtn bluebtn" num="12" >12</span></li>
+                    
+                </ul>             
+            </div>
+           <span class="infocss3"  style="background:#4A9FF2;" >后区选号</span><span class="sjiao bsjiao" ></span><span class="infocss6" >至少选2个</span>
+        </div>
+        <div>
+            <ul class="ballbox blueballs" >
+               
+                 <li><span class="spanball" num="01" colordata="blue" >01</span></li>
+                
+                 <li><span class="spanball" num="02" colordata="blue" >02</span></li>
+                
+                 <li><span class="spanball" num="03" colordata="blue" >03</span></li>
+                
+                 <li><span class="spanball" num="04" colordata="blue" >04</span></li>
+                
+                 <li><span class="spanball" num="05" colordata="blue" >05</span></li>
+                
+                 <li><span class="spanball" num="06" colordata="blue" >06</span></li>
+                
+                 <li><span class="spanball" num="07" colordata="blue" >07</span></li>
+                
+                 <li><span class="spanball" num="08" colordata="blue" >08</span></li>
+                
+                 <li><span class="spanball" num="09" colordata="blue" >09</span></li>
+                
+                 <li><span class="spanball" num="10" colordata="blue" >10</span></li>
+                
+                 <li><span class="spanball" num="11" colordata="blue" >11</span></li>
+                
+                 <li><span class="spanball" num="12" colordata="blue" >12</span></li>
+                     
+            </ul>
+        </div>
+       </div>
+      <div class="yaoyiyaotitle" >
+            摇一摇随机选号1注
+      </div>  
+      <div style="height:95px;" >
+
+      </div>
+      <div class="palybottom palybottomdlt">
+         <div style="text-align:center;line-height:35px;color:#AAA; font-size:14px" >
+             当前选择：<span id="note" >0</span>注<span id="mount" style="margin-left:5px">0</span>元
+         </div>
+         <div class="floatrow" style="background-color:#fff;padding-top:3px; padding-bottom:3px; border-top:1px solid #F0F0F0">
+             <div class="bottombtncol"><span class="btbtn" onclick="clearselball()" >清空</span></div>
+             <div class="bottombtncol"><span class="btbtn" onclick="openbuyfilter()" >过滤</span></div>
+             <div class="bottombtncol"><span class="btbtn listcount" onclick="showbuycontent()" >列表</span></div>
+             <div class="bottombtncol"><span id="addbuy" class="btbtn addbuybtn"><span class="addbuytext">确定</span></span></div>
+         </div>
+     </div>    
+    </div>
+
+
+    <div id="buycontent"  >
+           <div class="topcontainer" >        
+      <div class="topbanner topb2" >
+                <span class="topRight">
+                    <span class="top_drop" ></span>
+                </span>
+                <span class="topLeft">
+                    <a  class="backbtn" href="javascript:pagePanel.goback();" >
+                        <em class="arrow-left"></em>
+                    </a>
+                </span>
+                <span class="top_drop">
+                      确认计算
+                </span>
+     </div>
+</div>
+    <div class="topbannerh2" ></div>
+
+        <div style="padding:0px 10px;" >
+        <ul class="digbuytop" >
+            <li><button type="button" class="digtopbtn b1" onclick="gobackpaly()"  >自选号码</button></li>
+            <li><button type="button" class="digtopbtn b2" onclick="RamdomballsByBuyList()"  >机选1注 </button></li>
+            <li><button type="button" class="digtopbtn b3" onclick="ClearAll()" >清空列表</button></li>
+        </ul>
+        <div >
+            <ul id="buylist" class="buycontentul" >
+            </ul>
+        </div>
+        </div>
+        <div class="buybottom"  >
+            <div>
+                <ul class="buybottomul" >
+                    <li>
+                       <div>投<input id="times" class="times" type="text"  value="1" onkeyup="countTimes(this)" /> 倍</div>
+                    </li>
+                    <li style="padding-top:5px">
+                         <input id="isAppend" type="checkbox"  class="chk_1"  onclick="countMoney()"  /><label for="isAppend"  ><span class="chk_css_ico"></span>追加投注</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="buybtnbanner" >
+                <button type="button"  class="zhuihao" onclick="zhuihao1()" >追号</button>
+                <span style="margin-left:12px; font-size:14px" >投注：<span id="notecount_total" >0</span>注<span id="amount_total" >0</span>元</span>
+                <span style="float:right;display:none;" ><button  class="dobuy" type="button" onclick="szcbuy(1)"  >提交彩店</button></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="zhuihaocontent" class="zhuihaocontent"  zhuihaodata=""  filterType="" zhuihaodataNoteCount="0" >
+           <div class="topcontainer" >        
+      <div class="topbanner topb2" >
+                <span class="topRight">
+                    <span class="top_drop" ></span>
+                </span>
+                <span class="topLeft">
+                    <a  class="backbtn" href="javascript:pagePanel.goback();" >
+                        <em class="arrow-left"></em>
+                    </a>
+                </span>
+                <span class="top_drop">
+                      确认计算
+                </span>
+     </div>
+</div>
+    <div class="topbannerh2" ></div>
+
+        <div style="padding:10px;" >
+             <div class="zhitemd zhuihaotitle" >
+                        <div class="zhitemcol2 zh-data-col1">期号</div>
+                        <div class="zhitemcol2 zh-data-col2">倍数</div>
+                        <div class="zhitemcol2 zh-data-col3">当期投入</div>
+                        <div class="zhitemcol2 zh-data-col4">累计投入</div>
+                        <div style="clear:both;" ></div>
+             </div>
+             <ul id="zhuihaocontainer" class="zhuihaoul" >
+            </ul>    
+        </div>
+
+
+         <div class="zhuihaobottom"  >
+            <div>
+                <ul class="buybottomul" >
+                    <li>追<input id="zhuihaocountinp" class="zhuihaocountinp" type="text"  value="10" onkeyup="ChangeZhuihaoCount(this)" />期</li>
+                    <li>
+                         <input id="iswonstop" type="checkbox"  class="chk_1"  /><label for="iswonstop"><span class="chk_css_ico"></span>中奖后停止追号</label>
+                    </li>
+                    <li>
+                         <input id="huihaoisAppend" type="checkbox"  onclick="countzhuihaomoney()" class="chk_1"  /><label for="huihaoisAppend"><span class="chk_css_ico"></span>追加投注</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="buybtnbanner" >
+                <span style="margin-left:25px;" >追<span id="zhuihaoIssueCount" >0</span>期，<span id="zhuihao_amount_total" >0</span>元</span>
+                <span style="float:right;display:none;" > <button  class="dobuy" type="button"  onclick="szcbuy(2)"  >提交彩店</button></span>
+            </div>
+        </div>
+    </div>
+             
+    <div id="filtercontent" class="filtercontent" >
+           <div class="topcontainer" >        
+      <div class="topbanner topb2" >
+                <span class="topRight">
+                    <span class="top_drop" ></span>
+                </span>
+                <span class="topLeft">
+                    <a  class="backbtn" href="javascript:pagePanel.goback();" >
+                        <em class="arrow-left"></em>
+                    </a>
+                </span>
+                <span class="top_drop">
+                      确认计算
+                </span>
+     </div>
+</div>
+    <div class="topbannerh2" ></div>
+
+        <div  class="padd10"  >
+            投注选号
+        </div>
+        <div id="filtedatasource"  filterdata="" style="background-color:#fff;" class="padd10" >
+            <div id="filter_rbtext" class="colorRed" ></div>
+            <div id="filter_bbtext" class="colorBlue" ></div>
+            <div id="filter_notetext" class="colorGray" ></div>
+        </div>
+        <div class="padd10" >
+            过滤方式
+        </div>
+        <div style="background-color:#fff;" >
+            <ul id="filterlist" class="filterul" >               
+            </ul>
+        </div>
+
+       <div class="buybottom"  >
+            <div>
+                <ul class="buybottomul" >
+                    <li>
+                       <div>投<input id="filtertimes" class="times" type="text"  value="1" onkeyup="countfilterTimes(this)" /> 倍</div>
+                    </li>
+                    <li>
+                         <input id="filterisAppend" type="checkbox" class="chk_1"  onclick="countfiltermoney()"  /><label for="filterisAppend""><span class="chk_css_ico"></span>追加投注</label>
+                    </li>
+                </ul>
+            </div>
+            <div style="background:#eee;padding:10px;" >
+                <button type="button"  class="zhuihao" onclick="zhuihao2()" >追号</button>
+                <span style="margin-left:20px;" >投注：<span id="filter_notecount_total" >0</span>注<span id="filter_amount_total" >0</span>元</span>
+                <button  class="dobuy" type="button" onclick="szcbuy(3)" style="float:right;display:none;" >提交彩店</button>
+            </div>
+        </div>
+    </div>
+    <div id="filterlistpanel" style="display:none" >
+        <div class="topcontainer" >        
+      <div class="topbanner topb2" >
+                <span class="topRight">
+                    <span class="top_drop" ></span>
+                </span>
+                <span class="topLeft">
+                    <a  class="backbtn" href="javascript:pagePanel.goback();" >
+                        <em class="arrow-left"></em>
+                    </a>
+                </span>
+                <span class="top_drop">
+                      过滤投注详情
+                </span>
+     </div>
+</div>
+    <div class="topbannerh2" ></div>
+    <div id="filterdatalist" filterdata="" filtertype="" hasNext="true" >
+        
+
+        
+    </div>
+    </div>
+</body>
+ <script type="text/javascript" src="/Trade/Js/dlt.js?v=3" ></script>
+<script type="text/javascript" >
+    window.onresize = function(){
+        setelscorllsize();	
+    }    
+    function setelscorllsize(){
+        $("#buylist").height($(window).height() - $("#buylist").offset().top - $(".buybottom").height()- 10) ;
+        $("#zhuihaocontainer").height($( window ).height() - $("#zhuihaocontainer").offset().top - $(".zhuihaobottom").height() -10) ;        
+    }
+    setelscorllsize();	
+    pagePanel.init("mainplay");   
+
+    $("#showmenu").click(function(){
+        if ($("#topmenulist").css("display")== "none"){
+            $("#topmenulist").show();
+            $("#masktopdv").show();
+        }else{
+            $("#topmenulist").hide();
+            $("#masktopdv").hide();
+        }
+    });
+</script>
+</html>

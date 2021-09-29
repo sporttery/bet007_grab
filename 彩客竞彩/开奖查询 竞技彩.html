@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1, minimal-ui' name='viewport' /><meta content='yes' name='apple-mobile-web-app-capable' /><meta content='black' name='apple-mobile-web-app-status-bar-style' /><meta content='telephone=no' name='format-detection' /><script src='/Trade/Js/jquery.js?2019'></script><link rel='stylesheet' href='/Trade/Css/main2017.css?2019' /><link href="/Images/touch-icon.png" rel="apple-touch-icon-precomposed" /> <title>
+	开奖查询
+</title>
+    <script type="text/javascript">
+        var AwardList = [{"lotteryType":10011,"issueText":"最新开奖:2021-05-07 周五","type":1,"payload1":{"logo":"","color":"#4CA117","homeText":"法倫斯(-1)","scoreText":"2:2","guestText":"吉马雷斯"}},{"lotteryType":10012,"issueText":"最新开奖:2021-05-07 周五","type":1,"payload1":{"logo":"","color":"#ECA61F","homeText":"步行者","scoreText":"133:126","guestText":"老鹰"}},{"lotteryType":20011,"issueText":"最新开奖:2021-05-07 周五","type":1,"payload1":{"logo":"","color":"#4CA117","homeText":"万卡约体育(+1)","scoreText":"0:3","guestText":"科林蒂安"}},{"lotteryType":10031,"issueText":"第2021049期 最新开奖:2021-05-06 周四","type":2,"payload2":["1","1","0","0","0","3","1","3","3","3","3","3","0","1"]},{"lotteryType":10033,"issueText":"第2021049期 最新开奖:2021-05-06 周四","type":2,"payload2":["3","3","3","3","3","3","3","3","1","3","1","1"]},{"lotteryType":10034,"issueText":"第2021049期 最新开奖:2021-05-06 周四","type":2,"payload2":["2","0","2","0","3","0","1","0"]}];
+    </script>
+    <style type="text/css" >
+        a{text-decoration:none;}
+        a:hover{text-decoration:none;}
+        a:link{text-decoration:none;}
+        .draw_topbtn {
+	padding:8px 0px;
+	text-align:center;
+	width:60px;
+	flex-grow:1;
+	background-color:#FFF;
+	border-bottom: 1px solid #DDD; 
+}
+        .lottitle_span,.titlespan{color:#000000;}
+        .title_selected {border-bottom:2px solid #ff6a00;}
+        .title_selected  .titlespan {color:#ff6a00;}
+        .lotlist_d {border-bottom:1px solid #eee; padding:8px 12px;}
+        .ZcSpanNum {text-align:center;background-color: #74AA45;color: #fff;display: inline-block;width:16px;height: 25px;margin-right: 3px;line-height: 25px; border-radius: 2px;font-size: 14px;}
+        .dignum{color: #fff;padding: 3px;width: 22px;height: 22px;line-height: 22px;font-size: 14px; display: inline-block;text-align: center;border-radius: 20px; margin-right: 5px;}
+        .lottitle {height:28px; line-height:28px;}
+        .issuetxt_span {color:#666;font-size:10px; margin-left:20px; vertical-align:top;}
+        .jingjiimg {position:absolute;  width:34px; height:28px; z-index:2;left:0px; }
+        .jingji_info {position:absolute;padding-left:30px; padding-right:20px; padding-top:3px; padding-bottom:3px; border-radius:30px; color:#fff;font-size:14px; height:22px;line-height:22px; z-index:0;left:15px; }
+        .dice {width: 33px;height: 33px; background: url(/Trade/Images/kj.png) no-repeat; cursor: pointer; display:inline-block;   margin-left: 2px;background-size:360px 35px; }
+        .dice_1{background-position:-2px 0px}
+.dice_2{background-position:-33px 0px}
+.dice_3{background-position:-66px 0px}
+.dice_4{background-position:-99px 0px}
+.dice_5{background-position:-132px 0px}
+.dice_6{background-position:-165px 0px}
+.dice_t{background-position:-201px 0px}
+.dice_s{background-position:-235px 0px}
+.dice_0{background-position:-302px 0px}
+.kj_num {margin-right:25px;}
+.kj_num em {margin-left: 1px;font-size: 14px;font-family: "Microsoft YaHei","微软雅黑",Arial;}
+.kj_1 em,.kj_3 em{color: #171717;}
+.kj_2 em,.kj_4 em{color: #cc0000;}
+.kj_num i {background: url(/Trade/Images/poker_ico.png); display:inline-block; }
+/*黑桃*/
+.kj_1 i {margin-left: -8.5px;width: 17px;height: 19px;background-position: -201px -18px;}
+/*红桃*/
+.kj_2 i {margin-left:-9.5px;width:19px;height:18px;background-position:-220px -19px}
+/*梅花*/
+.kj_3 i {top: 24px;margin-left: -9.5px;width: 19px;height: 20px;background-position: -242px -18px;
+}
+/*方块*/
+.kj_4 i {top: 23px;margin-left: -9.5px;width: 19px;height: 22px;background-position: -264px -17px;}
+    </style>
+</head>
+<body>
+  
+<style>
+    .alertdlg{position:fixed;padding:10px; min-width:100px;background-color:#000000;color:#ffffff;text-align:center;display:none;top: 50%;left: 50%; border-radius:5px; z-index:120000; }
+</style>
+<div id="alertdlg" class="alertdlg" >
+</div>
+<script src="/Trade/Js/pageHead.js?v=5" type="text/javascript"></script>
+<script type="text/javascript">
+    function JsGetAppType(){
+        var agent =  navigator.userAgent.toLowerCase();
+        var IOS_Arr = ["iPhone", "iPod", "iPad" ];
+        var isIOS = false;
+        for(var i=0;i<IOS_Arr.length;i++)
+        {
+            if (agent.indexOf(IOS_Arr[i].toLowerCase()) != -1)
+            {
+                isIOS = true;
+                break;
+            }
+        }
+        return isIOS ? 2 : 1 ;
+    }
+    MobileBase.AppType=JsGetAppType();   //必须 。为解决缓存记录了值，改使用Js函数动态获取类型
+       MobileBase.init(); //IOS必须      
+       var isOpenApp = false;
+       function  hrefOpenInApp(href)
+       { 
+           if (isOpenApp){
+               var obj = {'urlString':href,useBrowser:false,targetName:'URL',isPageNoHeader:true};
+               rst = "javascript:MobileBase.appRoute(" + JSON.stringify(obj) + ")";
+               }else{
+               rst = href;
+           }
+           return rst;
+       }    
+       function OpenHrefByJs(shref,isret) {           
+           
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {              
+               location.href = shref  + (typeof(isret) !=  "undefined" && isret == true? (shref.indexOf("?")==-1?"?":"") + "&ret=" + encodeURIComponent(location.href) :"");
+           }
+       }
+       function OpenHrefWithTitle(shref,title) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: false, targetName: 'URL', isPageNoHeader: false,title:title };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       function OpenWithLogin(shref)
+       {          
+           LoginDlg.SuccessCallBack = function () {OpenHrefByJs(shref) };
+           LoginDlg.show();
+       }
+       function alert(msg){ //自定义alert
+           $("#alertdlg").html(msg);
+           $("#alertdlg").show();      
+           $("#alertdlg").css("margin-left", "-" + ($("#alertdlg").width()/2) + "px");
+           $("#alertdlg").css("margin-top", "-" + ($("#alertdlg").height()/2) + "px");
+           setTimeout(function(){$("#alertdlg").hide();},2000);
+       }
+       function GetQueryString(name) {
+           var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+           var r = window.location.search.substr(1).match(reg);           
+           if (r != null) return decodeURIComponent(r[2]); return null;
+       }
+       function gotoback(default_url){
+           if (isOpenApp){
+               MobileBase.appGoBack();
+           }else{
+               var reqUrl = GetQueryString("ret");
+               if (reqUrl == null || reqUrl==""){
+                   if(typeof(default_url) == "undefined" || default_url=="" )
+                       history.back();
+                   else
+                       location.href = default_url;
+               }else{
+                   location.href = reqUrl;
+               }
+           }
+       }
+       function OpenUrlByJs(shref,isUserBrowser) {
+           var clickevent = "location.href='" + shref + "'";
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               var obj = { 'urlString': shref, useBrowser: (typeof(isUserBrowser) != "undefinde" && isUserBrowser == true ? true : false), targetName: 'URL', isPageNoHeader: true };
+               MobileBase.appRoute(obj);
+           } else {
+               location.href = shref;
+           }
+       }
+       //设置刷新预设页面
+       function SetPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appSetPageTag(name);
+           }
+       }
+       //刷新预设页面
+       function RefreshPageTagPage(name)
+       {
+           if (typeof (isOpenApp) != "undefined" && isOpenApp == true) {
+               MobileBase.appRefreshTagPage(name);
+           }
+       }
+
+       $(document).ready(function(){
+           $("a").each(function (idx, item) {//触屏版做成快捷方式后不能用a的直接跳转，会新开窗口到浏览器的，用这种方式可以避免尴尬
+               if($(this).attr("href")!=undefined&&$(this).attr("href").indexOf(".aspx")!=-1)
+               {
+                   $(this).click(function () {
+                       location.href = $(this).attr("href");
+                       return false;
+                   });
+               }
+           });
+       });
+</script>
+ <div class="topcontainer" >
+ <div class="topbanner" >
+        <span class="topRight">
+            
+        </span>
+        <span class="topLeft">
+            <a id="goback1" class="backbtn" href="javascript:gotoback('/Trade/Index.aspx')" >
+                <em class="arrow-left"></em>
+            </a>
+        </span>
+     <span class="top_drop toptitle topdropbtn" id="top_type">开奖查询
+      </span>
+
+ </div>
+     <div class="floatrow" >
+       <div class="draw_topbtn ">
+           <a href="DrawInfoMain.aspx?type=1"><span class="titlespan">热门</span></a>
+       </div>
+         <div class="draw_topbtn title_selected">
+           <a href="DrawInfoMain.aspx?type=2"><span class="titlespan">竞技彩</span></a>
+       </div>
+         <div class="draw_topbtn ">
+           <a href="DrawInfoMain.aspx?type=3"><span class="titlespan">数字彩</span></a>
+       </div>
+        
+    </div>
+</div>
+<div id='topheightdiv' style='height:40px;'></div><script type='text/javascript' >$(function(){if ($('.topcontainer').length >0){  $('#topheightdiv').css('height',$('.topcontainer').height()+'px'); } });</script>
+
+    
+    <a href="javascript:OpenHrefByJs('/Trade/DrawInfo/jingjiDraw.aspx?lotteryType=10011',true)" >
+     <div class="lotlist_d" >         
+        <div class="lottitle" ><span class="lottitle_span">竞彩足球</span> <span class="issuetxt_span">最新开奖:2021-05-07 周五</span> </div>
+        
+        
+         <!-- 竞技彩 -->
+          <div style="position:relative;" >
+              
+          <img class="jingjiimg" src="/Trade/Images/drawlot1.png" /> 
+          <div class="jingji_info" style="background-color:#4CA117" >法倫斯(-1) 2:2 吉马雷斯 </div>
+          <div style="height:30px;"></div>
+          </div> 
+        
+    </div>
+    </a>
+    
+    <a href="javascript:OpenHrefByJs('/Trade/DrawInfo/jingjiDraw.aspx?lotteryType=10012',true)" >
+     <div class="lotlist_d" >         
+        <div class="lottitle" ><span class="lottitle_span">竞彩篮球</span> <span class="issuetxt_span">最新开奖:2021-05-07 周五</span> </div>
+        
+        
+         <!-- 竞技彩 -->
+          <div style="position:relative;" >
+              
+          <img class="jingjiimg" src="/Trade/Images/drawlot2.png" /> 
+          <div class="jingji_info" style="background-color:#ECA61F" >步行者 133:126 老鹰 </div>
+          <div style="height:30px;"></div>
+          </div> 
+        
+    </div>
+    </a>
+    
+    <a href="javascript:OpenHrefByJs('/Trade/DrawInfo/jingjiDraw.aspx?lotteryType=20011',true)" >
+     <div class="lotlist_d" >         
+        <div class="lottitle" ><span class="lottitle_span">北京单场</span> <span class="issuetxt_span">最新开奖:2021-05-07 周五</span> </div>
+        
+        
+         <!-- 竞技彩 -->
+          <div style="position:relative;" >
+              
+          <img class="jingjiimg" src="/Trade/Images/drawlot3.png" /> 
+          <div class="jingji_info" style="background-color:#4CA117" >万卡约体育(+1) 0:3 科林蒂安 </div>
+          <div style="height:30px;"></div>
+          </div> 
+        
+    </div>
+    </a>
+    
+    <a href="javascript:OpenHrefByJs('/Trade/DrawInfo/OtherDrawList.aspx?lotteryType=10031',true)" >
+     <div class="lotlist_d" >         
+        <div class="lottitle" ><span class="lottitle_span">十四场胜负</span> <span class="issuetxt_span">第2021049期 最新开奖:2021-05-06 周四</span> </div>
+        
+        
+         <!-- 足彩 -->
+        <div><span class='ZcSpanNum'>1</span><span class='ZcSpanNum'>1</span><span class='ZcSpanNum'>0</span><span class='ZcSpanNum'>0</span><span class='ZcSpanNum'>0</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>1</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>0</span><span class='ZcSpanNum'>1</span> </div>
+        
+    </div>
+    </a>
+    
+    <a href="javascript:OpenHrefByJs('/Trade/DrawInfo/OtherDrawList.aspx?lotteryType=10033',true)" >
+     <div class="lotlist_d" >         
+        <div class="lottitle" ><span class="lottitle_span">六场半全场</span> <span class="issuetxt_span">第2021049期 最新开奖:2021-05-06 周四</span> </div>
+        
+        
+         <!-- 足彩 -->
+        <div><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>1</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>1</span><span class='ZcSpanNum'>1</span> </div>
+        
+    </div>
+    </a>
+    
+    <a href="javascript:OpenHrefByJs('/Trade/DrawInfo/OtherDrawList.aspx?lotteryType=10034',true)" >
+     <div class="lotlist_d" >         
+        <div class="lottitle" ><span class="lottitle_span">四场进球</span> <span class="issuetxt_span">第2021049期 最新开奖:2021-05-06 周四</span> </div>
+        
+        
+         <!-- 足彩 -->
+        <div><span class='ZcSpanNum'>2</span><span class='ZcSpanNum'>0</span><span class='ZcSpanNum'>2</span><span class='ZcSpanNum'>0</span><span class='ZcSpanNum'>3</span><span class='ZcSpanNum'>0</span><span class='ZcSpanNum'>1</span><span class='ZcSpanNum'>0</span> </div>
+        
+    </div>
+    </a>
+    
+</body>
+</html>
