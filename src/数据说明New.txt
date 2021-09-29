@@ -1,0 +1,26 @@
+1、从Config.js 文件里，取得所有需要采集的联赛，逐一采集
+2、http://info.310win.com/jsData/LeagueSeason/sea12.js 这个地址采集所有的赛季信息
+    var arrSeason = ['2020-2021','2019-2020','2018-2019','2017-2018','2016-2017','2015-2016','2014-2015','2013-2014','2012-2013','2011-2012','2010-2011','2009-2010','2008-2009','2007-2008','2006-2007','2005-2006','2004-2005'];
+3、获取赛季对应的球队信息：
+    http://info.310win.com/jsData/SinDou/2017/sd26.js
+4、获取所有球队信息，并入库
+
+5、根据球队id,查找球队对应的历史对阵。分页获取地址： 
+    http://info.310win.com/cn/team/TeamScheAjax.aspx?TeamID=2817&pageNo=2&flesh=0.18015394301756316
+
+6、首次运行，每支球队历史对阵大于33场即可。
+   定时运行，获取每支球队新增完场数据
+
+7、根据比赛id，获取赔率 
+    欧盘
+    http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=1806655&company=Bet365&companyid=8
+    http://data.310win.com/changeDetail/1x2.aspx?id=2071146&companyid=8&l=0
+    http://1x2d.win007.com/1910109.js?r=007132665582558691738
+    亚盘
+    http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=1806655&companyid=8&company=Bet365
+    http://data.310win.com/changeDetail/handicap.aspx?id=2071146&companyid=8&l=0
+    http://vip.win007.com/AsianOdds_n.aspx?id=1910109&l=0
+    
+8、程序： mainNew.js
+
+

@@ -115,6 +115,7 @@ async function saveModelArr(modelArr, tableName = "t_match") {
     Logger.info("参数个数 ：" + params.length);
     let results = await query(sql, params);
     Logger.info("成功插入条数：" + JSON.stringify(results));
+    return results;
 }
 
 //先查询，再判断是否入库，根据主键查询
@@ -137,9 +138,10 @@ async function saveModelData(modelData, tableName, privateKey = "id") {
         });
         var modelArr = Object.values(modelData);
         if (modelArr.length > 0) {
-            await saveModelArr(modelArr, tableName);
+            return await saveModelArr(modelArr, tableName);
         }
     }
+    return 0;
 }
 
 let closePool=async function(){

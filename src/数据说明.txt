@@ -43,3 +43,11 @@
     oddsData["O_1231"]=[[赔率公司id,主胜，平，客胜],...]；
     oddsData["T_1231"]=[[赔率公司id,大球，盘口，小球],...]
     
+6、程序： getMatchJs.js saveMatch.js getOdds.js
+
+    getMatchJs.js 将赛程保存到本地的js文件
+    saveMatch.js 将本地文件的比赛入库
+    getOdds.js 获取本地文件中的赛程的赔率，保存文件并入库
+
+
+7、比赛不全，弃用，新的方式 见 数据说明New

@@ -1,59 +1,38 @@
-// const Utils = require("../src/Utils");
-const Logger = require("../src/Logger");
-// const Config = require("../src/Config");
-const Request = require('request');
-const Puppeteer = require('puppeteer');
+#!/usr/bin/env node
 
-const exec = process.argv.slice(0, 2);
-let args = process.argv.splice(2);
-let request = Request.defaults({ jar: true });
-let checkCode = "246813579";
-let headless = false;
-if (args.length > 0 && args[0] == "headless") {
-    headless = true;
-    args = args.slice(1);
+var program = require('commander');
+
+function range(val) {
+    return val.split('..').map(Number);
 }
 
+function list(val) {
+    return val.split(',');
+}
 
-console.log("启动命令：" + exec.join(" "));
+program
+    .version('0.0.1')
+    .usage('test')
+    .option('-C, --chdir [value]', '设置服务器节点','/home/conan/server')
+    .option('-c, --config [value]', '设置配置文件','./deploy.conf')
+    .option('-m, --max ', '最大连接数')
+    .option('-s, --seed ', '出始种子')
+    .option('-r,--range <a>..<b>', '阈值区间')
+    .option('-l, --list ', 'IP列表')
 
-(async () => {
-
-    // console.log(checkCode);
-
-    await Puppeteer.launch({
-        headless: headless,
-        defaultViewport: {
-            width: 1920,
-            height: 966
-        },
-        //ignoreDefaultArgs: ["--enable-automation"]
-        //  devtools:true
-
-    }).then(async browser => {
-
-        let pages = await browser.pages();
-        let page = pages[0];
-       
-        await page.on('console', (msg) => {
-            if (msg.text().charAt(0) == '~') {
-                Logger.info(msg.text());
-            } else {
-                console.log('PAGE LOG:', msg.text());
-            }
-        });
-        await page.goto("http://www.baidu.com");
-        
-
-        /*
-        await browser.close();
-
-        Logger.info("程序运行完毕，进入结束");
-
-        await DBHelper.closePool();
-
-        await process.exit();
-        */
-
+program
+    .command('deploy ')
+    .description('部署一个服务节点')
+    .action(function(name){
+        console.log('Deploying "%s"', name);
     });
-})();
+
+program.parse(process.argv);
+
+console.log(' chdir - %s ', program.chdir);
+console.log(' config - %s ', program.config);
+console.log(' max: %j', program.max);
+console.log(' seed: %j', program.seed);
+program.range = program.range || [];
+console.log(' range: %j..%j', program.range[0], program.range[1]);
+console.log(' list: %j', program.list);

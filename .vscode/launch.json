@@ -11,7 +11,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\src\\getOdds.js"
+            "program": "${workspaceFolder}\\src\\mainNew.js",
+            "args": ["-e","odds"]
         }
     ]
 }
