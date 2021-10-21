@@ -22,7 +22,12 @@ async function addCollectionButton(page, options) {
             button = document.createElement('button');
             button.setAttribute('id', '_pp_id');
             button.addEventListener('click', () => {
-                window.ft2Click();
+                if (btnCollect.style.color == "red") {
+                    window.running = false;
+                } else {
+                    window.ft2Click();
+                    window.running = true;
+                }
             });
             document.body.appendChild(button);
             button.style.position = 'fixed';
@@ -295,29 +300,6 @@ async function addCollectionButton(page, options) {
             }
         }, matchlist);
 
-        // 对Date的扩展，将 Date 转化为指定格式的String   
-        // 月(M)、日(d)、小时(H)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，   
-        // 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)   
-        // 例子：   
-        // (new Date()).Format("yyyy-MM-dd HH:mm:ss.S") ==> 2006-07-02 08:09:04.423   
-        // (new Date()).Format("yyyy-M-d H:m:s.S")      ==> 2006-7-2 8:9:4.18   
-        Date.prototype.Format = function (fmt) { //author: meizz   
-            var o = {
-                "M+": this.getMonth() + 1,                 //月份   
-                "d+": this.getDate(),                    //日   
-                "h+": this.getHours(),                   //小时   
-                "m+": this.getMinutes(),                 //分   
-                "s+": this.getSeconds(),                 //秒   
-                "q+": Math.floor((this.getMonth() + 3) / 3), //季度   
-                "S": this.getMilliseconds()             //毫秒   
-            };
-            if (/(y+)/.test(fmt))
-                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-            for (var k in o)
-                if (new RegExp("(" + k + ")").test(fmt))
-                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-            return fmt;
-        }
         async function addJquery(pageIdx) {
             var allPage = await browser.pages();
             var npage;
@@ -338,31 +320,31 @@ async function addCollectionButton(page, options) {
 
 
         async function saveTable(matchtable, startDateStr) {
-            if (!fs.existsSync("cn")) {
-                fs.mkdirSync("cn");
+            console.info("保存数据库 日期=" + startDateStr + " , ids=" + matchtable);
+            var ids = matchtable.split(",");
+            var values = [], params = [];
+            for (var i = 0; i < ids.length; i++) {
+                values.push("(?,?)");
+                params.push(ids[i]);
+                params.push(startDateStr);
             }
-            console.info("保存文件 cn/" + startDateStr + ".htm");
-            fs.writeFileSync("cn/" + startDateStr + ".htm", matchtable);
+            await DBHelper.query("insert into t_match_date(id,datestr)values " + values.join(",") + " ON DUPLICATE KEY UPDATE datestr=VALUES(datestr)", params);
+
         }
         async function saveMatch(id, json) {
             console.info("保存数据库 id=" + id);
             await DBHelper.query("insert into t_match_data(id,json)values(?,?) ON DUPLICATE KEY UPDATE json=VALUES(json)", [id, json]);
         }
         async function ft2Click() {
-            let npageBf = await browser.newPage();
-            await npageBf.exposeFunction("saveTable", saveTable);
-            await npageBf.exposeFunction("saveMatch", saveMatch);
-            await npageBf.exposeFunction("addJquery", addJquery);
-
-            var startDate = new Date(2018, 0, 1);
-            var startDateStr = startDate.Format("yyyyMMdd");
-            while (fs.existsSync("cn/" + startDateStr + ".htm")) {
-                startDate = new Date(startDate.getTime() + 1000 * 86400);
-                startDateStr = startDate.Format("yyyyMMdd");
+            var datestr = await DBHelper.query("select max(datestr) datestr from t_match_date");
+            datestr=datestr["datestr"];
+            console.info("select max(datestr) from t_match_date => " + datestr);
+            // var noDataIds = await DBHelper.query("select de.id from t_match_date de left join t_match_data da on de.id = da.id where da.id is null");
+            if (datestr == null) {
+                datestr = "20180101";
             }
-            await npageBf.goto("http://bf.win007.com/football/Over_" + startDateStr + ".htm");
-            console.log("加载完了");
-            var noJquery = await npageBf.evaluate(() => {
+            var startDate = new Date(parseInt(datestr.substring(0, 4)), parseInt(datestr.substring(4, 6)) - 1, parseInt(datestr.substring(6)));
+            var noJquery = await page.evaluate(() => {
                 if (typeof jQuery === "undefined") {
                     return 1;
                 }
@@ -371,84 +353,91 @@ async function addCollectionButton(page, options) {
             if (noJquery) {
                 await addJquery();
             }
-            try {
-                await npageBf.waitForSelector("#table_live");
-            } catch (error) {
-                console.error(error);
-            } finally {
-                await npageBf.evaluate((ids, startDate) => {
-                    document.body.innerHTML = '<textarea rows=30 id=msg cols=150></textarea>';
-                    jQuery.ajaxSetup({ async: false });
-                    Date.prototype.Format = function (fmt) { //author: meizz   
-                        var o = {
-                            "M+": this.getMonth() + 1,                 //月份   
-                            "d+": this.getDate(),                    //日   
-                            "h+": this.getHours(),                   //小时   
-                            "m+": this.getMinutes(),                 //分   
-                            "s+": this.getSeconds(),                 //秒   
-                            "q+": Math.floor((this.getMonth() + 3) / 3), //季度   
-                            "S": this.getMilliseconds()             //毫秒   
-                        };
-                        if (/(y+)/.test(fmt))
-                            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-                        for (var k in o)
-                            if (new RegExp("(" + k + ")").test(fmt))
-                                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-                        return fmt;
+
+            await page.evaluate((ids, startDate) => {
+                jQuery.ajaxSetup({ async: false });
+
+                Date.prototype.Format = function (fmt) { //author: meizz   
+                    var o = {
+                        "M+": this.getMonth() + 1,                 //月份   
+                        "d+": this.getDate(),                    //日   
+                        "h+": this.getHours(),                   //小时   
+                        "m+": this.getMinutes(),                 //分   
+                        "s+": this.getSeconds(),                 //秒   
+                        "q+": Math.floor((this.getMonth() + 3) / 3), //季度   
+                        "S": this.getMilliseconds()             //毫秒   
+                    };
+                    if (/(y+)/.test(fmt))
+                        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                    for (var k in o)
+                        if (new RegExp("(" + k + ")").test(fmt))
+                            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                    return fmt;
+                }
+
+
+                window.getByDate = function (date) {
+                    var datestr = date.Format("yyyyMMdd");
+                    if (btnCollect.style.color != "green") {
+                        btnCollect.style.color = 'green';
+                        btnCollect.style.background = '#eee';
                     }
-
-                    var msg = document.querySelector("#msg");
-
-                    window.getByDate = function (date) {
-                        var datestr = date.Format("yyyyMMdd");
-                        msg.value += ("开始获取日期 /football/Over_" + datestr + ".htm 的数据\n");
-                        $.get("/football/Over_" + datestr + ".htm", (html) => {
-                            var table_live = $(html).find("#table_live");
-                            // var html = table_live[0].outerHTML;
-                            // console.info(html);
-                            var analysisIds = [];
-                            var trs = table_live.find("tr");
-                            // console.info("比赛场次数：" + trs.length);
-                            for (var i = 0; i < trs.length; i++) {
-                                var name = $(trs[i]).attr("name");
-                                if (name) {
-                                    var leagueId = name.split(",")[0];
-                                    if (ids[parseInt(leagueId)]) {
-                                        var onclick = $(trs[i]).find("td:eq(4)").attr("onclick");
-                                        if (onclick) {
-                                            var id = onclick.replace(/\D/g, "");
-                                            analysisIds.push(id);
-                                            msg.value += ("开始获取id /analysis/" + id + "cn.htm 的数据\n");
-                                            $.get("//zq.win007.com/analysis/" + id + "cn.htm", (analysis) => {
-                                                var start = analysis.indexOf("var lang");
-                                                analysis = analysis.substring(start);
-                                                var end = analysis.indexOf("</script>");
-                                                var sc = analysis.substring(0, end);
-                                                eval(sc);
-                                                var matchinfo = {
-                                                    matchState, scheduleID, h2h_home, h2h_away,
-                                                    hometeam, guestteam, h_data, a_data, Vs_hOdds, Vs_eOdds
-                                                };
-                                                saveMatch(id, JSON.stringify(matchinfo));
-                                            })
-                                        }
+                    btnCollect.innerText = datestr;
+                    // msg.value += ("开始获取日期 /football/Over_" + datestr + ".htm 的数据\n");
+                    $.get("//bf.win007.com/football/Over_" + datestr + ".htm", (html) => {
+                        var table_live = $(html).find("#table_live");
+                        // var html = table_live[0].outerHTML;
+                        // console.info(html);
+                        var analysisIds = [];
+                        var trs = table_live.find("tr");
+                        // console.info("比赛场次数：" + trs.length);
+                        for (var i = 0; i < trs.length; i++) {
+                            var name = $(trs[i]).attr("name");
+                            if (name) {
+                                var leagueId = name.split(",")[0];
+                                if (ids[parseInt(leagueId)]) {
+                                    var onclick = $(trs[i]).find("td:eq(4)").attr("onclick");
+                                    if (onclick) {
+                                        var id = onclick.replace(/\D/g, "");
+                                        analysisIds.push(id);
+                                        btnCollect.innerText = id;
+                                        // msg.value += ("开始获取id /analysis/" + id + "cn.htm 的数据\n");
+                                        $.get("//zq.win007.com/analysis/" + id + "cn.htm", (analysis) => {
+                                            var start = analysis.indexOf("var lang");
+                                            analysis = analysis.substring(start);
+                                            var end = analysis.indexOf("</script>");
+                                            var sc = analysis.substring(0, end);
+                                            eval(sc);
+                                            var matchinfo = {
+                                                matchState, scheduleID, h2h_home, h2h_away,
+                                                hometeam, guestteam, h_data, a_data, Vs_hOdds, Vs_eOdds
+                                            };
+                                            saveMatch(id, JSON.stringify(matchinfo));
+                                        })
                                     }
                                 }
                             }
-                            saveTable(analysisIds.join(","), datestr);
+                        }
+                        saveTable(analysisIds.join(","), datestr);
+                        if (window.running) {
                             date = new Date(date.getTime() + 1000 * 86400);
                             setTimeout((date) => { getByDate(date) }, 100, date);
-                        });
-                    }
-                    window.startDate = startDate;
-                    window.ids = ids;
-                    getByDate(new Date(startDate));
-                }, config.ids, startDate.getTime());
-            }
-
-
+                        } else {
+                            btnCollect.style.color = 'white';
+                            btnCollect.style.background = 'red';
+                            btnCollect.innerText = '采集';
+                        }
+                    });
+                }
+                window.startDate = startDate;
+                window.ids = ids;
+                getByDate(new Date(startDate));
+            }, config.ids, startDate.getTime());
         }
         await page.exposeFunction("ft2Click", ft2Click);
+        await page.exposeFunction("saveTable", saveTable);
+        await page.exposeFunction("saveMatch", saveMatch);
+        await page.exposeFunction("addJquery", addJquery);
 
         await addCollectionButton(page);
     });
