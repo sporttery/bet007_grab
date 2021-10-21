@@ -1,10 +1,58 @@
 const Puppeteer = require('puppeteer');
 const Logger = require("./Logger");
+const DBHelper = require("./DBHelper")
 const fs = require("fs");
 const os = require('os');
 const path = require('path');
+const config = require("./Config");
 const exeDir = __dirname;
 const exeFile = process.argv[1];
+
+
+async function addCollectionButton(page, options) {
+    if (!options) {
+        options = {};
+    }
+
+    let first = await page.evaluate(options => {
+        let first = 0;
+        let button = document.getElementById('_pp_id');
+        if (button == null) {
+            first = 1;
+            button = document.createElement('button');
+            button.setAttribute('id', '_pp_id');
+            button.addEventListener('click', () => {
+                window.ft2Click();
+            });
+            document.body.appendChild(button);
+            button.style.position = 'fixed';
+            button.style.left = '30px';
+            button.style.top = '100px';
+            button.style.zIndex = '100000000';
+            button.style.borderRadius = '50%';
+            button.style.border = 'none';
+            button.style.height = '80px';
+            button.style.width = '80px';
+            button.style.cursor = 'pointer';
+            button.style.lineHeight = '80px';
+            button.style.outline = 'none';
+            button.style.fontWeight = 'bold';
+            button.style.fontSize = '21px';
+            window.btnCollect = button;
+        }
+
+        button.style.color = options.color || 'white';
+        button.style.background = options.background || 'red';
+        button.innerText = options.text || '采集';
+        return first;
+    }, options);
+    if (first == 1) {
+        // await addTaobaoLogo(page);
+    }
+}
+
+
+
 (async () => {
     await Puppeteer.launch({
         headless: false,
@@ -12,7 +60,7 @@ const exeFile = process.argv[1];
             width: 1440,
             height: 900
         },
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        args: ["--no-sandbox", "--disable-setuid-sandbox", '--disable-web-security'],
         ignoreHTTPSErrors: true,
         // devtools: true
     }).then(async browser => {
@@ -200,7 +248,7 @@ const exeFile = process.argv[1];
             var html = [];
             for (var key in matchlist) {
                 var match = matchlist[key];
-                html.push('<tr class="bet-tb-tr" id="m'+key+'">');
+                html.push('<tr class="bet-tb-tr" id="m' + key + '">');
                 html.push('<td class="td td-no"><a href="javascript:;" class="bet-evt-hide" >' + match.week + match.num + '</a></td>');
                 html.push('<td class="td td-evt"><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html" target="_blank" style="background:' + match.leagueColor + ';" >' + match.leagueName + '</a></td>');
                 html.push('<td class="td td-endtime" title="' + match.playtime + '截止">' + match.playtime.substring(5) + '</td>');
@@ -233,16 +281,175 @@ const exeFile = process.argv[1];
                 var yp = match.bet365_yp;
                 html.push('<td class="td td-pei">');
                 html.push('<div class="betbtn-row itm-rangB1">');
-                html.push('<span>'+op[0]+'</span><span>'+op[1]+'</span><span>'+op[2]+'</span></div>');
+                html.push('<span>' + op[0] + '</span><span>' + op[1] + '</span><span>' + op[2] + '</span></div>');
                 html.push('<div class="betbtn-row itm-rangB2">');
-                html.push('<span>'+yp[0]+'</span><span>'+yp[1]+'</span><span>'+yp[2]+'</span></div>');
+                html.push('<span>' + yp[0] + '</span><span>' + yp[1] + '</span><span>' + yp[2] + '</span></div>');
                 html.push('</td>');
                 html.push('</tr>');
             }
             $("#matchlist").html(html.join(''));
+
+
             function bolool(obj) {
 
             }
         }, matchlist);
+
+        // 对Date的扩展，将 Date 转化为指定格式的String   
+        // 月(M)、日(d)、小时(H)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，   
+        // 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)   
+        // 例子：   
+        // (new Date()).Format("yyyy-MM-dd HH:mm:ss.S") ==> 2006-07-02 08:09:04.423   
+        // (new Date()).Format("yyyy-M-d H:m:s.S")      ==> 2006-7-2 8:9:4.18   
+        Date.prototype.Format = function (fmt) { //author: meizz   
+            var o = {
+                "M+": this.getMonth() + 1,                 //月份   
+                "d+": this.getDate(),                    //日   
+                "h+": this.getHours(),                   //小时   
+                "m+": this.getMinutes(),                 //分   
+                "s+": this.getSeconds(),                 //秒   
+                "q+": Math.floor((this.getMonth() + 3) / 3), //季度   
+                "S": this.getMilliseconds()             //毫秒   
+            };
+            if (/(y+)/.test(fmt))
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt))
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        }
+        async function addJquery(pageIdx) {
+            var allPage = await browser.pages();
+            var npage;
+            if (!pageIdx) {
+                npage = allPage[allPage.length - 1];
+            } else {
+                npage = allPage[pageIdx];
+            }
+            let jQueryPath = path.join(__dirname, "res", "jquery.min.js");
+            if (fs.existsSync(jQueryPath)) {
+                let jQuery = fs.readFileSync(jQueryPath, { encoding: "utf-8" }).toString();
+                await npage.addScriptTag({
+                    content: jQuery
+                });
+                console.log("addJquery完了");
+            }
+        }
+
+
+        async function saveTable(matchtable, startDateStr) {
+            if (!fs.existsSync("cn")) {
+                fs.mkdirSync("cn");
+            }
+            console.info("保存文件 cn/" + startDateStr + ".htm");
+            fs.writeFileSync("cn/" + startDateStr + ".htm", matchtable);
+        }
+        async function saveMatch(id, json) {
+            console.info("保存数据库 id=" + id);
+            await DBHelper.query("insert into t_match_data(id,json)values(?,?)", [id, json]);
+        }
+        async function ft2Click() {
+            let npageBf = await browser.newPage();
+            await npageBf.exposeFunction("saveTable", saveTable);
+            await npageBf.exposeFunction("saveMatch", saveMatch);
+            await npageBf.exposeFunction("addJquery", addJquery);
+
+            var startDate = new Date(2018, 0, 1);
+            var startDateStr = startDate.Format("yyyyMMdd");
+            while (fs.existsSync("cn/" + startDateStr + ".htm")) {
+                startDate = new Date(startDate.getTime() + 1000 * 86400);
+                startDateStr = startDate.Format("yyyyMMdd");
+            }
+            await npageBf.goto("http://bf.win007.com/football/Over_" + startDateStr + ".htm");
+            console.log("加载完了");
+            var noJquery = await npageBf.evaluate(() => {
+                if (typeof jQuery === "undefined") {
+                    return 1;
+                }
+                return 0;
+            });
+            if (noJquery) {
+                await addJquery();
+            }
+            try {
+                await npageBf.waitForSelector("#table_live");
+            } catch (error) {
+                console.error(error);
+            } finally {
+                await npageBf.evaluate((ids, startDate) => {
+                    document.body.innerHTML = '<textarea rows=30 id=msg cols=150></textarea>';
+                    jQuery.ajaxSetup({ async: false });
+                    Date.prototype.Format = function (fmt) { //author: meizz   
+                        var o = {
+                            "M+": this.getMonth() + 1,                 //月份   
+                            "d+": this.getDate(),                    //日   
+                            "h+": this.getHours(),                   //小时   
+                            "m+": this.getMinutes(),                 //分   
+                            "s+": this.getSeconds(),                 //秒   
+                            "q+": Math.floor((this.getMonth() + 3) / 3), //季度   
+                            "S": this.getMilliseconds()             //毫秒   
+                        };
+                        if (/(y+)/.test(fmt))
+                            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                        for (var k in o)
+                            if (new RegExp("(" + k + ")").test(fmt))
+                                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                        return fmt;
+                    }
+
+                    var msg = document.querySelector("#msg");
+
+                    window.getByDate = function (date) {
+                        var datestr = date.Format("yyyyMMdd");
+                        msg.value += ("开始获取日期 /football/Over_" + datestr + ".htm 的数据\n");
+                        $.get("/football/Over_" + datestr + ".htm", (html) => {
+                            var table_live = $(html).find("#table_live");
+                            // var html = table_live[0].outerHTML;
+                            // console.info(html);
+                            var analysisIds = [];
+                            var trs = table_live.find("tr");
+                            // console.info("比赛场次数：" + trs.length);
+                            for (var i = 0; i < trs.length; i++) {
+                                var name = $(trs[i]).attr("name");
+                                if (name) {
+                                    var leagueId = name.split(",")[0];
+                                    if (ids[parseInt(leagueId)]) {
+                                        var onclick = $(trs[i]).find("td:eq(4)").attr("onclick");
+                                        if (onclick) {
+                                            var id = onclick.replace(/\D/g, "");
+                                            analysisIds.push(id);
+                                            msg.value += ("开始获取id /analysis/" + id + "cn.htm 的数据\n");
+                                            $.get("//zq.win007.com/analysis/" + id + "cn.htm", (analysis) => {
+                                                var start = analysis.indexOf("var lang");
+                                                analysis = analysis.substring(start);
+                                                var end = analysis.indexOf("</script>");
+                                                var sc = analysis.substring(0, end);
+                                                eval(sc);
+                                                var matchinfo = {
+                                                    matchState, scheduleID, h2h_home, h2h_away,
+                                                    hometeam, guestteam, h_data, a_data, Vs_hOdds, Vs_eOdds
+                                                };
+                                                saveMatch(id, JSON.stringify(matchinfo));
+                                            })
+                                        }
+                                    }
+                                }
+                            }
+                            saveTable(analysisIds.join(","), datestr);
+                            date = new Date(date.getTime() + 1000 * 86400);
+                            setTimeout((date) => { getByDate(date) }, 100, date);
+                        });
+                    }
+                    window.startDate = startDate;
+                    window.ids = ids;
+                    getByDate(new Date(startDate));
+                }, config.ids, startDate.getTime());
+            }
+
+
+        }
+        await page.exposeFunction("ft2Click", ft2Click);
+
+        await addCollectionButton(page);
     });
 })();

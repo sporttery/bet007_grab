@@ -183,8 +183,14 @@ const urls = [
   { "name": "非冠杯", "url": "http://zq.win007.com/cn/CupMatch/239.html","id":239 }
 ];
 
+const ids = {};
+urls.forEach(urlinfo => {
+  ids[urlinfo.id] = urlinfo;
+});
+
 var maxSeason = "2018";
 module.exports = {
   urls,
-  maxSeason
+  maxSeason,
+  ids
 };
