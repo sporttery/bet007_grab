@@ -346,7 +346,7 @@ async function addCollectionButton(page, options) {
         }
         async function saveMatch(id, json) {
             console.info("保存数据库 id=" + id);
-            await DBHelper.query("insert into t_match_data(id,json)values(?,?)", [id, json]);
+            await DBHelper.query("insert into t_match_data(id,json)values(?,?) ON DUPLICATE KEY UPDATE json=VALUES(json)", [id, json]);
         }
         async function ft2Click() {
             let npageBf = await browser.newPage();
