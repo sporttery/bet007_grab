@@ -335,11 +335,71 @@ async function addCollectionButton(page, options) {
             console.info("保存数据库 id=" + id);
             await DBHelper.query("insert into t_match_data(id,json)values(?,?) ON DUPLICATE KEY UPDATE json=VALUES(json)", [id, json]);
         }
+        async function getById(id) {
+            let retry = await page.evaluate(async id => {
+                if (btnCollect) {
+                    btnCollect.innerText = id;
+                }
+                var retry = 0;
+                do {
+                    if (retry > 0) {
+                        console.info("获取ID " + id + " 第" + retry + "次尝试");
+                    }
+                    var matchinfo = null;
+                    $.get("//zq.win007.com/analysis/" + id + "cn.htm", (analysis) => {
+                        var start = analysis.indexOf("var lang");
+                        if (start != -1) {
+                            analysis = analysis.substring(start);
+                            var end = analysis.indexOf("</script>");
+                            var sc = analysis.substring(0, end);
+                            eval(sc);
+                            matchinfo = {
+                                matchState, scheduleID, h2h_home, h2h_away,
+                                hometeam, guestteam, h_data, a_data, Vs_hOdds, Vs_eOdds
+                            };
+                        }
+                    })
+                    if(matchinfo){
+                        await saveMatch(id, JSON.stringify(matchinfo));
+                        retry=0;
+                        break;
+                    }
+                } while (retry++ < 2);
+                return retry;
+            }, id);
+            if (retry > 0 ) {
+                let nPage = await page.browser().newPage();
+                let url = "http://zq.win007.com/analysis/" + id + "cn.htm";
+                await nPage.goto(url);
+                let analysis = await nPage.content();
+                var start = analysis.indexOf("var lang");
+                if (start != -1) {
+                    analysis = analysis.substring(start);
+                    var end = analysis.indexOf("</script>");
+                    var sc = analysis.substring(0, end);
+                    eval(sc);
+                    var matchinfo = {
+                        matchState, scheduleID, h2h_home, h2h_away,
+                        hometeam, guestteam, h_data, a_data, Vs_hOdds, Vs_eOdds
+                    };
+                    await saveMatch(id, JSON.stringify(matchinfo));
+                }
+                await nPage.close();
+            }
+        }
         async function ft2Click() {
-            var datestr = await DBHelper.query("select max(datestr) datestr from t_match_date");
-            datestr=datestr["datestr"];
+            var datestr = "20180101";
+            var dateResult = await DBHelper.query("select max(datestr) datestr from t_match_date");
+            if (dateResult && dateResult.length == 1) {
+                datestr = dateResult[0]["datestr"];
+            }
             console.info("select max(datestr) from t_match_date => " + datestr);
-            // var noDataIds = await DBHelper.query("select de.id from t_match_date de left join t_match_data da on de.id = da.id where da.id is null");
+            var noDataResult = await DBHelper.query("select de.id from t_match_date de left join t_match_data da on de.id = da.id where da.id is null");
+            // console.info(noDataResult);
+            var noDataIds = [];
+            noDataResult.forEach(RowDataPacket => {
+                noDataIds.push(RowDataPacket.id);
+            });
             if (datestr == null) {
                 datestr = "20180101";
             }
@@ -354,7 +414,9 @@ async function addCollectionButton(page, options) {
                 await addJquery();
             }
 
-            await page.evaluate((ids, startDate) => {
+
+
+            await page.evaluate((ids, startDate, noDataIds) => {
                 jQuery.ajaxSetup({ async: false });
 
                 Date.prototype.Format = function (fmt) { //author: meizz   
@@ -375,8 +437,7 @@ async function addCollectionButton(page, options) {
                     return fmt;
                 }
 
-
-                window.getByDate = function (date) {
+                window.getByDate = async function (date) {
                     var datestr = date.Format("yyyyMMdd");
                     if (btnCollect.style.color != "green") {
                         btnCollect.style.color = 'green';
@@ -384,11 +445,11 @@ async function addCollectionButton(page, options) {
                     }
                     btnCollect.innerText = datestr;
                     // msg.value += ("开始获取日期 /football/Over_" + datestr + ".htm 的数据\n");
-                    $.get("//bf.win007.com/football/Over_" + datestr + ".htm", (html) => {
+                    var analysisIds = [];
+                    $.get("//bf.win007.com/football/Over_" + datestr + ".htm",html => {
                         var table_live = $(html).find("#table_live");
                         // var html = table_live[0].outerHTML;
                         // console.info(html);
-                        var analysisIds = [];
                         var trs = table_live.find("tr");
                         // console.info("比赛场次数：" + trs.length);
                         for (var i = 0; i < trs.length; i++) {
@@ -400,44 +461,42 @@ async function addCollectionButton(page, options) {
                                     if (onclick) {
                                         var id = onclick.replace(/\D/g, "");
                                         analysisIds.push(id);
-                                        btnCollect.innerText = id;
-                                        // msg.value += ("开始获取id /analysis/" + id + "cn.htm 的数据\n");
-                                        $.get("//zq.win007.com/analysis/" + id + "cn.htm", (analysis) => {
-                                            var start = analysis.indexOf("var lang");
-                                            analysis = analysis.substring(start);
-                                            var end = analysis.indexOf("</script>");
-                                            var sc = analysis.substring(0, end);
-                                            eval(sc);
-                                            var matchinfo = {
-                                                matchState, scheduleID, h2h_home, h2h_away,
-                                                hometeam, guestteam, h_data, a_data, Vs_hOdds, Vs_eOdds
-                                            };
-                                            saveMatch(id, JSON.stringify(matchinfo));
-                                        })
                                     }
                                 }
                             }
                         }
-                        saveTable(analysisIds.join(","), datestr);
-                        if (window.running) {
-                            date = new Date(date.getTime() + 1000 * 86400);
-                            setTimeout((date) => { getByDate(date) }, 100, date);
-                        } else {
-                            btnCollect.style.color = 'white';
-                            btnCollect.style.background = 'red';
-                            btnCollect.innerText = '采集';
-                        }
                     });
+                    if (analysisIds.length > 0) {
+                        for(var i=0;i<analysisIds.length;i++){
+                            await getById(analysisIds[i]);
+                        }
+                        await saveTable(analysisIds.join(","), datestr);
+                    }
                 }
                 window.startDate = startDate;
                 window.ids = ids;
-                getByDate(new Date(startDate));
-            }, config.ids, startDate.getTime());
+                (async()=>{
+                    let date = new Date(startDate);
+                    do{
+                        await getByDate(date);
+                        date = new Date(date.getTime() + 1000 * 86400);
+                    }while(date.getTime() < new Date().getTime() && window.running);
+                    for(var i=0;i<noDataIds.length;i++){
+                        await getById(noDataIds[i]);
+                    }
+                    window.running = false;
+                    btnCollect.style.color = 'white';
+                    btnCollect.style.background = 'red';
+                    btnCollect.innerText = '采集';
+                })();;
+            }, config.ids, startDate.getTime(), noDataIds);
+
         }
         await page.exposeFunction("ft2Click", ft2Click);
         await page.exposeFunction("saveTable", saveTable);
         await page.exposeFunction("saveMatch", saveMatch);
         await page.exposeFunction("addJquery", addJquery);
+        await page.exposeFunction("getById", getById);
 
         await addCollectionButton(page);
     });
