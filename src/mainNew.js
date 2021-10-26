@@ -16,18 +16,23 @@ program
 var args = process.argv.slice(2);
 if (!program.exec && args.indexOf("odds") != -1) {
     program.exec = "odds";
+    Logger.info("执行ODDs操作");
 }
 if (!program.teamId && args.indexOf("-t") != -1) {
     program.teamId = args[args.indexOf("-t") + 1];
+    Logger.info("指定球队ID=" + program.teamId);
 }
 if (!program.matchId && args.indexOf("-m") != -1) {
     program.matchId = args[args.indexOf("-m") + 1];
+    Logger.info("指定比赛ID=" + program.matchId);
 }
 if (!program.allTeam && args.indexOf("-a") != -1) {
+    Logger.info("强制刷新球队数据");
     program.allTeam = true;
 }
 if (!program.leagueId && args.indexOf("-l") != -1) {
     program.leagueId = args[args.indexOf("-l") + 1];
+    Logger.info("指定联赛ID=" + program.leagueId);
 }
 
 var g_browser, g_url_idx = 0, vipPage, zqPage;
@@ -121,8 +126,11 @@ var g_browser, g_url_idx = 0, vipPage, zqPage;
                     get: () => "Win32",
                 });
             });
-            await page.on('console', msg => console.log('PAGE' + i + ' LOG:', msg.text()));
+            page.on('console', msg => console.log('PAGE' + i + ' LOG:', msg.text()));
         }
+        browser.on("disconnected", () => {
+            process.exit();
+        })
 
         Logger.info("正在打开浏览器，进入球探主页");
         await zqPage.goto("http://zq.win007.com/");
@@ -190,6 +198,7 @@ async function getTeam(page) {
     if (urlObj) {
         //如果指定联赛id，则判断是否为指定联赛id
         if (program.leagueId && urlObj.id != program.leagueId) {
+            //不处理当前ID，直接下一个
             getTeam(page);
             return;
         }
@@ -286,8 +295,14 @@ async function getMatchOdds() {
             retry = 1;
             while (content.indexOf("id=\"odds\"") == -1) {
                 console.log(europeOddsUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
-                await page.waitForTimeout(6 * 1000 * retry);
+                await page.waitForTimeout(6 * 1000 * retry++);
                 content = await Utils.getFromUrl(page, europeOddsUrl);
+                if (retry > 10) {
+                    break;
+                }
+            }
+            if (content.indexOf("id=\"odds\"") == -1) {
+                continue;
             }
             var nH = Utils.safeHtml(content);
             var europeOdds = await page.evaluate((nH) => {
@@ -308,8 +323,14 @@ async function getMatchOdds() {
             retry = 1;
             while (content.indexOf("id=\"odds\"") == -1) {
                 console.log(asiaOddsUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
-                await page.waitForTimeout(6 * 1000 * retry);
+                await page.waitForTimeout(6 * 1000 * retry++);
                 content = await Utils.getFromUrl(page, asiaOddsUrl);
+                if (retry > 10) {
+                    break;
+                }
+            }
+            if (content.indexOf("id=\"odds\"") == -1) {
+                continue;
             }
             nH = Utils.safeHtml(content);
             var asiaOdds = await page.evaluate((nH) => {
@@ -349,21 +370,32 @@ async function getMatchByTeam(page) {
     var ids;
     if (program.teamId) {
         console.log("有指定teamId =" + program.teamId);
-        ids = [program.teamId];
+        ids = [{ id: program.teamId }];
     } else {
-        ids = await DBHelper.query("select id from t_team where match_count < 33 and totalPage > 2");
+        ids = await DBHelper.query("select id from t_team ");
     }
     var idsLen = ids.length;
     for (var i = 0; i < idsLen; i++) {
         var id = ids[i]["id"];
         console.log("正在获取第" + (i + 1) + "个球队ID=" + id + "的历史比赛数据,还剩" + (idsLen - i - 1));
+        var dbOldPlaytimeRs = await DBHelper.query("select date_format(max(playtime),'%Y/%m/%d %H:%i') as playtime from t_match where homeId =" + id + " or awayId=" + id);
+        var maxPlaytime = "0000/00/00 00:00";
+        if (dbOldPlaytimeRs) {
+            maxPlaytime = dbOldPlaytimeRs[0]["playtime"];
+        }
         var sdUrl = "/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=1&flesh=";
         var sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
         retry = 1;
         while (sdContent == "-1") {
             console.log(sdUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-            await page.waitForTimeout(10 * 1000 * retry);
+            await page.waitForTimeout(10 * 1000 * retry++);
             sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
+            if (retry > 10) {
+                break;
+            }
+        }
+        if (sdContent == "-1") {
+            continue;
         }
         delete teamPageInfo;
         delete teamPageData;
@@ -383,6 +415,9 @@ async function getMatchByTeam(page) {
                 // console.log("比赛没有比分，过滤掉了 fullscore=" + match.fullscore);
                 continue;
             }
+            if (playtime < maxPlaytime) {
+                break;
+            }
             allMatch.push(data);
         }
         for (var pageNo = 2; pageNo <= totalPage; pageNo++) {
@@ -391,12 +426,22 @@ async function getMatchByTeam(page) {
             retry = 1;
             while (sdContent == "-1") {
                 console.log(sdUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                await page.waitForTimeout(10 * 1000 * retry);
+                await page.waitForTimeout(10 * 1000 * retry++);
                 sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
+                if (retry > 10) {
+                    break;
+                }
+            }
+            if (sdContent == "-1") {
+                continue;
             }
             delete teamPageInfo
             delete teamPageData;
             eval(sdContent);
+            //如果第一场的比赛时间小于数据库里最大时间，则不需要抓取了
+            if (teamPageData[0][3] < maxPlaytime) {
+                break;
+            }
             for (var j = 0; j < teamPageData.length; j++) {
                 var data = teamPageData[j];
                 var playtime = data[3];
@@ -408,7 +453,14 @@ async function getMatchByTeam(page) {
                     // console.log("比赛没有比分，过滤掉了 fullscore=" + match.fullscore);
                     continue;
                 }
+                if (playtime < maxPlaytime) {
+                    break;
+                }
                 allMatch.push(data);
+            }
+            //如果最后一场的比赛时间小于数据库里最大时间，则不继续
+            if (teamPageData[teamPageData.length - 1][3] < maxPlaytime) {
+                break;
             }
             if (allMatch.length > 33) {
                 break;
@@ -472,5 +524,4 @@ async function exit() {
 
     Logger.info("程序运行完毕，进入结束");
 
-    await process.exit();
 }

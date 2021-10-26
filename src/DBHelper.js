@@ -1,10 +1,10 @@
 const mysql = require("mysql")
 const Logger = require('./Logger');
 // const dbConfig = {
-//     host: 'rdst1232w056y4nu19w8o.mysql.rds.aliyuncs.com',
-//     port: 3306,
-//     user: 'adm_zw',
-//     password: '876543219',
+//     host: '56f2cff845240.gz.cdb.myqcloud.com',
+//     port: 17816,
+//     user: 'cdb_outerroot',
+//     password: '1111111',
 //     database: 'bolool'
 // };
 

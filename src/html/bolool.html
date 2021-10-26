@@ -5,23 +5,23 @@
 <meta charset="UTF-8" />
 <title>菠萝足球-2代指数</title>
 <!-- 新 Bootstrap 核心 CSS 文件 -->
-<link rel="stylesheet" href="res/bootstrap.min.css" />
+<link rel="stylesheet" href="../res/bootstrap.min.css" />
 
 <!-- 可选的Bootstrap主题文件（一般不用引入） -->
-<link rel="stylesheet" href="res/bootstrap-theme.min.css" />
+<link rel="stylesheet" href="../res/bootstrap-theme.min.css" />
 
 <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
-<script src="res/jquery.min.js"></script>
+<script src="../res/jquery.min.js"></script>
 
 <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-<script src="res/bootstrap.min.js"></script>
-<script src="res/bootstrap-paginator.min.js"></script>
-<link rel="stylesheet" href="res/datetimepicker.css" />
-<script src="res/bootstrap-datetimepicker.min.js"></script>
-<link rel="stylesheet" href="res/headshrinker.min.css" />
-<script src="res/jquery.headshrinker.min.js"></script>
-<script src="res/layer-v2.3/layer/layer.js"></script>
-<script src="res/bolool.js"></script>
+<script src="../res/bootstrap.min.js"></script>
+<script src="../res/bootstrap-paginator.min.js"></script>
+<link rel="stylesheet" href="../res/datetimepicker.css" />
+<script src="../res/bootstrap-datetimepicker.min.js"></script>
+<link rel="stylesheet" href="../res/headshrinker.min.css" />
+<script src="../res/jquery.headshrinker.min.js"></script>
+<script src="../res/layer-v2.3/layer/layer.js"></script>
+<script src="../res/bolool.js"></script>
 <style type="text/css">
 .odds.selected{
 	color: red;
@@ -242,16 +242,15 @@ var params = getRequest();
 $(()=>{
 	var headhtml = [];
     headhtml.push('<tr>');
-    //headhtml.push('<th rowspan="2">序号</th>');
-    headhtml.push('<th rowspan="2">场次</th>');
+    headhtml.push('<th rowspan="2">ID</th>');
     headhtml.push('<th rowspan="2">联赛</th>');
     headhtml.push('<th rowspan="2" width="100px">赛季</th>');
     headhtml.push('<th rowspan="2">球队</th>');
     headhtml.push('<th rowspan="2">比赛时间</th>');
-    headhtml.push('<th rowspan="2">让球</th>');
-    headhtml.push('<th colspan="3" style="text-align:center">竞彩赔率</th>');
     headhtml.push('<th colspan="3" style="text-align:center">bet365欧赔</th>');
     headhtml.push('<th colspan="3" style="text-align:center">bet365亚赔</th>');
+    headhtml.push('<th colspan="3" style="text-align:center">澳门欧赔</th>');
+    headhtml.push('<th colspan="3" style="text-align:center">澳门亚赔</th>');
     headhtml.push('<th colspan="2" style="text-align:center">积分<select id="topNSection" onchange="changeTopN()"><option value="30">30</option><option value="33">33</option></section></th>');
     headhtml.push('<th colspan="2" style="text-align:center">分区</th>');
     headhtml.push('<th colspan="2" style="text-align:center">近3场</th>');
@@ -263,6 +262,9 @@ $(()=>{
     headhtml.push('<th>胜</th>');
     headhtml.push('<th>平</th>');
     headhtml.push('<th>负</th>');
+	headhtml.push('<th>主</th>');
+    headhtml.push('<th>盘</th>');
+    headhtml.push('<th>客</th>');
     headhtml.push('<th>胜</th>');
     headhtml.push('<th>平</th>');
     headhtml.push('<th>负</th>');
