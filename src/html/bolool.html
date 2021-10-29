@@ -1,49 +1,53 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta charset="UTF-8" />
-<title>菠萝足球-2代指数</title>
-<!-- 新 Bootstrap 核心 CSS 文件 -->
-<link rel="stylesheet" href="../res/bootstrap.min.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta charset="UTF-8" />
+	<title>菠萝足球-2代指数</title>
+	<!-- 新 Bootstrap 核心 CSS 文件 -->
+	<link rel="stylesheet" href="../res/bootstrap.min.css" />
 
-<!-- 可选的Bootstrap主题文件（一般不用引入） -->
-<link rel="stylesheet" href="../res/bootstrap-theme.min.css" />
+	<!-- 可选的Bootstrap主题文件（一般不用引入） -->
+	<link rel="stylesheet" href="../res/bootstrap-theme.min.css" />
 
-<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
-<script src="../res/jquery.min.js"></script>
+	<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+	<script src="../res/jquery.min.js"></script>
 
-<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-<script src="../res/bootstrap.min.js"></script>
-<script src="../res/bootstrap-paginator.min.js"></script>
-<link rel="stylesheet" href="../res/datetimepicker.css" />
-<script src="../res/bootstrap-datetimepicker.min.js"></script>
-<link rel="stylesheet" href="../res/headshrinker.min.css" />
-<script src="../res/jquery.headshrinker.min.js"></script>
-<script src="../res/layer-v2.3/layer/layer.js"></script>
-<script src="../res/bolool.js"></script>
-<style type="text/css">
-.odds.selected{
-	color: red;
-    background-color: yellow;
-}
-.aRight {
-	text-align: right;
-}
+	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+	<script src="../res/bootstrap.min.js"></script>
+	<script src="../res/bootstrap-paginator.min.js"></script>
+	<link rel="stylesheet" href="../res/datetimepicker.css" />
+	<script src="../res/bootstrap-datetimepicker.min.js"></script>
+	<link rel="stylesheet" href="../res/headshrinker.min.css" />
+	<script src="../res/jquery.headshrinker.min.js"></script>
+	<script src="../res/layer-v2.3/layer/layer.js"></script>
+	<script src="../res/bolool.js"></script>
+	<style type="text/css">
+		.odds.selected {
+			color: red;
+			background-color: yellow;
+		}
 
-.aLeft {
-	text-align: left;
-}
+		.aRight {
+			text-align: right;
+		}
 
-input {
-	color: #000;
-}
-</style>
+		.aLeft {
+			text-align: left;
+		}
+
+		input {
+			color: #000;
+		}
+	</style>
 </head>
+
 <body>
 	<div class="container-fluid theme-showcase" role="main">
 		<div class="page-header">
-				<label for="date">日期</label><input type="text" id="date" class="datetimepicker" data-date-format="yyyy-mm-dd" onchange="showdate(this.value)" />
+			<label for="date">日期</label><input type="text" id="date" class="datetimepicker"
+				data-date-format="yyyy-mm-dd" onchange="showdate(this.value)" />
 		</div>
 		<div class="view">
 			<table class="table table-bordered">
@@ -54,475 +58,151 @@ input {
 	</div>
 </body>
 <script type="text/javascript">
-var topN = 30;
+	var topN = 30;
 
-var now = new Date();
-var month = now.getMonth() +1;
-var date = now.getDate();
-if(month < 10){
-	month = "0"+month;
-}
-if(date < 10){
-	date = "0" + date;
-}
-var datetime = now.getFullYear()+"-"+month+"-"+date;
-$(".datetimepicker").datetimepicker({
-	minView: "month", //选择日期后，不会再跳转去选择时分秒 
-	language:  'zh-CN',
-	autoclose: true ,
-	format : 'yyyy-mm-dd'
-});
-function showdate(date){
-	if(params.date==date){
-		return;
+	var now = new Date();
+	var month = now.getMonth() + 1;
+	var date = now.getDate();
+	if (month < 10) {
+		month = "0" + month;
 	}
-	var url = location.href;
-	if(params.date){
-		url = url.replace(params.date,date);
-		location.href = url;
-	}else{
-		if(url.indexOf("?")==-1){
-			location.href = url + "?date="+date;
-		}else{
-			location.href = url + "&date="+date;
+	if (date < 10) {
+		date = "0" + date;
+	}
+	var datetime = now.getFullYear() + "-" + month + "-" + date;
+	$(".datetimepicker").datetimepicker({
+		minView: "month", //选择日期后，不会再跳转去选择时分秒 
+		language: 'zh-CN',
+		autoclose: true,
+		format: 'yyyy-mm-dd'
+	});
+	function showdate(date) {
+		if (params.date == date) {
+			return;
 		}
-	}
-}
-function getMatchCallback(d){
-	d=safeHtml(d);
-	body = $(d);
-	if(location.href.indexOf("endday")==-1){
-		body.remove(".endday");
-	}
-	var html=[],ids=[];
-	
-	body.find(".touzhu").children().each((idx,el)=>{
-		var div = $(el);
-		if(div.find(".more_weik:hidden").length==1){
-			var id = div.attr("data-mid");
-			var leagueName = div.find(".saiming").text();
-			var leagueId = div.attr("filterdata").split(",")[1];
-			var leagueColor=div.find(".saiming").css("background-color");
-			var leagueHref=div.find(".saiming").attr("href");
-			var playtime = div.find(".shijian").attr("title").replace("比赛时间:","").trim();
-			var playtimepart = playtime.split(/\D/);
-			var playtime_datetiime = new Date(playtimepart[0],parseInt(playtimepart[1])-1,playtimepart[2],playtimepart[3],playtimepart[4],playtimepart[5]);
-			if(params.date || playtime_datetiime.getTime() > now.getTime()){
-				var num = div.find(".xulie").attr("title");
-				var hostName = div.find(".shenpf .zhu .zhum").text();
-				var hostOrder = div.find(".shenpf .zhu .paim").text();
-				var homeName = div.find(".shenpf .zhu .zhum").text();
-				var homeOrder = div.find(".shenpf .zhu .paim").text().trim();
-				var awayName = div.find(".shenpf .fu .zhum").text();
-				var awayOrder = div.find(".shenpf .fu .paim").text().trim();
-				var h = div.find(".shenpf .zhu .peilv").text().trim();
-				var d = div.find(".shenpf .ping .peilv").text().trim();
-				var a = div.find(".shenpf .fu .peilv").text().trim();
-				
-				var h1 = div.find(".rangqiuspf .zhu .peilv").text().trim();
-				var d1 = div.find(".rangqiuspf .ping .peilv").text().trim();
-				var a1 = div.find(".rangqiuspf .fu .peilv").text().trim();
-				
-				var rq = div.attr("filterdata").split(",")[0];
-				var fengxin1 = div.find(".fengxin1").html();
-				fengxin1 = fengxin1.replace(/onclick.+?href/g,"href");
-				html.push('<tr id="m'+id+'">');
-				html.push('<td rowspan="2">'+num+'</td>');
-				html.push('<td rowspan="2" style="background-color:'+leagueColor+'"><a href="'+leagueHref+'" style="color:white">'+leagueName+'</a></td>');
-				html.push('<td rowspan="2" class="season">'+num+'</td>');
-				html.push('<td rowspan="2" class="teamInfo"><span style="font-size:12px;color:#ccc">'+homeOrder+'</span> <a class="hName" href="javascript:showHistory('+id+',\'h\')">'+homeName 
-				+'</a> VS <a class="aName" href="javascript:showHistory('+id+',\'a\')">'+awayName +'</a><span style="font-size:12px;color:#ccc">'+awayOrder+'</span></td>');
-				html.push('<td rowspan="2">'+playtime+'</td>');
-				html.push('<td rowspan="2">'+rq +'</td>');
-				html.push('<td class="odds">'+h+'</td>');
-				html.push('<td class="odds">'+d+'</td>');
-				html.push('<td class="odds">'+a+'</td>');
-				html.push('<td rowspan="2" class="europe">-</td>');
-				html.push('<td rowspan="2" class="europe">-</td>');
-				html.push('<td rowspan="2" class="europe">-</td>');
-				html.push('<td rowspan="2" class="asia">-</td>');
-				html.push('<td rowspan="2" class="asia">-</td>');
-				html.push('<td rowspan="2" class="asia">-</td>');
-				html.push('<td rowspan="2" class="hScore">-</td>');
-				html.push('<td rowspan="2" class="aScore">-</td>');
-				html.push('<td rowspan="2" class="hSection">-</td>');
-				html.push('<td rowspan="2" class="aSection">-</td>');
-				html.push('<td rowspan="2" class="hNear3">-</td>');
-				html.push('<td rowspan="2" class="aNear3">-</td>');
-				html.push('<td rowspan="2" class="hStrong">-</td>');
-				html.push('<td rowspan="2" class="aStrong">-</td>');
-				html.push('<td rowspan="2">'+fengxin1+' <a href="javascript:gotoBoloolDetail('+id+')">菠萝</a></td>');
-				html.push('</tr>');
-				html.push('<tr>');
-				html.push('<td class="odds">'+h1+'</td>');
-				html.push('<td class="odds">'+d1+'</td>');
-				html.push('<td class="odds">'+a1+'</td>');
-				html.push('</tr>');
-				g_match["_"+id] = {id,leagueId,leagueName,leagueColor,homeName,homeOrder,num,playtime,awayName,awayOrder,h,d,a,h1,d1,a1,rq,fengxin1};
-				ids.push(id);
+		var url = location.href;
+		if (params.date) {
+			url = url.replace(params.date, date);
+			location.href = url;
+		} else {
+			if (url.indexOf("?") == -1) {
+				location.href = url + "?date=" + date;
+			} else {
+				location.href = url + "&date=" + date;
 			}
 		}
-	});
-	$("#matchlist").html(html.join(""));
-	return ids;
-}
-function gotoBoloolDetail(id){
-	var bolool = g_match["_"+id].boloolData["top"+topN];
-	var match = g_match["_"+id];
-	match.trHtml= "<tr>" + match.tr.html() + "</tr><tr>" + match.tr.next().html()+"</tr>";
-// 	sessionStorage.setItem("b_match_"+id,JSON.stringify(match));
-	sessionStorage.setItem("g_match",JSON.stringify(g_match));
-	window.open('boloolDetail.html?id='+id+'&topN='+topN+'&hsection='+bolool.hsection+'&asection='+bolool.asection);
-}
-function setBolool(tr,boloolData){
-	["h","a"].forEach((n)=>{
-		var bolool = boloolData["top"+topN];
-		if(!bolool){
-			bolool = {hscore:'-',ascore:'-',hresult:'-',aresult:'-',hsection:'-',asection:'-'};
-			bolool.top3={hstrong:'-',astrong:'-',hresult:'-',aresult:'-'};
-		}
-		tr.find("."+n+"Score").text(bolool[n+"score"]).attr("title",bolool[n+"result"]);
-		tr.find("."+n+"Section").text(bolool[n+"section"]);
-		var bolool3 = bolool.top3;
-		if(!bolool3){
-			bolool3 = getBoloolFromResult(bolool.hresult,bolool.aresult,3);
-			bolool.top3=bolool3;
-		}
-		tr.find("."+n+"Near3").text(bolool3[n+"result"]);
-		tr.find("."+n+"Strong").text(bolool3[n+"strong"]);
-	});
-}
-
-function finishLoad(){
-	layer.closeAll();
-	setTimeout(()=>{
-		ids = [];
-		for(var key in g_match){
-			var item = g_match[key];
-			ids.push(item.id);
-		}
-		$.post("/api/getBoloolByIds",{ids:ids.join(","),topN:"33"},function(arr){
-			for(var i=0;i<arr.length;i++){
-				var bolool = arr[i];
-				var match = g_match["_"+bolool.id];
-				var bolool3 = getBoloolFromResult(bolool.hresult,bolool.aresult,3);
-				bolool.top3=bolool3;
-				match.boloolData["top33"] = bolool;
-			}
-		});
-	},1000);
-	for(var key in g_match){
-		var tr = g_match[key].tr;
-		//updateData[id] = [fullscore,halfscore,result,goalscore];
-		var scoreData = updateData[key.substring(1)];
-		if(scoreData && tr) {
-			var teamInfo = tr.find(".teamInfo");
-			teamInfo.html(teamInfo.html().replace("VS",'<font color=red>'+scoreData[0]+"</font>("+scoreData[1]+")"));
-		}
 	}
-}
+	var g_match = {}, g_team, g_data, updateData = {};
+	var params = getRequest();
+	$(() => {
+		var headhtml = [];
+		headhtml.push('<tr>');
+		headhtml.push('<th rowspan="2">ID/序号</th>');
+		headhtml.push('<th rowspan="2">联赛</th>');
+		headhtml.push('<th rowspan="2">主队</th>');
+		headhtml.push('<th rowspan="2">比分</th>');
+		headhtml.push('<th rowspan="2">客队</th>');
+		headhtml.push('<th rowspan="2">比赛时间</th>');
+		headhtml.push('<th colspan="3" style="text-align:center">bet365欧赔</th>');
+		headhtml.push('<th colspan="3" style="text-align:center">bet365亚赔</th>');
+		// headhtml.push('<th colspan="3" style="text-align:center">澳门欧赔</th>');
+		// headhtml.push('<th colspan="3" style="text-align:center">澳门亚赔</th>');
+		headhtml.push('<th colspan="2" style="text-align:center">积分</th>');
+		headhtml.push('<th colspan="2" style="text-align:center">分区</th>');
+		headhtml.push('<th colspan="2" style="text-align:center">近3场</th>');
+		headhtml.push('<th colspan="2" style="text-align:center">强弱</th>');
+		headhtml.push('<th rowspan="2" style="text-align:center">分析</th>');
+		headhtml.push('</tr>');
 
-function changeTopN(id){
-	if(id){
-		var key = "_"+id;
-		var tr = g_match[key].tr;
-		var boloolData = g_match[key].boloolData;
-		setBolool(tr,boloolData);
-	}else{
-		topN=$("#topNSection").val();
-		for(var key in g_match){
-			var tr = g_match[key].tr;
-			var boloolData = g_match[key].boloolData;
-			setBolool(tr,boloolData);
-		}
-	}
-}
-var g_match={},g_team,g_data,updateData={};
-var params = getRequest();
-$(()=>{
-	var headhtml = [];
-    headhtml.push('<tr>');
-    headhtml.push('<th rowspan="2">ID</th>');
-    headhtml.push('<th rowspan="2">联赛</th>');
-    headhtml.push('<th rowspan="2" width="100px">赛季</th>');
-    headhtml.push('<th rowspan="2">球队</th>');
-    headhtml.push('<th rowspan="2">比赛时间</th>');
-    headhtml.push('<th colspan="3" style="text-align:center">bet365欧赔</th>');
-    headhtml.push('<th colspan="3" style="text-align:center">bet365亚赔</th>');
-    headhtml.push('<th colspan="3" style="text-align:center">澳门欧赔</th>');
-    headhtml.push('<th colspan="3" style="text-align:center">澳门亚赔</th>');
-    headhtml.push('<th colspan="2" style="text-align:center">积分<select id="topNSection" onchange="changeTopN()"><option value="30">30</option><option value="33">33</option></section></th>');
-    headhtml.push('<th colspan="2" style="text-align:center">分区</th>');
-    headhtml.push('<th colspan="2" style="text-align:center">近3场</th>');
-    headhtml.push('<th colspan="2" style="text-align:center">强弱</th>');
-    headhtml.push('<th rowspan="2" style="text-align:center">分析</th>');
-    headhtml.push('</tr>');
+		headhtml.push('<tr>');
+		headhtml.push('<th>胜</th>');
+		headhtml.push('<th>平</th>');
+		headhtml.push('<th>负</th>');
+		headhtml.push('<th>主</th>');
+		headhtml.push('<th>盘</th>');
+		headhtml.push('<th>客</th>');
+		// headhtml.push('<th>胜</th>');
+		// headhtml.push('<th>平</th>');
+		// headhtml.push('<th>负</th>');
+		// headhtml.push('<th>主</th>');
+		// headhtml.push('<th>盘</th>');
+		// headhtml.push('<th>客</th>');
+		headhtml.push('<th>主</th>');
+		headhtml.push('<th>客</th>');
+		headhtml.push('<th>主</th>');
+		headhtml.push('<th>客</th>');
+		headhtml.push('<th>主</th>');
+		headhtml.push('<th>客</th>');
+		headhtml.push('<th>主</th>');
+		headhtml.push('<th>客</th>');
+		headhtml.push('</tr>');
 
-    headhtml.push('<tr>');
-    headhtml.push('<th>胜</th>');
-    headhtml.push('<th>平</th>');
-    headhtml.push('<th>负</th>');
-	headhtml.push('<th>主</th>');
-    headhtml.push('<th>盘</th>');
-    headhtml.push('<th>客</th>');
-    headhtml.push('<th>胜</th>');
-    headhtml.push('<th>平</th>');
-    headhtml.push('<th>负</th>');
-    headhtml.push('<th>主</th>');
-    headhtml.push('<th>盘</th>');
-    headhtml.push('<th>客</th>');
-    headhtml.push('<th>主</th>');
-    headhtml.push('<th>客</th>');
-    headhtml.push('<th>主</th>');
-    headhtml.push('<th>客</th>');
-    headhtml.push('<th>主</th>');
-    headhtml.push('<th>客</th>');
-    headhtml.push('<th>主</th>');
-    headhtml.push('<th>客</th>');
-    headhtml.push('</tr>');
+		$("#thead").html(headhtml.join(""));
+		layer.load(2);
 
-    $("#thead").html(headhtml.join(""));
-    layer.load(2);
-    var cache_g_team = localStorage.getItem("g_team");
-    if(!cache_g_team){
-		$.getJSON("/team.json",function(team){
-			g_team=team;
-			localStorage.setItem("g_team",JSON.stringify(g_team));
-		});
-    }else{
-    	g_team=JSON.parse(cache_g_team);
-    }
-    var url = "/api/getOkoooJc?url=/jingcai/";
-    if(params.date){
-    	$("#date").val(params.date);
-    	url = "/api/getOkoooJc?url=/jingcai/"+ params.date + "/";
-    	$.get("/api/getOkoooJc?url=/livecenter/jingcai/?date="+params.date,function(d){
-    		body = $(safeHtml(d));
-    		
-    		body.find(".each_match").each((idx,el)=>{
-    			var match = $(el);
-    			var id = match.attr("matchid");
-    			var state = match.attr("state");
-    			if ("End"==state) {
-					var halfscore = match.attr("data-hs");
-					var fullscore = match.find(".show_score").text().replace(/[\r\n\s]/g, "");
-					var scores = fullscore.split("-");
-					if (scores.length == 2) {
-						var h = parseInt(scores[0]);
-						var a = parseInt(scores[1]);
-						var goalscore = "0";
-						var result = "负";
-						if (h > a) {
-							goalscore = "3";
-							result = "胜";
-						} else if (h == a) {
-							goalscore = "1";
-							result = "平";
-						}
-						updateData[id] = [fullscore,halfscore,result,goalscore];
-					}
-				}else{
-					console.log(" 更新赛程比分：" + id + " 没有比分 ");
-				}
-    		});
-    		$.post("/api/saveMatchScore",{data:JSON.stringify(updateData)},function(r){
-    			console.log(r);
-    		});
-    	})
-    }
-	$.get(url,function(d){
-		ids = getMatchCallback(d);
-		$(".odds").css("cursor","pointer").on("click",function(e){
-			var odds = e.target || e.currentTarget;
-			$(odds).toggleClass("selected");
-			if($(".odds.selected").length>=2){
-				var x = (e.pageX || e.screenX || 20) + 20;
-				var y = (e.pageY || e.screenY || 80) ;
-				saveButton=$("#saveButton");
-				if(saveButton.length==0){
-					let button = document.createElement('button');
-			        button.setAttribute('id', 'saveButton');
-			        button.addEventListener('click', () => {
-			            window.saveOrder();
-			        });
-			        button.style.position = 'fixed';
-			        button.style.left = x+'px';
-			        button.style.top = y+'px';
-			        button.style.zIndex = '100000000';
-			        button.style.borderRadius = '50%';
-			        button.style.border = 'none';
-			        button.style.height = '80px';
-			        button.style.width = '80px';
-			        button.style.lineHeight = '80px';
-			        button.style.color = 'white';
-			        button.style.background = 'brown';
-			        button.style.outline = 'none';
-			        button.innerText = '保存';
-			        document.body.appendChild(button);
-			        saveButton=$("#saveButton");
-				}else{
-					saveButton.css({left:x+"px",top:y+"px"}).show();
-				}
-				setTimeout(function(){saveButton.hide("slow")},5000,saveButton);
-			}
-		});
-		if(ids.length==0){
-			$.ajaxSetup({async:false})
-			$.get("/okooo_demo.html",function(demo_html){
-				ids = getMatchCallback(demo_html);
-			});
-			$.ajaxSetup({async:true})
-		}
-		if(ids.length > 0){
-			$.post("/api/getMatchHistoryNew",{matchIds:ids.join(","),topN},function(arr){
-				var noBolool = [],noEuropeOdds=[],noAsiaOdds=[];
-				for(var i=0;i<arr.length;i++){
-					var item = arr[i];
-					var bolool = null;
-					if(item.hresult && item.aresult){
-						bolool = {"hresult":item.hresult,"aresult":item.aresult,"hscore":item.hscore,"ascore":item.ascore,"hsection":item.hsection,"asection":item.asection};
-						var bolool3 = getBoloolFromResult(bolool.hresult,bolool.aresult,3);
-						bolool.top3=bolool3;
-					}
-					
-					var match = g_match["_"+item.id];
-					match.tr = $("#m"+item.id);
-					if(item.s && item.p && item.f){
-						match.europe=[item.s,item.p,item.f];
-					}
-					if(item.h && item.pan && item.a){
-						match.asia=[item.h,item.pan,item.a];
-					}
-					if(bolool){
-						match.boloolData={};
-						match.boloolData["top"+topN]=bolool;
-					}
-				}
-				for(var key in g_match){
-					var item = g_match[key];
-					if(!item.europe){
-						noEuropeOdds.push(item.id);
-					}else{
-						item.tr.find(".europe").each((idx,el)=>{
-							$(el).text(item.europe[idx]);
-						})
-					}
-					if(!item.asia){
-						noAsiaOdds.push(item.id);
-					}else{
-						item.tr.find(".asia").each((idx,el)=>{
-							$(el).text(item.asia[idx]);
-						})
-					}
-					if(!item.boloolData){
-						noBolool.push(item.id);
-					}else{
-						setBolool(item.tr,item.boloolData);
-					}
-				}
-				if(noBolool.length > 0){
-					ids = noBolool;
-					for(var i=0;i<ids.length;i++){
-						var id = ids[i];
-						$.get("/api/getOkoooJc",{url:"/soccer/match/"+id+"/history/"},matchHistoryCallback(id));
-					}
-				}else{
-					finishLoad();
-				}
-				
-				
-				if(noEuropeOdds.length > 0){
-					$.post("/api/getOkoooJc",{url:"/ajax/?method=data.match.odds","args":"bettingTypeId=1&providerId=27&matchIds="+noEuropeOdds.join(","),method:"post"},function(d1){
-						var data = JSON.parse(d1);
-						for(var key in data){
-							var tr = g_match["_"+key].tr;
-							if(!tr){
-								tr = $("#m"+key);
-							}
-							if(tr && tr.length == 1){
-								tr.find(".europe").each((idx,el)=>{
-									$(el).text(data[key][idx]);
-								})
-							}
-							g_match["_"+key].europe=data[key];
-						}
-						$.post("/api/saveEuropeOdds",{"odds":d1},function(data){
-							console.log(data);
-						});
-					});
-				}
-				
-				if(noAsiaOdds.length > 0){
-					$.post("/api/getOkoooJc",{url:"/ajax/?method=data.match.odds","args":"bettingTypeId=2&providerId=27&matchIds="+noAsiaOdds.join(","),method:"post"},function(d1){
-						var data = JSON.parse(d1);
-						for(var key in data){
-							var tr = g_match["_"+key].tr;
-							if(!tr){
-								tr = $("#m"+key);
-							}
-							if(tr && tr.length == 1){
-								tr.find(".asia").each((idx,el)=>{
-									$(el).text(data[key][idx]);
-								})
-							}
-							g_match["_"+key].asia=data[key];
-						}
-						$.post("/api/saveAsiaOdds",{"odds":d1},function(data){
-							console.log(data);
-						});
-					});
-				}
-			});
-			/*
-			$.post("/api/getOkoooJc",{url:"/ajax/?method=data.match.odds","args":"bettingTypeId=1&providerId=27&matchIds="+ids.join(","),method:"post"},function(d1){
-				var data = JSON.parse(d1);
-				for(var key in data){
-					tr = $("#m"+key);
-					if(tr.length==1){
-						tr.find(".europe").each((idx,el)=>{
-							$(el).text(data[key][idx]);
-						})
-					}
-					g_match["_"+key].europe=data[key];
-				}
-			});
-			$.post("/api/getOkoooJc",{url:"/ajax/?method=data.match.odds","args":"bettingTypeId=2&providerId=27&matchIds="+ids.join(","),method:"post"},function(d1){
-				var data = JSON.parse(d1);
-				for(var key in data){
-					tr = $("#m"+key);
-					if(tr.length==1){
-						tr.find(".asia").each((idx,el)=>{
-							$(el).text(data[key][idx]);
-						})
-					}
-					g_match["_"+key].asia=data[key];
-				}
-			});
-// 			$.ajaxSetup({async:false})
-			$.post("/api/getMatchHistory",{matchIds:ids.join(",")},function(arr){
-				for(var i=0;i<arr.length;i++){
-					var history = arr[i];
-					g_match["_"+history.id].matchlist=JSON.parse(history.matchlist);
-					var data = getMatchDataFromHistoryJson(history);
-					setMatchBoloolData(history.id,data);
-				}
-				for(var key in g_match){
-					var matchlist = g_match[key].matchlist;
-					if(!matchlist){
-						var id = key.substring(1);
-						$.get("/api/getOkoooJc",{url:"/soccer/match/"+id+"/history/"},matchHistoryCallback(id));
-					}
-				}
-				
-			});
-// 			$.ajaxSetup({async:true})
-			*/
-		}else{
-			layer.alert("没有比赛数据");
-			layer.closeAll();
+		if (params.date) {
+			$("#date").val(params.date);
+			initData(params.date);
 		}
 	});
-	
-});
+	function getStrong(hscore, ascore) {
+		return hscore > ascore ? '强' : hscore == ascore ? '平' : '弱';
+	}
+	async function initTable(matchlist) {
+		if (!matchlist) {
+			matchlist = g_match;
+		}
+		var html = [];
+		for (var key in matchlist) {
+			var match = matchlist[key];
+			html.push('<tr id="m' + match.id + '">');
+			html.push("<td>" + match.num + "</td>");
+			html.push("<td>" + match.leagueName + "</td>");
+			html.push("<td>" + match.homeName + "</td>");
+			html.push("<td>" + (match.score != '-' ? match.score + "<br/><font color=red>(" + match.halfscore + ")</font>" : "VS") + "</td>");
+			html.push("<td>" + match.awayName + "</td>");
+			html.push("<td>" + match.playtime + "</td>");
+			html.push("<td>" + match.bet365_op[0] + "</td>");
+			html.push("<td>" + match.bet365_op[1] + "</td>");
+			html.push("<td>" + match.bet365_op[2] + "</td>");
+			html.push("<td>" + match.bet365_yp[0] + "</td>");
+			html.push("<td>" + match.bet365_yp[1] + "</td>");
+			html.push("<td>" + match.bet365_yp[2] + "</td>");
+			var bolool = match.bolool;
+			if(!bolool){
+				bolool = await getBoloolById(match.id,match.homeId,match.awayId,match.playtime);
+			}
+			if (bolool) {
+				// console.info(bolool);
+				//hscore,ascore,hresult,aresult,hsection,asection 
+				html.push("<td>" + bolool.hscore + "</td>");
+				html.push("<td>" + bolool.ascore + "</td>");
+				html.push("<td>" + bolool.hsection + "</td>");
+				html.push("<td>" + bolool.asection + "</td>");
+				html.push("<td title='" + bolool.hresult + "'>" + bolool.hresult.substring(0, 3) + "</td>");
+				html.push("<td title='" + bolool.hresult + "'>" + bolool.aresult.substring(0, 3) + "</td>");
+				var hstrong = getStrong(bolool.hscore, bolool.ascore);
+				var astrong = getStrong(bolool.ascore, bolool.hscore);
+				html.push("<td>" + hstrong + "</td>");
+				html.push("<td>" + astrong + "</td>");
+			} else {
+				html.push("<td>--</td>");
+				html.push("<td>--</td>");
+				html.push("<td>--</td>");
+				html.push("<td>--</td>");
+				html.push("<td>--</td>");
+				html.push("<td>--</td>");
+				html.push("<td>--</td>");
+				html.push("<td>--</td>");
+			}
+			html.push("<td><a href='javascript:boloolDetail("+match.id+")'>情</a>&nbsp;");
+			html.push("	<a href='http://www.310win.com/analysis/" + match.id + ".htm' target='_blank'>析</a></td>");
+			html.push('</tr>');
+		}
+		$("#matchlist").html(html.join(""));
+		layer.closeAll();
+	}
+
 </script>
+
 </html>

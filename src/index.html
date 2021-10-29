@@ -11,6 +11,13 @@
         href="https://trade.500cache.com/??/newtrade/css/newAlert.css,/newtrade/css/button.css,/newtrade/css/dxt/jc.css,/newtrade/css/dxt/process.css?v=1619146661"
         rel="stylesheet" type="text/css" />
     <script src="https://cdn.bootcss.com/jquery/3.2.0/jquery.min.js"></script>
+    <script src="res/layer-v2.3/layer/layer.js"></script>
+    <style>
+        #typeTab .betbtn-on a {
+            color: rgb(0, 255, 98);
+            font-size: larger;
+        }
+    </style>
 </head>
 
 <body>
@@ -34,10 +41,12 @@
                                 <td colspan="8">
                                     <div class="td-betbtn">
                                         <div class="betbtn-row" id="typeTab">
-                                            <p class="betbtn" onclick="jingcai()"><a href="?type=1">竞彩</a>
+                                            <p class="betbtn" onclick="jingcai()"><a href="javascript:void(0)">竞彩</a>
                                             </p>
-                                            <p class="betbtn" onclick="beidan()"><a href="?type=2">北单</a></p>
-                                            <p class="betbtn" onclick="zucai()"><a href="?type=3">足彩14场</a>
+                                            <p class="betbtn" onclick="beidan()"><a href="javascript:void(0)">北单</a></p>
+                                            <p class="betbtn" onclick="zucai()"><a href="javascript:void(0)">足彩14场</a>
+                                            </p>
+                                            <p  class="betbtn" onclick="gotoBolool()"><a href="javascript:void(0)" style="color: red;">菠萝指数</a>
                                             </p>
                                         </div>
                                     </div>
@@ -102,8 +111,7 @@
                                 data-processdate="2021-05-24" data-isshow="1" data-processname="1001"
                                 data-buyendtime="2021-05-24 22:00:00" data-isactive="1"
                                 data-subactive="bfdg:1,bfgg:1,bqdg:0,bqgg:1,dxqdg:0,dxqgg:0,hcdg:1,hcgg:1,jqdg:0,jqgg:1,nspfdg:0,nspfgg:1,spfdg:0,spfgg:1"
-                                data-matchnum="周一001" data-isend="0" data-kdg="" 
-                                data-head="26196|1001|">
+                                data-matchnum="周一001" data-isend="0" data-kdg="" data-head="26196|1001|">
                                 <td class="td td-no"><a href="javascript:;" class="bet-evt-hide" title="点击可隐藏该比赛"
                                         id="link178">周一001<s></s></a></td>
                                 <td class="td td-evt">
@@ -339,10 +347,10 @@
             html.push('</div></td>');
 
             html.push('<td class="td td-data">');
-            html.push('<a href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">析</a>');
-            html.push('<a href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">亚</a>');
-            html.push('<a href="http://www.310win.com/analysis/' + match.id + '.html" target="_blank">欧</a>');
-            html.push('<a class="tdQing" href="javascript:void(0);" onclick="bolool(this)" style="color:red" target="_blank">情</a></td>');
+            html.push('<a href="http://www.310win.com/analysis/' + match.id + '.htm" target="_blank">析</a>');
+            html.push('<a href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
+            html.push('<a href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
+            html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red" >情</a></td>');
             var op = match.bet365_op;
             var yp = match.bet365_yp;
             html.push('<td class="td td-pei">');
@@ -424,9 +432,9 @@
                     var awayName = $(tds[7]).text().trim();
                     var ids = $(tds[4]).find("a").attr("onmouseout").split("_");
                     var id = ids[1];
-                    var homeId = ids[2];
+                    var homeId = ids[2].replace(/\D/g, "");
                     ids = $(tds[7]).find("a").attr("onmouseout").split("_");
-                    var awayId = ids[2];
+                    var awayId = ids[2].replace(/\D/g, "");
 
                     var h = $(tds[13]).text();
                     var d = $(tds[14]).text();
@@ -470,10 +478,10 @@
             html.push('</div></td>');
 
             html.push('<td class="td td-data">');
-            html.push('<a href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">析</a>');
-            html.push('<a href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">亚</a>');
-            html.push('<a href="http://www.310win.com/analysis/' + match.id + '.html" target="_blank">欧</a>');
-            html.push('<a class="tdQing" href="javascript:void(0);" onclick="bolool(this)" style="color:red" target="_blank">情</a></td>');
+            html.push('<a href="http://www.310win.com/analysis/' + match.id + '.htm" target="_blank">析</a>');
+            html.push('<a href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
+            html.push('<a href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
+            html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');"  style="color:red" >情</a></td>');
             var op = match.bet365_op;
             var yp = match.bet365_yp;
             html.push('<td class="td td-pei">');
@@ -540,6 +548,9 @@
                     }
 
                     var playtime = $(tds[2]).text().trim();
+                    if (playtime.substring(0, 2) != "20") {
+                        playtime = new Date().getFullYear() + "-" + playtime;
+                    }
                     var homeName = $(tds[3]).text().trim();
                     var awayName = $(tds[4]).text().trim();
                     var ids = $(tds[3]).find("a").attr("onmouseover").split(/[_.]/);
@@ -580,10 +591,10 @@
             html.push('<td class="td td-betbtn">--</td>');
 
             html.push('<td class="td td-data">');
-            html.push('<a href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">析</a>');
-            html.push('<a href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">亚</a>');
-            html.push('<a href="http://www.310win.com/analysis/' + match.id + '.html" target="_blank">欧</a>');
-            html.push('<a class="tdQing" href="javascript:void(0);" onclick="bolool(this)" style="color:red" target="_blank">情</a></td>');
+            html.push('<a href="http://www.310win.com/analysis/' + match.id + '.htm" target="_blank">析</a>');
+            html.push('<a href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
+            html.push('<a href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
+            html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red" >情</a></td>');
             var op = match.bet365_op;
             var yp = match.bet365_yp;
             html.push('<td class="td td-pei">');
@@ -598,14 +609,17 @@
 
     }
     $(() => {
-        if (location.href.indexOf("type=2")!=-1) {
+        if (location.href.indexOf("type=2") != -1) {
             beidan();
-        } else if (location.href.indexOf("type=3")!=-1) {
+        } else if (location.href.indexOf("type=3") != -1) {
             zucai();
         } else {
             jingcai();
         }
     });
+    function gotoBolool(id) {
+        bolool(id);
+    }
 </script>
 
 </html>

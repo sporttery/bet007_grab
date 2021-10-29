@@ -4,6 +4,7 @@ const Config = require("./Config")
 const DBHelper = require("./DBHelper")
 const Puppeteer = require('puppeteer');
 const program = require('commander');
+const matchUtil = require("./matchUtils");
 
 program
     .version('0.1.0')
@@ -126,7 +127,7 @@ var g_browser, g_url_idx = 0, vipPage, zqPage;
                     get: () => "Win32",
                 });
             });
-            page.on('console', msg => console.log('PAGE' + i + ' LOG:', msg.text()));
+            page.on('console', msg => Logger.log('PAGE' + i + ' LOG:', msg.text()));
         }
         browser.on("disconnected", () => {
             process.exit();
@@ -157,17 +158,18 @@ var g_browser, g_url_idx = 0, vipPage, zqPage;
             return typeof jQuery != "undefined";
         })
         await zqPage.evaluate(() => {
-            console.log(jQuery.fn.jquery);
+            Logger.log(jQuery.fn.jquery);
             window.$ = jQuery;
         });
 
         await vipPage.evaluate(() => {
-            console.log(jQuery.fn.jquery);
+            Logger.log(jQuery.fn.jquery);
             window.$ = jQuery;
         });
 
         if (program.exec == "odds") {
-            await getMatchOdds();
+            await getMatchOdds(vipPage,program.matchId);
+            exit();
         } else {
             await getTeam(zqPage);
         }
@@ -188,10 +190,11 @@ async function getTeam(page) {
         }
     }
     if (teamCount > 0) {
-        console.log("球队已经采集过了，不用重新采集");
-        console.log("开始采集球队的历史比赛");
-        await getMatchByTeam(page);
-        await getMatchOdds();
+        Logger.log("球队已经采集过了，不用重新采集");
+        Logger.log("开始采集球队的历史比赛");
+        await matchUtil.getMatchByTeam(page,program.teamId);
+        await matchUtil.getMatchOdds(vipPage,program.matchId);
+        exit();
         return;
     }
     var urlObj = Config.urls[g_url_idx++];
@@ -202,7 +205,7 @@ async function getTeam(page) {
             getTeam(page);
             return;
         }
-        console.log("准备抓取[ " + urlObj.name + " ],地址：" + urlObj.url);
+        Logger.log("准备抓取[ " + urlObj.name + " ],地址：" + urlObj.url);
         urlObj.start = new Date();
         var seaUrl = "/jsData/LeagueSeason/sea" + urlObj.id + ".js";
         var seaContent = await Utils.getFile(seaUrl);
@@ -210,7 +213,7 @@ async function getTeam(page) {
             seaContent = await Utils.getFromUrl(page, seaUrl);
             retry = 1;
             while (seaContent == "-1") {
-                console.log(seaUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
+                Logger.log(seaUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
                 await page.waitForTimeout(10 * 1000 * retry);
                 seaContent = await Utils.getFromUrl(page, seaUrl);
             }
@@ -231,7 +234,7 @@ async function getTeam(page) {
                     sdContent = await Utils.getFromUrl(page, sdUrl);
                     retry = 1;
                     while (sdContent == "-1") {
-                        console.log(sdUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
+                        Logger.log(sdUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
                         await page.waitForTimeout(10 * 1000 * retry);
                         sdContent = await Utils.getFromUrl(page, sdUrl);
                     }
@@ -258,7 +261,7 @@ async function getTeam(page) {
         }
         if (urlObj.finish) {
             var ms = (urlObj.finish.getTime() - urlObj.start.getTime());
-            console.log("准备抓取[ " + urlObj.name + " ] 完成，开始于" + urlObj.start + ",结束于" + urlObj.finish + ",共耗时 " + ms + " 毫秒");
+            Logger.log("准备抓取[ " + urlObj.name + " ] 完成，开始于" + urlObj.start + ",结束于" + urlObj.finish + ",共耗时 " + ms + " 毫秒");
             await page.waitForTimeout(500);
             getTeam(page);
         } else {
@@ -267,253 +270,11 @@ async function getTeam(page) {
             getTeam(page);
         }
     } else {
-        console.log("球队采集完毕");
-        console.log("开始采集球队的历史比赛");
-        await getMatchByTeam(page);
-        await getMatchOdds();
-    }
-}
-
-async function getMatchOdds() {
-    page = vipPage;
-    var limit = 100;
-    while (true) {
-        var ids;
-        if (program.matchId) {
-            console.log("指定了matchId=" + program.matchId);
-            ids = [program.matchId];
-        } else {
-            ids = await DBHelper.query("select m.id from t_match m left join t_match_odds o on m.id = o.matchId where o.id is null limit " + limit);
-        }
-        var len = ids.length;
-        var oddsData = {};
-        for (var i = 0; i < len; i++) {
-            var id = ids[i]["id"];
-            console.log("正在获取第" + (i + 1) + "个Id=" + id + "的赔率,还剩 " + (len - i - 1));
-            var europeOddsUrl = "/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
-            var content = await Utils.getFromUrl(page, europeOddsUrl);
-            retry = 1;
-            while (content.indexOf("id=\"odds\"") == -1) {
-                console.log(europeOddsUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
-                await page.waitForTimeout(6 * 1000 * retry++);
-                content = await Utils.getFromUrl(page, europeOddsUrl);
-                if (retry > 10) {
-                    break;
-                }
-            }
-            if (content.indexOf("id=\"odds\"") == -1) {
-                continue;
-            }
-            var nH = Utils.safeHtml(content);
-            var europeOdds = await page.evaluate((nH) => {
-                var tds = $(nH).find("table tr:eq(2)").find("td");
-                var company = $(tds[0]).text().trim();
-                var h = $(tds[1]).text().trim();
-                var d = $(tds[2]).text().trim();
-                var a = $(tds[3]).text().trim();
-                if (company.indexOf("365") != -1 && h != "" && d != "" && a != "") {
-                    return [isNaN(h) ? 0 : parseFloat(h), isNaN(d) ? 0 : parseFloat(d), isNaN(a) ? 0 : parseFloat(a)];
-                } else {
-                    return [0, 0, 0];
-                }
-            }, nH);
-            await page.waitForTimeout(1000);
-            var asiaOddsUrl = "/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
-            content = await Utils.getFromUrl(page, asiaOddsUrl);
-            retry = 1;
-            while (content.indexOf("id=\"odds\"") == -1) {
-                console.log(asiaOddsUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
-                await page.waitForTimeout(6 * 1000 * retry++);
-                content = await Utils.getFromUrl(page, asiaOddsUrl);
-                if (retry > 10) {
-                    break;
-                }
-            }
-            if (content.indexOf("id=\"odds\"") == -1) {
-                continue;
-            }
-            nH = Utils.safeHtml(content);
-            var asiaOdds = await page.evaluate((nH) => {
-                var tds = $(nH).find("table tr:eq(2)").find("td");
-                var company = $(tds[0]).text().trim();
-                var h = $(tds[1]).text().trim();
-                var pan = $(tds[2]).text().trim();
-                var a = $(tds[3]).text().trim();
-                if (company.indexOf("365") != -1 && h != "" && a != "") {
-                    return [isNaN(h) ? 0 : parseFloat(h), pan, isNaN(a) ? 0 : parseFloat(a)];
-                } else {
-                    return [0, 0, 0];
-                }
-            }, nH);
-            console.log("europeOdds:", europeOdds, "asiaOdds:", asiaOdds);
-
-            if (europeOdds[0] === null) {
-                europeOdds = [0, 0, 0];
-            }
-            if (asiaOdds[0] === null) {
-                asiaOdds = [0, '', 0];
-            }
-            var odds = { id: id + "-Bet365", company: "Bet365", s: europeOdds[0], p: europeOdds[1], f: europeOdds[2], h: asiaOdds[0], pan: asiaOdds[1], a: asiaOdds[2], matchId: id };
-            oddsData[id] = odds;
-        }
-        if (len > 0) {
-            await DBHelper.saveModelData(oddsData, "t_match_odds");
-        }
-        if (len < limit) {
-            break;
-        }
-    }
-    exit();
-}
-
-async function getMatchByTeam(page) {
-    var ids;
-    if (program.teamId) {
-        console.log("有指定teamId =" + program.teamId);
-        ids = [{ id: program.teamId }];
-    } else {
-        ids = await DBHelper.query("select id from t_team ");
-    }
-    var idsLen = ids.length;
-    for (var i = 0; i < idsLen; i++) {
-        var id = ids[i]["id"];
-        console.log("正在获取第" + (i + 1) + "个球队ID=" + id + "的历史比赛数据,还剩" + (idsLen - i - 1));
-        var dbOldPlaytimeRs = await DBHelper.query("select date_format(max(playtime),'%Y/%m/%d %H:%i') as playtime from t_match where homeId =" + id + " or awayId=" + id);
-        var maxPlaytime = "0000/00/00 00:00";
-        if (dbOldPlaytimeRs) {
-            maxPlaytime = dbOldPlaytimeRs[0]["playtime"];
-        }
-        var sdUrl = "/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=1&flesh=";
-        var sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
-        retry = 1;
-        while (sdContent == "-1") {
-            console.log(sdUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-            await page.waitForTimeout(10 * 1000 * retry++);
-            sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
-            if (retry > 10) {
-                break;
-            }
-        }
-        if (sdContent == "-1") {
-            continue;
-        }
-        delete teamPageInfo;
-        delete teamPageData;
-        eval(sdContent);
-        // var pageLen = teamPageData.length;
-        var totalPage = teamPageInfo[0];
-        var allMatch = [];
-        var nTimeStr = Utils.formatDate(new Date(), "yyyy/MM/dd hh:mm");
-        for (var j = 0; j < teamPageData.length; j++) {
-            var data = teamPageData[j];
-            var playtime = data[3];
-            if (playtime > nTimeStr) {//未开始的比赛，直接过滤掉
-                // console.log("比赛未开始，过滤掉了 playtime=" + playtime);
-                continue;
-            }
-            if (data[6].split(/[-:]/).length != 2) { //没有比分的比赛，直接过滤掉
-                // console.log("比赛没有比分，过滤掉了 fullscore=" + match.fullscore);
-                continue;
-            }
-            if (playtime < maxPlaytime) {
-                break;
-            }
-            allMatch.push(data);
-        }
-        for (var pageNo = 2; pageNo <= totalPage; pageNo++) {
-            sdUrl = "/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=" + pageNo + "&flesh=";
-            sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
-            retry = 1;
-            while (sdContent == "-1") {
-                console.log(sdUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                await page.waitForTimeout(10 * 1000 * retry++);
-                sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
-                if (retry > 10) {
-                    break;
-                }
-            }
-            if (sdContent == "-1") {
-                continue;
-            }
-            delete teamPageInfo
-            delete teamPageData;
-            eval(sdContent);
-            //如果第一场的比赛时间小于数据库里最大时间，则不需要抓取了
-            if (teamPageData[0][3] < maxPlaytime) {
-                break;
-            }
-            for (var j = 0; j < teamPageData.length; j++) {
-                var data = teamPageData[j];
-                var playtime = data[3];
-                if (playtime > nTimeStr) {//未开始的比赛，直接过滤掉
-                    // console.log("比赛未开始，过滤掉了 playtime=" + playtime);
-                    continue;
-                }
-                if (data[6].split(/[-:]/).length != 2) { //没有比分的比赛，直接过滤掉
-                    // console.log("比赛没有比分，过滤掉了 fullscore=" + match.fullscore);
-                    continue;
-                }
-                if (playtime < maxPlaytime) {
-                    break;
-                }
-                allMatch.push(data);
-            }
-            //如果最后一场的比赛时间小于数据库里最大时间，则不继续
-            if (teamPageData[teamPageData.length - 1][3] < maxPlaytime) {
-                break;
-            }
-            if (allMatch.length > 33) {
-                break;
-            }
-        }
-        console.log("teamId=" + id + " 共获取比赛 " + allMatch.length + " 场");
-
-        var matchData = {}, matchCount = 0;
-        for (var idx = 0; idx < allMatch.length; idx++) {
-            var data = allMatch[idx];
-            var playtime = data[3];
-
-            var match = {};
-            match.id = data[0];
-            match.leagueId = data[1];
-            match.leagueColor = data[2];
-            match.playtime = playtime;
-            match.leagueName = data[8];
-            match.homeName = data[11];
-            match.homeId = data[4];
-            match.awayName = data[14];
-            match.awayId = data[5];
-            match.fullscore = data[6];
-            match.halfscore = data[7];
-            // if (playtime > nTimeStr) {//未开始的比赛，直接过滤掉
-            //     console.log("比赛未开始，过滤掉了 playtime=" + playtime);
-            //     continue;
-            // }
-            let scores = match.fullscore.split(/[:-]/g);
-            // if (scores.length != 2) { //没有比分的比赛，直接过滤掉
-            //     console.log("比赛没有比分，过滤掉了 fullscore=" + match.fullscore);
-            //     continue;
-            // }
-            if (scores.length == 2) {
-                h_score = scores[0];
-                a_score = scores[1];
-                if (h_score > a_score) {
-                    match.result = "胜";
-                } else if (h_score < a_score) {
-                    match.result = '负';
-                } else {
-                    match.result = "平";
-                }
-            }
-            matchData[match.id] = match;
-            matchCount++;
-        }
-        if (matchCount > 0) {
-            var res = await DBHelper.saveModelData(matchData, "t_match");
-            console.log("teamId=" + id + " 比赛入库的结果", res);
-        }
-        await DBHelper.query("update t_team set totalPage=" + totalPage + ",match_count = (select count(1) from t_match where homeId=" + id + " or awayId=" + id + ") where id=" + id);
-        console.log("更新t_team 比赛场次数结束");
+        Logger.log("球队采集完毕");
+        Logger.log("开始采集球队的历史比赛");
+        await matchUtil.getMatchByTeam(page,program.teamId);
+        await matchUtil.getMatchOdds(vipPage,program.matchId);
+        exit();
     }
 }
 
