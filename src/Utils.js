@@ -8,6 +8,7 @@ const logger = require('./Logger');
 const assert = require('assert');
 var request = require("request");
 const Config = require('./Config');
+var child_process = require("child_process");
 
 /**
   * 异步延迟
@@ -117,15 +118,15 @@ async function downloadFromUrl(url, filePath) {
             time = null;
             reject('time out');
         }, 3000);
-        writer.on('finish', async () => {
+        writer.on('finish', () => {
             logger.info('保存文件完成:', url, " -> ", filePath);
             clearTimeout(time);
-            return await resolve();
+            return resolve();
         });
-        writer.on('error', async () => {
+        writer.on('error', () => {
             logger.info('download error');
             clearTimeout(time);
-            return await reject();
+            return reject();
         });
     });
 }
@@ -391,6 +392,29 @@ async function getFile(url) {
     }
 }
 
+async function getByCurl(curl, chk, retry) {
+    if (chk) {
+        if (!retry) {
+            retry = 5;
+        }
+        var count = 1;
+        do {
+            var body = child_process.execSync(curl).toString("utf-8");
+            if (chk(body)) {
+                return body;
+            }
+            if(count<retry){
+                var sleepMs = count * 1200;
+                console.info("第" + count + "次获取数据失败，暂停" + (sleepMs) + "ms后再次尝试");
+                await sleep(sleepMs);
+            }
+        } while (count++ < retry);
+        return null;
+    } else {
+        return child_process.execSync(curl).toString("utf-8");
+    }
+
+}
 
 async function getFromUrl(page, url) {
     var content = await page.evaluate((url) => {
@@ -415,6 +439,46 @@ async function getFromUrl(page, url) {
     return "";
 }
 
+const myProxyConfig = [{ ip: "175.27.160.71", port: 3389 },
+{ ip: "1.13.179.183", port: 3389 },
+{ ip: "1.13.20.33", port: 3389 },
+{ ip: "1.13.188.135", port: 3389 },
+{ ip: "1.13.172.37", port: 3389 },
+{ ip: "1.13.180.73", port: 3389 }];
+var myProxyIdx = 0;
+var proxyFromApi = true;
+const tianqiApi="http://api.tianqiip.com/getip?secret=xwtey386lnwk3ovi&type=json&num=1&time=3&port=3";
+async function getProxy(num) {
+    if (!num) {
+        num = 1;
+    }
+    let proxyIp;
+    if (proxyFromApi) {
+        var curl = "curl -s \""+tianqiApi+"\"";
+        proxyIp = JSON.parse(await getByCurl(curl));
+        if (proxyIp.code != 1000) {
+            if (proxyIp.code == 1010) {
+                //{"code":1010,"msg":"当前IP(1.13.183.154)不在白名单内，请先设置IP白名单或联系客户经理"}
+                var myIp = proxyIp.msg.split(/[()]/)[1];
+                await getByCurl("curl -s \"http://api.tianqiip.com/white/add?key=Lewis&brand=2&sign=4262ed4718940d6481af115b480bc8fe&ip=" + myIp+"\"");
+                proxyIp = JSON.parse(await getByCurl(curl));
+            } else {
+                console.error(proxyIp.msg)
+                proxyFromApi = false;
+                return getProxy(num);
+            }
+        }
+    } else {
+        proxyIp = { code: 1000, data: [] };
+        while (proxyIp.data.length < num) {
+            proxyIp.data.push(myProxyConfig[myProxyIdx++]);
+            if (myProxyIdx >= myProxyConfig.length) {
+                myProxyIdx = 0;
+            }
+        }
+    }
+    return proxyIp;
+}
 
 
 module.exports = {
@@ -435,6 +499,8 @@ module.exports = {
     getFiles,
     getFile,
     getFromUrl,
-    saveFile
+    saveFile,
+    getByCurl,
+    getProxy
 };
 

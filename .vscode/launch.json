@@ -22,6 +22,16 @@
             ],
             "program": "${workspaceFolder}\\src\\mainNew.js",
             "args": ["-e","odds"]
+        },
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "saveOdds",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\src\\saveOddsFromFile.js",
+            "args": ["-e","odds"]
         }
     ]
 }

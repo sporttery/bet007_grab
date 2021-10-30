@@ -1,7 +1,7 @@
 const Utils = require("./Utils")
 const Logger = require("./Logger")
 const Config = require("./Config")
-const Puppeteer = require('puppeteer');
+const Puppeteer = require('puppeteer-core');
 
 var g_browser, g_url_idx = 0;
 
@@ -17,6 +17,7 @@ var g_browser, g_url_idx = 0;
             height: 966
         },
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
         ignoreHTTPSErrors: true,
         //ignoreDefaultArgs: ["--enable-automation"]
         // devtools: true

@@ -450,7 +450,7 @@
                         bet365_yp = ['-', '-', '-'];
                     }
                     var match = { bet365_op, bet365_yp, leagueId, leagueName, leagueColor, jcmatchId, week, num, playtime, homeName, homeId, awayName, awayId, h, d, a, rq, id, score, halfscore };
-                    matchlist[num] = match;
+                    matchlist[id] = match;
                 });
             }
         })
@@ -568,7 +568,7 @@
                         bet365_yp = ['-', '-', '-'];
                     }
                     var match = { bet365_op, bet365_yp, leagueId, leagueName, leagueColor, num, playtime, homeName, homeId, awayName, awayId, id };
-                    matchlist[num] = match;
+                    matchlist[id] = match;
                 });
             }
         })
@@ -594,10 +594,12 @@
             html.push('<a href="http://www.310win.com/analysis/' + match.id + '.htm" target="_blank">析</a>');
             html.push('<a href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
             html.push('<a href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
-            html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red" >情</a></td>');
             var op = match.bet365_op;
             var yp = match.bet365_yp;
-            html.push('<td class="td td-pei">');
+            if(op && op[0] != '-' && yp && yp[0] != '-'){
+                html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red" >情</a>');
+            }
+            html.push('</td><td class="td td-pei">');
             html.push('<div class="betbtn-row itm-rangB1">');
             html.push('<span>' + op[0] + '</span><span>' + op[1] + '</span><span>' + op[2] + '</span></div>');
             html.push('<div class="betbtn-row itm-rangB2">');

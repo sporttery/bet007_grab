@@ -11,7 +11,9 @@
     "license": "ISC",
     "dependencies": {
         "axios": "^0.21.1",
+        "cheerio": "^1.0.0-rc.10",
         "commander": "^7.2.0",
+        "filereader": "^0.10.3",
         "formdata-node": "^1.5.2",
         "http-server": "^13.0.1",
         "js-base64": "^2.5.1",

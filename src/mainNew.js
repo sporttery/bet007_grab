@@ -2,7 +2,7 @@ const Utils = require("./Utils")
 const Logger = require("./Logger")
 const Config = require("./Config")
 const DBHelper = require("./DBHelper")
-const Puppeteer = require('puppeteer');
+const Puppeteer = require('puppeteer-core');
 const program = require('commander');
 const matchUtil = require("./matchUtils");
 
@@ -51,6 +51,7 @@ var g_browser, g_url_idx = 0, vipPage, zqPage;
         },
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
         ignoreHTTPSErrors: true,
+        executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
         //ignoreDefaultArgs: ["--enable-automation"]
         // devtools: true
 
@@ -158,17 +159,17 @@ var g_browser, g_url_idx = 0, vipPage, zqPage;
             return typeof jQuery != "undefined";
         })
         await zqPage.evaluate(() => {
-            Logger.log(jQuery.fn.jquery);
+            console.log(jQuery.fn.jquery);
             window.$ = jQuery;
         });
 
         await vipPage.evaluate(() => {
-            Logger.log(jQuery.fn.jquery);
+            console.log(jQuery.fn.jquery);
             window.$ = jQuery;
         });
 
         if (program.exec == "odds") {
-            await getMatchOdds(vipPage,program.matchId);
+            await matchUtil.getMatchOdds(vipPage,program.matchId);
             exit();
         } else {
             await getTeam(zqPage);

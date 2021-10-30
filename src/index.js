@@ -11,7 +11,7 @@ const matchUtil = require("./matchUtils");
             width: 1440,
             height: 900
         },
-        args: ["--no-sandbox", "--disable-setuid-sandbox", '--disable-web-security',"--start-maximized"],
+        args: ["--no-sandbox", "--disable-setuid-sandbox", '--disable-web-security', "--start-maximized"],
         executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
         // ignoreDefaultArgs:['--enable-automation'],
         ignoreHTTPSErrors: true,
@@ -110,77 +110,82 @@ const matchUtil = require("./matchUtils");
                 await matchUtil.getMatchByTeam(page, teamId);
             }
             await Util.addCollectionButton(page);
-            await page.evaluate(()=>{
+            await page.evaluate(() => {
                 layer.closeAll();
                 layer.alert("采集完成")
             });
         }
-        var boloolPage,boloolDetailPage;
-        async function boloolDetail(id){
-            Logger.info("打开菠萝指数详情，id="+id);
-            var matchlist = await page.evaluate(()=>{
+
+        var boloolPage, boloolDetailPage;
+        async function boloolDetail(id) {
+            Logger.info("打开菠萝指数详情，id=" + id);
+            var matchlist = await page.evaluate(() => {
                 return JSON.stringify(matchlist);
             });
             matchlist = JSON.parse(matchlist);
             var match = matchlist[id];
-            if(!match){
-                Logger.error("找不到对应的比赛ID="+id);
-                await boloolPage.evaluate((id)=>{
+            if (!match) {
+                Logger.error("找不到对应的比赛ID=" + id);
+                await boloolPage.evaluate((id) => {
                     layer.alert("找不到对应的比赛ID=" + id);
-                },id);
+                }, id);
                 return;
             }
-            if(!boloolDetailPage){
+            if (!boloolDetailPage) {
                 boloolDetailPage = await browser.newPage();
-                boloolDetailPage .on('console', msg => console.log('PAGE LOG:', msg.text()));                
-                boloolDetailPage.on("close",()=>{
+                boloolDetailPage.on('console', msg => console.log('PAGE LOG:', msg.text()));
+                boloolDetailPage.on("close", () => {
                     boloolDetailPage = null;
-                })
+                });
+                await boloolDetailPage.exposeFunction("getBoloolListByOdds", matchUtil.getBoloolListByOdds);
+                await boloolDetailPage.exposeFunction("getBoloolById", matchUtil.getBoloolById);
             }
-            await boloolDetailPage.goto("file://" + __dirname + "/html/boloolDetail.html?id="+id);
-            await boloolDetailPage.evaluate((match)=>{
+            await boloolDetailPage.goto("file://" + __dirname + "/html/boloolDetail.html?id=" + id);
+            await boloolDetailPage.evaluate((match) => {
                 g_match = match;
                 showBolool(match);
-            },match);
+            }, match);
         }
 
-        async function bolool(id){
+        async function bolool(id) {
             Logger.info("打开菠萝指数");
-            if(!boloolPage){
+            if (!boloolPage) {
                 boloolPage = await browser.newPage();
-                boloolPage .on('console', msg => console.log('PAGE LOG:', msg.text()));
-                await boloolPage.exposeFunction("getBoloolById",matchUtil.getBoloolById);
-                await boloolPage.exposeFunction("boloolDetail",boloolDetail);
-                boloolPage.on("close",()=>{
+                boloolPage.on('console', msg => console.log('PAGE LOG:', msg.text()));
+                await boloolPage.exposeFunction("getBoloolById", matchUtil.getBoloolById);
+                await boloolPage.exposeFunction("boloolDetail", boloolDetail);
+                boloolPage.on("close", () => {
                     boloolPage = null;
                 })
             }
-            var matchlist = await page.evaluate(()=>{
+            await boloolPage.bringToFront();
+            var matchlist = await page.evaluate(() => {
                 return JSON.stringify(matchlist);
             });
             matchlist = JSON.parse(matchlist);
             await boloolPage.goto("file://" + __dirname + "/html/bolool.html");
-            for(var key in matchlist){
+            for (var key in matchlist) {
                 var match = matchlist[key];
-                if(!match.bolool){
-                    var bolool = await matchUtil.getBoloolById(match.id,match.homeId,match.awayId,match.playtime);
+                if (!match.bolool) {
+                    var bolool = await matchUtil.getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
                     match.bolool = bolool;
                 }
             }
-            await page.evaluate((_matchlist)=>{
-                matchlist= _matchlist;
-            },matchlist);
-            await boloolPage.evaluate((matchlist)=>{
+            await page.evaluate((_matchlist) => {
+                matchlist = _matchlist;
+            }, matchlist);
+            await boloolPage.evaluate((matchlist) => {
                 g_match = matchlist;
                 initTable();
-            },matchlist);
+            }, matchlist);
 
-            if(id){
+            if (id) {
                 await boloolDetail(id);
+                await boloolDetailPage.bringToFront();
             }
         }
 
-        
+
         browser.on("disconnected", () => {
             process.exit();
         })

@@ -84,7 +84,7 @@ async function saveModel(model, tableName = "t_match") {
  * @param modelArr 
  * 批量更新入库
  */
-async function saveModelArr(modelArr, tableName = "t_match") {
+async function saveModelArr(modelArr, tableName = "t_match",focusUpdate = false) {
     Logger.info("批量插入 " + tableName + ",共 ", modelArr.length);
     let columns = [], values = [], params = [], update = [], updateValue = [];
     var model = modelArr[0];
@@ -108,7 +108,7 @@ async function saveModelArr(modelArr, tableName = "t_match") {
     });
     params = params.concat(updateValue);
     let sql = "insert into " + tableName + "(" + columns.join(",") + ") values " + valuesArr.join(",");
-    if (update.length > 0) {
+    if (update.length > 0 || focusUpdate) {
         sql += "ON DUPLICATE KEY UPDATE  version=version+1";
     }
     Logger.info("执行sql:" + sql.substring(0,200));

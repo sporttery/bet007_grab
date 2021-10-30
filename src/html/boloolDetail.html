@@ -124,19 +124,16 @@
 			<table class="table table-bordered">
 				<thead>
 					<tr>
+						<th rowspan="2">ID/序号</th>
 						<th rowspan="2">联赛</th>
-						<th rowspan="2">赛季</th>
-						<th rowspan="2" width="100px">轮次</th>
-						<th rowspan="2">时间
-							<button type="button" class="btn btn-default" onclick="sortBy('playtime')"
-								aria-label="Center Align"><span class="glyphicon glyphicon-sort"
-									aria-hidden="true"></span></button>
-						</th>
 						<th rowspan="2">主队</th>
-						<th rowspan="2">客队</th>
 						<th rowspan="2">比分</th>
-						<th colspan="3">欧盘<button type="button" class="btn btn-default" onclick="sortBy('europe')"
-								aria-label="Center Align">
+						<th rowspan="2">客队</th>
+						<th rowspan="2">比赛时间<button type="button" class="btn btn-default" onclick="sortBy('playtime')"
+								aria-label="Center Align"><span class="glyphicon glyphicon-sort"
+									aria-hidden="true"></span></button></th>
+						<th colspan="3" style="text-align:center">bet365欧赔<button type="button" class="btn btn-default"
+								onclick="sortBy('europe')" aria-label="Center Align">
 								<span class="glyphicon glyphicon-sort" aria-hidden="true"></span></button>
 							<div style="display: none">
 								<select id="europeSec" onchange="filterData()"></select>
@@ -144,8 +141,8 @@
 								&nbsp;&nbsp;<a href="javascript:allOdds('europe')">全部</a>
 							</div>
 						</th>
-						<th colspan="3">亚盘<button type="button" class="btn btn-default" onclick="sortBy('asia')"
-								aria-label="Center Align">
+						<th colspan="3" style="text-align:center">bet365亚赔<button type="button" class="btn btn-default"
+								onclick="sortBy('asia')" aria-label="Center Align">
 								<span class="glyphicon glyphicon-sort" aria-hidden="true"></span></button>
 							<div style="display: none">
 								<select id="asiaSec" onchange="filterData()"></select>
@@ -153,17 +150,17 @@
 								&nbsp;&nbsp;<a href="javascript:allOdds('asia')">全部</a>
 							</div>
 						</th>
-						<th colspan="2">积分<label for="sameScore"
+						<th colspan="2" style="text-align:center">积分<label for="sameScore"
 								style="cursor: pointer; font-size: 22px; color: red;"><input id="sameScore"
 									type="checkbox" onchange="sameScore()" />同</label></th>
-						<th colspan="2">分区 <label for="sameSection"
+						<th colspan="2" style="text-align:center">分区<label for="sameSection"
 								style="cursor: pointer; font-size: 22px; color: red;"><input id="sameSection"
 									type="checkbox" onchange="sameSection()" />同</label></th>
-						<th colspan="2">近3场</th>
-						<th colspan="2">强弱<label for="sameStrong"
+						<th colspan="2" style="text-align:center">近3场</th>
+						<th colspan="2" style="text-align:center">强弱<label for="sameStrong"
 								style="cursor: pointer; font-size: 22px; color: red;"><input id="sameStrong"
 									type="checkbox" onchange="sameStrong()" />同</label></th>
-						<th rowspan="2">析</th>
+						<th rowspan="2" style="text-align:center">分析</th>
 					</tr>
 					<tr>
 						<!-- europe -->
@@ -472,131 +469,7 @@
 
 		layer.closeAll();
 	}
-	function getBoloolList() {
-		var europe = $("#matchEurope").val();
-		var asia = $("#matchAsia").val();
-		layer.load(2);
-		$.post("/api/getBoloolList", { europe, asia, topN }, function (d) {
-			if (typeof d == "string") {
-				layer.alert(d);
-			} else {
-				if (d.length == 0) {
-					layer.closeAll();
-					layer.alert("没有查到数据");
-					return;
-				}
-				var html = [];
-				var noBoloolIds = [];
-				var europeMap = {};
-				var asiaMap = {};
 
-				var totalCount = 0, showCount = 0;
-				d.forEach(item => {
-					if (g_boloolList["bolool_" + item.id]) {
-						return false;
-					}
-					totalCount++;
-					var eKey = item.s + " " + item.p + " " + item.f;
-					var aKey = item.h + " " + item.pan + " " + item.a;
-					var show = true;
-					//show = europe==eKey && asia == aKey;
-					var noBolool = false;
-					if (!item.hresult && !item.aresult) {
-						noBolool = true;
-					}
-					var className = "";
-					var bolool3 = { hstrong: "-1", astrong: "-1", hresult: "--", aresult: "--" };
-					if (noBolool) {
-						className = "noBolool";
-						noBoloolIds.push(item.id);
-					} else {
-						bolool3 = getBoloolFromResult(item.hresult, item.aresult, 3);
-						item.bolool3 = bolool3;
-					}
-					if (show) {
-						showCount++;
-					}
-					html.push('<tr id="bolool_' + item.id + '" class="' + className + '" style="' + (show ? "" : "display:none") + '" data-europe="' + eKey + '" data-asia="' + aKey +
-						'" data-hsection="' + item.hsection + '" data-asection="' + item.asection + '" data-hstrong="' + bolool3.hstrong + '" data-astrong="' + bolool3.astrong +
-						'" data-hscore="' + item.hscore + '" data-ascore="' + item.ascore + '" data-playtime="' + item.playtime + '">');
-					html.push('<td>' + item.leagueName + '</td>');
-					html.push('<td>' + item.seasonName + '</td>');
-					html.push('<td>' + item.round + '</td>');
-					html.push('<td>' + item.playtime + '</td>');
-					html.push('<td>' + item.homeName + '</td>');
-					html.push('<td>' + item.awayName + '</td>');
-					html.push('<td><span class="fullscore">' + item.fullscore + "</span><br/>" + item.halfscore + '</td>');
-
-					html.push('<td class="' + (europe == eKey ? 'red' : '') + '">' + item.s + '</td>');
-					html.push('<td class="' + (europe == eKey ? 'red' : '') + '">' + item.p + '</td>');
-					html.push('<td class="' + (europe == eKey ? 'red' : '') + '">' + item.f + '</td>');
-					if (!europeMap[eKey]) {
-						europeMap[eKey] = [];
-					}
-					europeMap[eKey].push(item.id);
-					html.push('<td class="' + (asia == aKey ? 'red' : '') + '">' + item.h + '</td>');
-					html.push('<td class="' + (asia == aKey ? 'red' : '') + '">' + item.pan + '</td>');
-					html.push('<td class="' + (asia == aKey ? 'red' : '') + '">' + item.a + '</td>');
-					if (!asiaMap[aKey]) {
-						asiaMap[aKey] = [];
-					}
-					asiaMap[aKey].push(item.id);
-					//hresult,aresult,hscore,ascore,hsection,asection
-					if (noBolool) {
-						html.push('<td class="hscore">--</td>');
-						html.push('<td>--</td>');
-						html.push('<td>--</td>');
-						html.push('<td>--</td>');
-						html.push('<td>--</td>');
-						html.push('<td>--</td>');
-						html.push('<td>--</td>');
-						html.push('<td>--</td>');
-					} else {
-						html.push('<td>' + item.hscore + '</td>');
-						html.push('<td>' + item.ascore + '</td>');
-						html.push('<td>' + item.hsection + '</td>');
-						html.push('<td>' + item.asection + '</td>');
-						html.push('<td>' + bolool3.hresult + '</td>');
-						html.push('<td>' + bolool3.aresult + '</td>');
-						html.push('<td>' + bolool3.hstrong + '</td>');
-						html.push('<td>' + bolool3.astrong + '</td>');
-					}
-					html.push('<td>                            <a class="ao jc-link" href="//www.okooo.com/soccer/match/' + item.id + '/odds/" target="_blank">欧</a>');
-					html.push('                            <a class="ao jc-link" href="//www.okooo.com/soccer/match/' + item.id + '/history/" target="_blank">析</a>');
-					html.push('                            <a class="ao jc-link" href="//www.okooo.com/soccer/match/' + item.id + '/node/" target="_blank">态</a></td>');
-					g_boloolList["bolool_" + item.id] = item;
-					html.push('</tr>');
-				});
-				ids = noBoloolIds;
-				boloolListEl = $("#boloolList");
-				boloolListEl.html(html.join(''));
-				setTotalInfo(totalCount, showCount);
-				html = [allOption];
-				var keys = Object.keys(europeMap);
-				keys.sort();
-				keys.forEach((key) => {
-					html.push('<option value="' + key + '" class="' + (key == europe ? "sameOdds" : "") + '">' + key + '</option>');
-				});
-				$("#europeSec").html(html.join('')).parent().show();
-				html = [allOption];
-				var keys = Object.keys(asiaMap);
-				keys.sort();
-				keys.forEach((key) => {
-					html.push('<option value="' + key + '" class="' + (key == asia ? "sameOdds" : "") + '">' + key + '</option>');
-				});
-				$("#asiaSec").html(html.join('')).parent().show();
-				$("#searchBtn").hide();
-				if (noBoloolIds.length > 0) {
-					for (var i = 0; i < noBoloolIds.length; i++) {
-						var id = noBoloolIds[i];
-						$.get("/api/getOkoooJc", { url: "/soccer/match/" + id + "/history/" }, matchHistoryCallback(id));
-					}
-				} else {
-					finishLoad();
-				}
-			}
-		});
-	}
 	function showBolool(match) {
 		thisMatch = match;
 		var bolool = thisMatch.bolool;
@@ -658,6 +531,8 @@
 
 		$("#matchtr").html(html.join(""));
 
+		getBoloolList();
+
 	}
 	var g_match = {}, topN = 30, ids = [], g_boloolList = {}, thisMatch = {};
 	var params = getRequest();
@@ -675,6 +550,137 @@
 			topN = params.topN;
 		}
 	});
+	async function getBoloolList() {
+		var europe = $("#matchEurope").val();
+		var asia = $("#matchAsia").val();
+		layer.load(2);
+		var data = await getBoloolListByOdds(europe, asia);
+
+		if (typeof data == "string") {
+			layer.alert(data);
+		} else {
+			if (data.length == 0) {
+				layer.closeAll();
+				layer.alert("没有查到数据");
+				return;
+			}
+			var html = [];
+			var noBoloolIds = [];
+			var europeMap = {};
+			var asiaMap = {};
+
+			var totalCount = 0, showCount = 0;
+			for(var i=0;i<data.length;i++){
+				var match = data[i];
+				if (g_boloolList["bolool_" + match.id]) {
+					return false;
+				}
+				totalCount++;
+				var eKey = match.s + " " + match.p + " " + match.f;
+				var aKey = match.h + " " + match.pan + " " + match.a;
+				var show = true;
+				//show = europe==eKey && asia == aKey;
+				var noBolool = false;
+				if (!match.hresult && !match.aresult) {
+					var bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+					if (!bolool) {
+						noBolool = true;
+					} else {
+						//hresult,aresult,hscore,ascore,hsection,asection
+						match.hscore = bolool.hscore;
+						match.ascore = bolool.ascore;
+						match.hresult = bolool.hresult;
+						match.aresult = bolool.aresult;
+						match.hsection = bolool.hsection;
+						match.asection = bolool.asection;
+					}
+				}
+				var className = "";
+				var bolool3 = { hstrong: "-1", astrong: "-1", hresult: "--", aresult: "--" };
+				if (noBolool) {
+					className = "noBolool";
+					noBoloolIds.push(match.id);
+				} else {
+					bolool3 = getBoloolFromResult(match.hresult, match.aresult, 3);
+					match.bolool3 = bolool3;
+				}
+				if (show) {
+					showCount++;
+				}
+				html.push('<tr id="bolool_' + match.id + '" class="' + className + '" style="' + (show ? "" : "display:none") + '" data-europe="' + eKey + '" data-asia="' + aKey +
+					'" data-hsection="' + match.hsection + '" data-asection="' + match.asection + '" data-hstrong="' + bolool3.hstrong + '" data-astrong="' + bolool3.astrong +
+					'" data-hscore="' + match.hscore + '" data-ascore="' + match.ascore + '" data-playtime="' + match.playtime + '">');
+				html.push('<td>' + match.id + '</td>');
+				html.push('<td>' + match.leagueName + '</td>');
+				html.push('<td>' + match.homeName + '</td>');
+				html.push('<td><span class="fullscore">' + match.fullscore + "</span><br/>" + match.halfscore + '</td>');
+				html.push('<td>' + match.awayName + '</td>');
+				html.push('<td>' + match.playtime + '</td>');
+
+				html.push('<td class="' + (europe == eKey ? 'red' : '') + '">' + match.s + '</td>');
+				html.push('<td class="' + (europe == eKey ? 'red' : '') + '">' + match.p + '</td>');
+				html.push('<td class="' + (europe == eKey ? 'red' : '') + '">' + match.f + '</td>');
+				if (!europeMap[eKey]) {
+					europeMap[eKey] = [];
+				}
+				europeMap[eKey].push(match.id);
+				html.push('<td class="' + (asia == aKey ? 'red' : '') + '">' + match.h + '</td>');
+				html.push('<td class="' + (asia == aKey ? 'red' : '') + '">' + match.pan + '</td>');
+				html.push('<td class="' + (asia == aKey ? 'red' : '') + '">' + match.a + '</td>');
+				if (!asiaMap[aKey]) {
+					asiaMap[aKey] = [];
+				}
+				asiaMap[aKey].push(match.id);
+				//hresult,aresult,hscore,ascore,hsection,asection
+				if (noBolool) {
+					html.push('<td class="hscore">--</td>');
+					html.push('<td>--</td>');
+					html.push('<td>--</td>');
+					html.push('<td>--</td>');
+					html.push('<td>--</td>');
+					html.push('<td>--</td>');
+					html.push('<td>--</td>');
+					html.push('<td>--</td>');
+				} else {
+					html.push('<td>' + match.hscore + '</td>');
+					html.push('<td>' + match.ascore + '</td>');
+					html.push('<td>' + match.hsection + '</td>');
+					html.push('<td>' + match.asection + '</td>');
+					html.push('<td>' + bolool3.hresult + '</td>');
+					html.push('<td>' + bolool3.aresult + '</td>');
+					html.push('<td>' + bolool3.hstrong + '</td>');
+					html.push('<td>' + bolool3.astrong + '</td>');
+				}
+				html.push('<td>   ');
+				html.push('<a class="ao jc-link" href="http://www.310win.com/analysis/' + match.id + '.htm" target="_blank">析</a>');
+				html.push('<a class="ao jc-link"  href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
+				html.push('<a class="ao jc-link" href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
+				html.push('</td>   ');
+				g_boloolList["bolool_" + match.id] = match;
+				html.push('</tr>');
+			};
+			ids = noBoloolIds;
+			boloolListEl = $("#boloolList");
+			boloolListEl.html(html.join(''));
+			setTotalInfo(totalCount, showCount);
+			html = [allOption];
+			var keys = Object.keys(europeMap);
+			keys.sort();
+			keys.forEach((key) => {
+				html.push('<option value="' + key + '" class="' + (key == europe ? "sameOdds" : "") + '">' + key + '</option>');
+			});
+			$("#europeSec").html(html.join('')).parent().show();
+			html = [allOption];
+			var keys = Object.keys(asiaMap);
+			keys.sort();
+			keys.forEach((key) => {
+				html.push('<option value="' + key + '" class="' + (key == asia ? "sameOdds" : "") + '">' + key + '</option>');
+			});
+			$("#asiaSec").html(html.join('')).parent().show();
+			$("#searchBtn").hide();
+			finishLoad();
+		}
+	}
 </script>
 
 </html>

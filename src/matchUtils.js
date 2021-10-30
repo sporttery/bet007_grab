@@ -1,6 +1,5 @@
 const Utils = require("./Utils");
 const Logger = require("./Logger");
-const Config = require("./Config");
 const DBHelper = require("./DBHelper");
 async function getMatchOdds(page, matchId) {
     var limit = 100;
@@ -10,7 +9,7 @@ async function getMatchOdds(page, matchId) {
             Logger.info("指定了matchId=" + matchId);
             ids = [matchId];
         } else {
-            ids = await DBHelper.query("select m.id from t_match m left join t_match_odds o on m.id = o.matchId where o.id is null limit " + limit);
+            ids = await DBHelper.query("select m.id from t_match m left join t_match_odds o on m.id = o.matchId where o.id is null ORDER BY RAND() limit " + limit);
         }
         var len = ids.length;
         var oddsData = {};
@@ -351,8 +350,18 @@ async function getBoloolById(mid, homeId, awayId, playtime) {
 
 }
 
+async function getBoloolListByOdds(europe,asia){
+    var europeOdds = europe.split(" ");
+    var asiaOdds = asia.split(" ");
+    var sql = "SELECT o.matchId,o.s,o.p,o.f,o.h,o.pan,o.a,m.leagueId,m.leagueName,m.homeId,m.homeName,m.awayId,m.awayName,m.fullscore,m.halfscore,m.playtime,"+
+    "b.hscore,ascore,hresult,aresult,hsection,asection from t_match_odds o left join t_match m on o.matchId=m.id left join t_bolool30 b on m.id = b.id where company='BET365'"+
+    " and (s="+europeOdds[0]+" and p="+europeOdds[1]+
+     " and f="+europeOdds[2]+") or (h="+asiaOdds[0]+" and pan='"+asiaOdds[1]+"' and a="+asiaOdds[2]+") order by m.playtime desc ";
+    //  console.info(sql);
+     return DBHelper.query(sql);
+}
 
 module.exports = {
     getMatchByTeam,
-    getMatchOdds, getScoreSection, getBoloolById
+    getMatchOdds, getScoreSection, getBoloolById,getBoloolListByOdds
 }

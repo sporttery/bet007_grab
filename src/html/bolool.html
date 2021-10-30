@@ -159,7 +159,7 @@
 			html.push("<td>" + match.num + "</td>");
 			html.push("<td>" + match.leagueName + "</td>");
 			html.push("<td>" + match.homeName + "</td>");
-			html.push("<td>" + (match.score != '-' ? match.score + "<br/><font color=red>(" + match.halfscore + ")</font>" : "VS") + "</td>");
+			html.push("<td>" + (match.score && match.score != '-' ? match.score + "<br/><font color=red>(" + match.halfscore + ")</font>" : "VS") + "</td>");
 			html.push("<td>" + match.awayName + "</td>");
 			html.push("<td>" + match.playtime + "</td>");
 			html.push("<td>" + match.bet365_op[0] + "</td>");
@@ -195,7 +195,10 @@
 				html.push("<td>--</td>");
 				html.push("<td>--</td>");
 			}
-			html.push("<td><a href='javascript:boloolDetail("+match.id+")'>情</a>&nbsp;");
+			html.push("<td>");
+			if(match.bet365_op && match.bet365_op[0]!='-' && match.bet365_yp && match.bet365_yp[0]!='-' ){
+				html.push("<a href='javascript:boloolDetail("+match.id+")' style='color:red'>情</a>&nbsp;");
+			}
 			html.push("	<a href='http://www.310win.com/analysis/" + match.id + ".htm' target='_blank'>析</a></td>");
 			html.push('</tr>');
 		}

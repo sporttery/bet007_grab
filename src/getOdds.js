@@ -73,7 +73,7 @@ async function saveOdds(content) {
 var g_browser;
 (async function () {
     Logger.info("程序开始运行");
-    const Puppeteer = require('puppeteer');
+    const Puppeteer = require('puppeteer-core');
     await Puppeteer.launch({
         headless: true,
         defaultViewport: {
@@ -81,6 +81,7 @@ var g_browser;
             height: 966
         },
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
         ignoreHTTPSErrors: true,
         //ignoreDefaultArgs: ["--enable-automation"]
         // devtools: true

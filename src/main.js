@@ -491,13 +491,14 @@ async function getOdds(page) {
         return;
     }
     Logger.info(urls);
-    const Puppeteer = require('puppeteer');
+    const Puppeteer = require('puppeteer-core');
     await Puppeteer.launch({
         headless: false,
         defaultViewport: {
             width: 1920,
             height: 966
         },
+        executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
         //ignoreDefaultArgs: ["--enable-automation"]
         //  devtools:true
 

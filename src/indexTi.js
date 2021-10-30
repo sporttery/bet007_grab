@@ -1,4 +1,4 @@
-const Puppeteer = require("puppeteer");
+const Puppeteer = require("puppeteer-core");
 const Logger = require("./Logger");
 const Redis = require("redis");
 // const fs = require("fs");
