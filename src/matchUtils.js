@@ -83,7 +83,17 @@ async function getMatchOdds(page, matchId) {
             oddsData[id] = odds;
         }
         if (len > 0) {
-            await DBHelper.saveModelData(oddsData, "t_match_odds");
+            retry=10;
+            count=1;
+            while(count++<retry){
+                try {
+                    await DBHelper.saveModelData(oddsData, "t_match_odds");
+                    break;
+                } catch (error) {
+                    console.error(error);
+                    await Utils.sleep(1000);
+                }
+            }
         }
         if (len < limit) {
             break;
@@ -113,8 +123,8 @@ async function getMatchByTeam(page, teamId) {
         var sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
         retry = 1;
         while (sdContent == "-1") {
-            Logger.info(sdUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-            await page.waitForTimeout(10 * 1000 * retry++);
+            Logger.info(sdUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
+            await page.waitForTimeout(6 * 1000 * retry++);
             sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
             if (retry > 10) {
                 break;
@@ -151,8 +161,8 @@ async function getMatchByTeam(page, teamId) {
             sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
             retry = 1;
             while (sdContent == "-1") {
-                Logger.info(sdUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                await page.waitForTimeout(10 * 1000 * retry++);
+                Logger.info(sdUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
+                await page.waitForTimeout(6 * 1000 * retry++);
                 sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
                 if (retry > 10) {
                     break;

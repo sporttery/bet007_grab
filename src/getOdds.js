@@ -252,8 +252,8 @@ var g_browser;
                 var content = await Utils.getFromUrl(page, url);
                 retry = 1;
                 while (content == "-1") {
-                    console.log(url + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                    await page.waitForTimeout(10 * 1000 * retry);
+                    console.log(url + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
+                    await page.waitForTimeout(6 * 1000 * retry++);
                     content = await Utils.getFromUrl(page, url);
                 }
                 if (content != "" && content.indexOf("DOCTYPE") == -1) {

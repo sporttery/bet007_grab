@@ -214,8 +214,8 @@ async function getTeam(page) {
             seaContent = await Utils.getFromUrl(page, seaUrl);
             retry = 1;
             while (seaContent == "-1") {
-                Logger.log(seaUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
-                await page.waitForTimeout(10 * 1000 * retry);
+                Logger.log(seaUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
+                await page.waitForTimeout(6 * 1000 * retry++);
                 seaContent = await Utils.getFromUrl(page, seaUrl);
             }
         }
@@ -235,7 +235,7 @@ async function getTeam(page) {
                     sdContent = await Utils.getFromUrl(page, sdUrl);
                     retry = 1;
                     while (sdContent == "-1") {
-                        Logger.log(sdUrl + "返回错误的数据，" + (10 * retry) + "秒后重试第" + retry + "次");
+                        Logger.log(sdUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
                         await page.waitForTimeout(10 * 1000 * retry);
                         sdContent = await Utils.getFromUrl(page, sdUrl);
                     }

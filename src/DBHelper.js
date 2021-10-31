@@ -138,7 +138,7 @@ async function saveModelData(modelData, tableName, privateKey = "id") {
         });
         var modelArr = Object.values(modelData);
         if (modelArr.length > 0) {
-            return await saveModelArr(modelArr, tableName);
+            return await saveModelArr(modelArr, tableName,true);
         }
     }
     return 0;
