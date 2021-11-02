@@ -199,12 +199,13 @@ async function convertOdds(){
                 console.info(nrs);
             }
         }
-        if(rs.len<100){
+        if(rs.length<100){
             console.info("最后一组处理完成，程序退出");
             break;
         }
     }
     console.info("程序退出");
+    process.exit();
 }
 
 if(process.argv[2]=="convert"){
