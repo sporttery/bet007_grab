@@ -1,16 +1,20 @@
 const DBHelper = require("./DBHelper")
 const Utils = require("./Utils")
 var child_process = require("child_process");
-const cheerio = require('cheerio')
+const cheerio = require('cheerio');
 const limit = 100;
 const companyIdMap = { "Bet365": { e: 8, a: 8 } };
 const sync = true;
 var proxy = {};
 var GoalCn="平手,平手/半球,半球,半球/一球,一球,一球/球半,球半,球半/两球,两球,两球/两球半,两球半,两球半/三球,三球,三球/三球半,三球半,三球半/四球,四球,四球/四球半,四球半,四球半/五球,五球,五/五球半,五球半,五球半/六,六球,六球/六球半,六球半,六球半/七球,七球,七球/七球半,七球半,七球半/八球,八球,八球/八球半,八球半,八球半/九球,九球,九球/九球半,九球半,九球半/十球,十球".split(",");
 function ConvertGoal(goal){ //数字盘口转汉汉字	
-	if (goal==null || goal +""=="" || isNaN(goal))
+	if (goal==null || goal +""=="" )
 		return "";
+    else if( isNaN(goal)){
+        return goal;
+    }
 	else{
+        if (goal > 10 || goal < -10) return goal + "球";
 		if(goal>=0)  return GoalCn[parseInt(goal*4)];
 		else return "受"+ GoalCn[Math.abs(parseInt(goal*4))];
 	}
@@ -184,11 +188,23 @@ async function saveOdds(data) {
 
 async function convertOdds(){
     while(true){
-        var rs =await DBHelper.query("select id,pan from t_match_odds where pan<>'平手' and LOCATE('球', pan)=0 and h <> 0 limit 100");
+        var rs =await DBHelper.query("select distinct pan from t_match_odds where pan<>'平手' and LOCATE('球', pan)=0 and h <> 0 limit 100");
         if(rs && rs.length>0){
-
+            for(var i=0;i<rs.length;i++){
+                var odds = rs[i];
+                var pan = ConvertGoal(odds.pan);
+                var sql = "update t_match_odds set pan='"+pan+"' where pan = '"+odds.pan+"' and h <> 0";
+                console.info(sql);
+                var nrs = await DBHelper.query(sql);
+                console.info(nrs);
+            }
+        }
+        if(rs.len<100){
+            console.info("最后一组处理完成，程序退出");
+            break;
         }
     }
+    console.info("程序退出");
 }
 
 if(process.argv[2]=="convert"){

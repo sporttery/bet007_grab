@@ -208,6 +208,9 @@
     function Goal2GoalCn(goal) { //数字盘口转汉汉字	
         if (goal == null || goal + "" == "")
             return "";
+        else if( isNaN(goal)){
+            return goal;
+        }
         else {
             if (goal > 10 || goal < -10) return goal + "球";
             if (goal >= 0) return GoalCn[parseInt(goal * 4)];
@@ -392,7 +395,7 @@
                     var id = item[1];
                     var cid = item[0];
                     if (cid == 8) {
-                        yp101[id] = [item[3], item[4], item[5]];
+                        yp101[id] = [item[3],Goal2GoalCn(item[4]), item[5]];
                     }
                 });
             }
@@ -524,7 +527,7 @@
                     var id = item[1];
                     var cid = item[0];
                     if (cid == 8) {
-                        yp101[id] = [item[3], item[4], item[5]];
+                        yp101[id] = [item[3], Goal2GoalCn(item[4]), item[5]];
                     }
                 });
             }

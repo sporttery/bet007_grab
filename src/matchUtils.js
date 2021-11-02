@@ -4,9 +4,13 @@ const DBHelper = require("./DBHelper");
 
 var GoalCn="平手,平手/半球,半球,半球/一球,一球,一球/球半,球半,球半/两球,两球,两球/两球半,两球半,两球半/三球,三球,三球/三球半,三球半,三球半/四球,四球,四球/四球半,四球半,四球半/五球,五球,五/五球半,五球半,五球半/六,六球,六球/六球半,六球半,六球半/七球,七球,七球/七球半,七球半,七球半/八球,八球,八球/八球半,八球半,八球半/九球,九球,九球/九球半,九球半,九球半/十球,十球".split(",");
 function ConvertGoal(goal){ //数字盘口转汉汉字	
-	if (goal==null || goal +""=="" || isNaN(goal))
+	if (goal==null || goal +""=="" )
 		return "";
+    else if( isNaN(goal)){
+        return goal;
+    }
 	else{
+        if (goal > 10 || goal < -10) return goal + "球";
 		if(goal>=0)  return GoalCn[parseInt(goal*4)];
 		else return "受"+ GoalCn[Math.abs(parseInt(goal*4))];
 	}
