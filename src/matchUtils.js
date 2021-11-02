@@ -381,7 +381,7 @@ async function getBoloolListByOdds(europe,asia){
     var sql = "SELECT o.matchId,o.s,o.p,o.f,o.h,o.pan,o.a,m.leagueId,m.leagueName,m.homeId,m.homeName,m.awayId,m.awayName,m.fullscore,m.halfscore, date_format(m.playtime,'%m-%d %H:%i') as playtime,"+
     "b.hscore,ascore,hresult,aresult,hsection,asection from t_match_odds o left join t_match m on o.matchId=m.id left join t_bolool30 b on m.id = b.id where company='BET365'"+
     " and (s="+europeOdds[0]+" and p="+europeOdds[1]+
-     " and f="+europeOdds[2]+") or (h="+asiaOdds[0]+"  and a="+asiaOdds[2]+" and (pan='"+pan+"' or pan='"+ConvertGoal(pan)+"')) order by m.playtime desc ";
+     " and f="+europeOdds[2]+") or (h="+asiaOdds[0]+"  and a="+asiaOdds[2]+" and pan='"+pan+"') order by m.playtime desc ";
      console.info(sql);
      return DBHelper.query(sql);
 }
