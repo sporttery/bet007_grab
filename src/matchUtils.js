@@ -110,6 +110,7 @@ async function getMatchByTeam(page, teamId) {
     } else {
         ids = await DBHelper.query("select id from t_team ");
     }
+    var totalCount = 0;
     var idsLen = ids.length;
     for (var i = 0; i < idsLen; i++) {
         var id = ids[i]["id"];
@@ -124,7 +125,7 @@ async function getMatchByTeam(page, teamId) {
         retry = 1;
         while (sdContent == "-1") {
             Logger.info(sdUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
-            await page.waitForTimeout(6 * 1000 * retry++);
+            await Utils.sleep(6 * 1000 * retry++);
             sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
             if (retry > 10) {
                 break;
@@ -156,13 +157,14 @@ async function getMatchByTeam(page, teamId) {
             }
             allMatch.push(data);
         }
+        totalCount+=allMatch.length;
         for (var pageNo = 2; pageNo <= totalPage; pageNo++) {
             sdUrl = "http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=" + pageNo + "&flesh=";
             sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
             retry = 1;
             while (sdContent == "-1") {
                 Logger.info(sdUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
-                await page.waitForTimeout(6 * 1000 * retry++);
+                await Utils.sleep(6 * 1000 * retry++);
                 sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
                 if (retry > 10) {
                     break;
@@ -203,7 +205,7 @@ async function getMatchByTeam(page, teamId) {
             }
         }
         Logger.info("teamId=" + id + " 共获取比赛 " + allMatch.length + " 场");
-
+        totalCount+=allMatch.length;
         var matchData = {}, matchCount = 0;
         for (var idx = 0; idx < allMatch.length; idx++) {
             var data = allMatch[idx];
@@ -251,6 +253,7 @@ async function getMatchByTeam(page, teamId) {
         await DBHelper.query("update t_team set totalPage=" + totalPage + ",match_count = (select count(1) from t_match where homeId=" + id + " or awayId=" + id + ") where id=" + id);
         Logger.info("更新t_team 比赛场次数结束");
     }
+    return totalCount;
 }
 
 function getScoreSection(score, count) {
@@ -363,11 +366,11 @@ async function getBoloolById(mid, homeId, awayId, playtime) {
 async function getBoloolListByOdds(europe,asia){
     var europeOdds = europe.split(" ");
     var asiaOdds = asia.split(" ");
-    var sql = "SELECT o.matchId,o.s,o.p,o.f,o.h,o.pan,o.a,m.leagueId,m.leagueName,m.homeId,m.homeName,m.awayId,m.awayName,m.fullscore,m.halfscore,m.playtime,"+
+    var sql = "SELECT o.matchId,o.s,o.p,o.f,o.h,o.pan,o.a,m.leagueId,m.leagueName,m.homeId,m.homeName,m.awayId,m.awayName,m.fullscore,m.halfscore, date_format(m.playtime,'%m-%d %H:%i') as playtime,"+
     "b.hscore,ascore,hresult,aresult,hsection,asection from t_match_odds o left join t_match m on o.matchId=m.id left join t_bolool30 b on m.id = b.id where company='BET365'"+
     " and (s="+europeOdds[0]+" and p="+europeOdds[1]+
-     " and f="+europeOdds[2]+") or (h="+asiaOdds[0]+" and pan='"+asiaOdds[1]+"' and a="+asiaOdds[2]+") order by m.playtime desc ";
-    //  console.info(sql);
+     " and f="+europeOdds[2]+") or (h="+asiaOdds[0]+"  and a="+asiaOdds[2]+") order by m.playtime desc ";
+     console.info(sql);
      return DBHelper.query(sql);
 }
 

@@ -50,7 +50,7 @@
 				data-date-format="yyyy-mm-dd" onchange="showdate(this.value)" />
 		</div>
 		<div class="view">
-			<table class="table table-bordered">
+			<table class="table table-bordered" style="width: 94%;">
 				<thead id="thead"></thead>
 				<tbody id="matchlist"></tbody>
 			</table>
@@ -158,9 +158,9 @@
 			html.push('<tr id="m' + match.id + '">');
 			html.push("<td>" + match.num + "</td>");
 			html.push("<td>" + match.leagueName + "</td>");
-			html.push("<td>" + match.homeName + "</td>");
+			html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.homeId + "&pageNo=1&flesh=' target='_blank'>" + match.homeName + "</a></td>");
 			html.push("<td>" + (match.score && match.score != '-' ? match.score + "<br/><font color=red>(" + match.halfscore + ")</font>" : "VS") + "</td>");
-			html.push("<td>" + match.awayName + "</td>");
+			html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.awayId + "&pageNo=1&flesh=' target='_blank'>" + match.awayName + "</a></td>");
 			html.push("<td>" + match.playtime + "</td>");
 			html.push("<td>" + match.bet365_op[0] + "</td>");
 			html.push("<td>" + match.bet365_op[1] + "</td>");

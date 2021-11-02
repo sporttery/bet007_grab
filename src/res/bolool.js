@@ -152,8 +152,8 @@ function getBoloolFromResult(hResult,aResult,topN){
 	if(!hResult || !aResult || hResult.length<topN || aResult.length<topN){
 		return {hresult:"--",aresult:"--",hscore:"--",ascore:"--",hstrong:"--",astrong:"--"};
 	}
-	var hresult=hResult.substring(0,topN).replace(/胜/g,"3").replace(/平/g,"1").replace(/负/g,"0");
-	var aresult=aResult.substring(0,topN).replace(/胜/g,"3").replace(/平/g,"1").replace(/负/g,"0");
+	var hresult=hResult.substring(0,topN).replace(/赢/g,"3").replace(/平/g,"1").replace(/输/g,"0");
+	var aresult=aResult.substring(0,topN).replace(/赢/g,"3").replace(/平/g,"1").replace(/输/g,"0");
 	var hscore=sum(hresult.split(/|/));
 	var ascore=sum(aresult.split(/|/));
 	var hstrong=getStrong(hscore,ascore);

@@ -116,6 +116,10 @@ const matchUtil = require("./matchUtils");
             });
         }
 
+        async function getMatchByTeam(teamId){
+            return await matchUtil.getMatchByTeam(boloolDetailPage,teamId);
+        }
+
         var boloolPage, boloolDetailPage;
         async function boloolDetail(id) {
             Logger.info("打开菠萝指数详情，id=" + id);
@@ -139,6 +143,7 @@ const matchUtil = require("./matchUtils");
                 });
                 await boloolDetailPage.exposeFunction("getBoloolListByOdds", matchUtil.getBoloolListByOdds);
                 await boloolDetailPage.exposeFunction("getBoloolById", matchUtil.getBoloolById);
+                await boloolDetailPage.exposeFunction("getMatchByTeam", getMatchByTeam);
             }
             await boloolDetailPage.goto("file://" + __dirname + "/html/boloolDetail.html?id=" + id);
             await boloolDetailPage.evaluate((match) => {

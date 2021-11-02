@@ -68,7 +68,7 @@
 	<div class="container-fluid theme-showcase" role="main">
 		<div class="page-header">
 			<div class="view">
-				<table class="table table-bordered">
+				<table class="table table-bordered" style="width: 94%;">
 					<tr>
 						<td class="aRight">欧盘</td>
 						<td class="aLeft"><input type="text" value="" id="matchEurope" maxlength="15"
@@ -79,7 +79,7 @@
 						<td width="50%"><a id="searchBtn" href="javascript:getBoloolList();">查询</a></td>
 					</tr>
 				</table>
-				<table class="table table-bordered">
+				<table class="table table-bordered"  style="width: 94%;">
 					<thead id="thead">
 						<tr>
 							<th rowspan="2">ID/序号</th>
@@ -121,7 +121,7 @@
 			同赔列表 <span id="msg"></span>
 		</div>
 		<div class="view">
-			<table class="table table-bordered">
+			<table class="table table-bordered" style="width: 94%;">
 				<thead>
 					<tr>
 						<th rowspan="2">ID/序号</th>
@@ -497,11 +497,11 @@
 			$("#matchAsia").val("-");
 		}
 		html = [];
-		html.push('<tr id="m' + match.id + '" bgcolor="red">');
+		html.push('<tr id="m' + match.id + '" bgcolor="red" style="color:yellow">');
 		html.push("<td>" + match.num + "</td>");
 		html.push("<td>" + match.leagueName + "</td>");
 		html.push("<td>" + match.homeName + "</td>");
-		html.push("<td>" + (match.score != '-' ? match.score + "<br/><font color=red>(" + match.halfscore + ")</font>" : "VS") + "</td>");
+		html.push("<td>" + (match.score && match.score != '-' ? (match.score + "<br/><font color=red>(" + match.halfscore + ")</font>") : "VS") + "</td>");
 		html.push("<td>" + match.awayName + "</td>");
 		html.push("<td>" + match.playtime + "</td>");
 		html.push("<td>" + match.bet365_op[0] + "</td>");
@@ -572,6 +572,9 @@
 			var totalCount = 0, showCount = 0;
 			for(var i=0;i<data.length;i++){
 				var match = data[i];
+				if(!match.id){
+					match.id = match.matchId;
+				}
 				if (g_boloolList["bolool_" + match.id]) {
 					return false;
 				}
@@ -583,6 +586,13 @@
 				var noBolool = false;
 				if (!match.hresult && !match.aresult) {
 					var bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+					if(!bolool){
+						var tcount = await getMatchByTeam(match.homeId);
+						console.info(match.id+" => " +match.homeId+ " 获取"+tcount+"场");
+						tcount = await getMatchByTeam(match.awayId);
+						console.info(match.id+" => " +match.awayId+ " 获取"+tcount+"场");
+						bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+					}
 					if (!bolool) {
 						noBolool = true;
 					} else {
@@ -612,9 +622,9 @@
 					'" data-hscore="' + match.hscore + '" data-ascore="' + match.ascore + '" data-playtime="' + match.playtime + '">');
 				html.push('<td>' + match.id + '</td>');
 				html.push('<td>' + match.leagueName + '</td>');
-				html.push('<td>' + match.homeName + '</td>');
-				html.push('<td><span class="fullscore">' + match.fullscore + "</span><br/>" + match.halfscore + '</td>');
-				html.push('<td>' + match.awayName + '</td>');
+				html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.homeId + "&pageNo=1&flesh=' target='_blank'>" + match.homeName + "</a></td>");
+				html.push('<td><a href="http://live.win007.com/detail/'+match.id+'cn.htm" target="_blank"><span class="fullscore">' + match.fullscore + "</span><br/>" + match.halfscore + '</a></td>');
+				html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.awayId + "&pageNo=1&flesh=' target='_blank'>" + match.awayName + "</a></td>");
 				html.push('<td>' + match.playtime + '</td>');
 
 				html.push('<td class="' + (europe == eKey ? 'red' : '') + '">' + match.s + '</td>');
@@ -646,8 +656,8 @@
 					html.push('<td>' + match.ascore + '</td>');
 					html.push('<td>' + match.hsection + '</td>');
 					html.push('<td>' + match.asection + '</td>');
-					html.push('<td>' + bolool3.hresult + '</td>');
-					html.push('<td>' + bolool3.aresult + '</td>');
+					html.push('<td title="'+match.hresult+'">' + bolool3.hresult + '</td>');
+					html.push('<td title="'+match.aresult+'">' + bolool3.aresult + '</td>');
 					html.push('<td>' + bolool3.hstrong + '</td>');
 					html.push('<td>' + bolool3.astrong + '</td>');
 				}

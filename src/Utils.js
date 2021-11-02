@@ -417,6 +417,9 @@ async function getByCurl(curl, chk, retry) {
 }
 
 async function getFromUrl(page, url) {
+    if(!page){
+        return await getByCurl("curl -s \"" + url+"\"");
+    }
     var content = await page.evaluate((url) => {
         var content = "";
         $.ajax({
