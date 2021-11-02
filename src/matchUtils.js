@@ -1,6 +1,17 @@
 const Utils = require("./Utils");
 const Logger = require("./Logger");
 const DBHelper = require("./DBHelper");
+
+var GoalCn="平手,平手/半球,半球,半球/一球,一球,一球/球半,球半,球半/两球,两球,两球/两球半,两球半,两球半/三球,三球,三球/三球半,三球半,三球半/四球,四球,四球/四球半,四球半,四球半/五球,五球,五/五球半,五球半,五球半/六,六球,六球/六球半,六球半,六球半/七球,七球,七球/七球半,七球半,七球半/八球,八球,八球/八球半,八球半,八球半/九球,九球,九球/九球半,九球半,九球半/十球,十球".split(",");
+function ConvertGoal(goal){ //数字盘口转汉汉字	
+	if (goal==null || goal +""=="" || isNaN(goal))
+		return "";
+	else{
+		if(goal>=0)  return GoalCn[parseInt(goal*4)];
+		else return "受"+ GoalCn[Math.abs(parseInt(goal*4))];
+	}
+}
+
 async function getMatchOdds(page, matchId) {
     var limit = 100;
     while (true) {
@@ -19,7 +30,7 @@ async function getMatchOdds(page, matchId) {
             var europeOddsUrl = "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
             var content = await Utils.getFromUrl(page, europeOddsUrl);
             retry = 1;
-            while (content.indexOf("id=\"odds\"") == -1) {
+            while (content.indexOf("id=\"odds\"") == -1 && content.indexOf("System.Web.Mvc.Controller")==-1) {
                 Logger.info(europeOddsUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
                 await page.waitForTimeout(6 * 1000 * retry++);
                 content = await Utils.getFromUrl(page, europeOddsUrl);
@@ -47,7 +58,7 @@ async function getMatchOdds(page, matchId) {
             var asiaOddsUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
             content = await Utils.getFromUrl(page, asiaOddsUrl);
             retry = 1;
-            while (content.indexOf("id=\"odds\"") == -1) {
+            while (content.indexOf("id=\"odds\"") == -1 && content.indexOf("System.Web.Mvc.Controller")==-1) {
                 Logger.info(asiaOddsUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
                 await page.waitForTimeout(6 * 1000 * retry++);
                 content = await Utils.getFromUrl(page, asiaOddsUrl);
@@ -79,6 +90,10 @@ async function getMatchOdds(page, matchId) {
             if (asiaOdds[0] === null) {
                 asiaOdds = [0, '', 0];
             }
+            if(asiaOdds[1]!=''){
+                asiaOdds[1]=ConvertGoal(asiaOdds[1]);
+            }
+
             var odds = { id: id + "-Bet365", company: "Bet365", s: europeOdds[0], p: europeOdds[1], f: europeOdds[2], h: asiaOdds[0], pan: asiaOdds[1], a: asiaOdds[2], matchId: id };
             oddsData[id] = odds;
         }
@@ -102,7 +117,7 @@ async function getMatchOdds(page, matchId) {
 
 }
 
-async function getMatchByTeam(page, teamId) {
+async function getMatchByTeam(page, teamId,nTimeStr) {
     var ids;
     if (teamId) {
         Logger.info("有指定teamId =" + teamId);
@@ -112,18 +127,17 @@ async function getMatchByTeam(page, teamId) {
     }
     var totalCount = 0;
     var idsLen = ids.length;
+    if(!nTimeStr){
+        nTimeStr = Utils.formatDate(new Date(), "yyyy/MM/dd hh:mm");
+    }
     for (var i = 0; i < idsLen; i++) {
         var id = ids[i]["id"];
         Logger.info("正在获取第" + (i + 1) + "个球队ID=" + id + "的历史比赛数据,还剩" + (idsLen - i - 1));
-        var dbOldPlaytimeRs = await DBHelper.query("select date_format(max(playtime),'%Y/%m/%d %H:%i') as playtime from t_match where homeId =" + id + " or awayId=" + id);
-        var maxPlaytime = "0000/00/00 00:00";
-        if (dbOldPlaytimeRs) {
-            maxPlaytime = dbOldPlaytimeRs[0]["playtime"];
-        }
+        
         var sdUrl = "http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=1&flesh=";
         var sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
         retry = 1;
-        while (sdContent == "-1") {
+        while (sdContent == "-1" && content.indexOf("System.Web.Mvc.Controller")==-1) {
             Logger.info(sdUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
             await Utils.sleep(6 * 1000 * retry++);
             sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
@@ -140,7 +154,7 @@ async function getMatchByTeam(page, teamId) {
         // var pageLen = teamPageData.length;
         var totalPage = teamPageInfo[0];
         var allMatch = [];
-        var nTimeStr = Utils.formatDate(new Date(), "yyyy/MM/dd hh:mm");
+        
         for (var j = 0; j < teamPageData.length; j++) {
             var data = teamPageData[j];
             var playtime = data[3];
@@ -152,9 +166,7 @@ async function getMatchByTeam(page, teamId) {
                 // console.info("比赛没有比分，过滤掉了 fullscore=" + match.fullscore);
                 continue;
             }
-            if (playtime < maxPlaytime) {
-                break;
-            }
+            
             allMatch.push(data);
         }
         totalCount+=allMatch.length;
@@ -162,7 +174,7 @@ async function getMatchByTeam(page, teamId) {
             sdUrl = "http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=" + pageNo + "&flesh=";
             sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
             retry = 1;
-            while (sdContent == "-1") {
+            while (sdContent == "-1" && content.indexOf("System.Web.Mvc.Controller")==-1) {
                 Logger.info(sdUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
                 await Utils.sleep(6 * 1000 * retry++);
                 sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
@@ -176,10 +188,7 @@ async function getMatchByTeam(page, teamId) {
             delete teamPageInfo
             delete teamPageData;
             eval(sdContent);
-            //如果第一场的比赛时间小于数据库里最大时间，则不需要抓取了
-            if (teamPageData[0][3] < maxPlaytime) {
-                break;
-            }
+            
             for (var j = 0; j < teamPageData.length; j++) {
                 var data = teamPageData[j];
                 var playtime = data[3];
@@ -191,15 +200,10 @@ async function getMatchByTeam(page, teamId) {
                     // console.info("比赛没有比分，过滤掉了 fullscore=" + match.fullscore);
                     continue;
                 }
-                if (playtime < maxPlaytime) {
-                    break;
-                }
+                
                 allMatch.push(data);
             }
-            //如果最后一场的比赛时间小于数据库里最大时间，则不继续
-            if (teamPageData[teamPageData.length - 1][3] < maxPlaytime) {
-                break;
-            }
+           
             if (allMatch.length > 33) {
                 break;
             }
@@ -289,10 +293,12 @@ async function getBoloolById(mid, homeId, awayId, playtime) {
         var homeId = match.homeId;
         var awayId = match.awayId;
         var playtime = match.playtime;
-        sql = "select  homeId,awayId,fullscore,goalscore,result from t_match where (homeId=" + homeId + " or awayId=" + homeId + ") and playtime < '" + playtime + "' and result <> '' and result is not null limit 30";
+        
+
+        sql = "select  homeId,awayId,fullscore,goalscore,result from t_match where (homeId=" + homeId + " or awayId=" + homeId + ") and playtime < '" + playtime + "' and result <> '' and result is not null  order by playtime desc limit 30";
         rs = await DBHelper.query(sql);
         if (rs && rs.length == 30) {
-            sql = "select  homeId,awayId,fullscore,goalscore,result from t_match where (homeId=" + awayId + " or awayId=" + awayId + ") and playtime < '" + playtime + "' and result <> '' and result is not null limit 30";
+            sql = "select  homeId,awayId,fullscore,goalscore,result from t_match where (homeId=" + awayId + " or awayId=" + awayId + ") and playtime < '" + playtime + "' and result <> '' and result is not null  order by playtime desc limit 30";
             var rs1 = await DBHelper.query(sql);
             if (rs1 && rs1.length == 30) {
                 var homeVs = rs;
@@ -352,24 +358,26 @@ async function getBoloolById(mid, homeId, awayId, playtime) {
                 return { hscore, ascore, hresult, aresult, hsection, asection };
             } else {
                 Logger.info(mid + " -》 " + awayId + " 客队不满足30场 ，暂时不计算");
+                return -2;
             }
         } else {
             Logger.info(mid + " -》 " + homeId + " 主队不满足30场 ，暂时不计算");
+            return -1;
         }
     } else {
         Logger.info(mid + " 此比赛未入库，无法从数据库获取");
     }
     return null;
-
 }
 
 async function getBoloolListByOdds(europe,asia){
     var europeOdds = europe.split(" ");
     var asiaOdds = asia.split(" ");
+    var pan = asiaOdds[1];
     var sql = "SELECT o.matchId,o.s,o.p,o.f,o.h,o.pan,o.a,m.leagueId,m.leagueName,m.homeId,m.homeName,m.awayId,m.awayName,m.fullscore,m.halfscore, date_format(m.playtime,'%m-%d %H:%i') as playtime,"+
     "b.hscore,ascore,hresult,aresult,hsection,asection from t_match_odds o left join t_match m on o.matchId=m.id left join t_bolool30 b on m.id = b.id where company='BET365'"+
     " and (s="+europeOdds[0]+" and p="+europeOdds[1]+
-     " and f="+europeOdds[2]+") or (h="+asiaOdds[0]+"  and a="+asiaOdds[2]+") order by m.playtime desc ";
+     " and f="+europeOdds[2]+") or (h="+asiaOdds[0]+"  and a="+asiaOdds[2]+" and (pan='"+pan+"' or pan='"+ConvertGoal(pan)+"')) order by m.playtime desc ";
      console.info(sql);
      return DBHelper.query(sql);
 }

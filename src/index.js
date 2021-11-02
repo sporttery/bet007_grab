@@ -116,8 +116,8 @@ const matchUtil = require("./matchUtils");
             });
         }
 
-        async function getMatchByTeam(teamId){
-            return await matchUtil.getMatchByTeam(boloolDetailPage,teamId);
+        async function getMatchByTeam(teamId, playtime) {
+            return await matchUtil.getMatchByTeam(boloolDetailPage, teamId, playtime);
         }
 
         var boloolPage, boloolDetailPage;
@@ -173,6 +173,18 @@ const matchUtil = require("./matchUtils");
                 var match = matchlist[key];
                 if (!match.bolool) {
                     var bolool = await matchUtil.getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+
+                    if (bolool == -1 || bolool == -3) {
+                        tcount = await getMatchByTeam(match.homeId, match.playtime);
+                        console.info(match.id + " => " + match.homeId + " 获取" + tcount + "场");
+                    }
+                    if (bolool == -2 || bolool == -3) {
+                        tcount = await getMatchByTeam(match.awayId, match.playtime);
+                        console.info(match.id + " => " + match.awayId + " 获取" + tcount + "场");
+                    }
+                    if (bolool == -1 || bolool == -2 || bolool == -3) {
+                        bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+                    }
                     match.bolool = bolool;
                 }
             }

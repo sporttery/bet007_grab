@@ -6,6 +6,15 @@ const limit = 100;
 const companyIdMap = { "Bet365": { e: 8, a: 8 } };
 const sync = true;
 var proxy = {};
+var GoalCn="平手,平手/半球,半球,半球/一球,一球,一球/球半,球半,球半/两球,两球,两球/两球半,两球半,两球半/三球,三球,三球/三球半,三球半,三球半/四球,四球,四球/四球半,四球半,四球半/五球,五球,五/五球半,五球半,五球半/六,六球,六球/六球半,六球半,六球半/七球,七球,七球/七球半,七球半,七球半/八球,八球,八球/八球半,八球半,八球半/九球,九球,九球/九球半,九球半,九球半/十球,十球".split(",");
+function ConvertGoal(goal){ //数字盘口转汉汉字	
+	if (goal==null || goal +""=="" || isNaN(goal))
+		return "";
+	else{
+		if(goal>=0)  return GoalCn[parseInt(goal*4)];
+		else return "受"+ GoalCn[Math.abs(parseInt(goal*4))];
+	}
+}
 async function main() {
     var ids = await DBHelper.query("select m.id from t_match m left join t_match_odds o on m.id = o.matchId where o.id is null ORDER BY RAND() limit " + limit);
     var len = ids.length;
@@ -149,7 +158,7 @@ async function saveOdds(data) {
     }
     if (data.asiaOdds) {
         odds.h = data.asiaOdds[0];
-        odds.pan = data.asiaOdds[1];
+        odds.pan =  ConvertGoal(data.asiaOdds[1]);
         odds.a = data.asiaOdds[2];
     }
     if (odds.hasOwnProperty("s") && odds.hasOwnProperty("pan")) {
@@ -173,4 +182,17 @@ async function saveOdds(data) {
     }
 }
 
-main();
+async function convertOdds(){
+    while(true){
+        var rs =await DBHelper.query("select id,pan from t_match_odds where pan<>'平手' and LOCATE('球', pan)=0 and h <> 0 limit 100");
+        if(rs && rs.length>0){
+
+        }
+    }
+}
+
+if(process.argv[2]=="convert"){
+    convertOdds();
+}else{
+    main();
+}

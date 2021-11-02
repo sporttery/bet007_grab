@@ -171,20 +171,30 @@
 			var bolool = match.bolool;
 			if(!bolool){
 				bolool = await getBoloolById(match.id,match.homeId,match.awayId,match.playtime);
+				if (bolool == -1 || bolool == -3) {
+					tcount = await getMatchByTeam(match.homeId, match.playtime);
+					console.info(match.id + " => " + match.homeId + " 获取" + tcount + "场");
+				}
+				if (bolool == -2 || bolool == -3) {
+					tcount = await getMatchByTeam(match.awayId, match.playtime);
+					console.info(match.id + " => " + match.awayId + " 获取" + tcount + "场");
+				}
+				if (bolool == -1 || bolool == -2 || bolool == -3) {
+					bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+				}
 			}
-			if (bolool) {
+			if (bolool && bolool.hresult) {
 				// console.info(bolool);
 				//hscore,ascore,hresult,aresult,hsection,asection 
 				html.push("<td>" + bolool.hscore + "</td>");
 				html.push("<td>" + bolool.ascore + "</td>");
 				html.push("<td>" + bolool.hsection + "</td>");
 				html.push("<td>" + bolool.asection + "</td>");
-				html.push("<td title='" + bolool.hresult + "'>" + bolool.hresult.substring(0, 3) + "</td>");
-				html.push("<td title='" + bolool.hresult + "'>" + bolool.aresult.substring(0, 3) + "</td>");
-				var hstrong = getStrong(bolool.hscore, bolool.ascore);
-				var astrong = getStrong(bolool.ascore, bolool.hscore);
-				html.push("<td>" + hstrong + "</td>");
-				html.push("<td>" + astrong + "</td>");
+				var bolool3 = getBoloolFromResult(bolool.hresult, bolool.aresult, 3);
+				html.push("<td title='" + bolool.hresult + "'>" + bolool3.hresult + "</td>");
+				html.push("<td title='" + bolool.hresult + "'>" + bolool3.aresult + "</td>");
+				html.push("<td>" + bolool3.hstrong + "</td>");
+				html.push("<td>" + bolool3.astrong + "</td>");
 			} else {
 				html.push("<td>--</td>");
 				html.push("<td>--</td>");

@@ -585,15 +585,23 @@
 				//show = europe==eKey && asia == aKey;
 				var noBolool = false;
 				if (!match.hresult && !match.aresult) {
-					var bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
-					if(!bolool){
-						var tcount = await getMatchByTeam(match.homeId);
-						console.info(match.id+" => " +match.homeId+ " 获取"+tcount+"场");
-						tcount = await getMatchByTeam(match.awayId);
-						console.info(match.id+" => " +match.awayId+ " 获取"+tcount+"场");
-						bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+					if(match.playtime.substring(0,4)!=new Date().getFullYear()+""){
+						match.playtime = new Date().getFullYear()+"-"+match.playtime ;
 					}
-					if (!bolool) {
+					var bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+					if (bolool == -1 || bolool == -3) {
+                        tcount = await getMatchByTeam(match.homeId, match.playtime);
+                        console.info(match.id + " => " + match.homeId + " 获取" + tcount + "场");
+                    }
+                    if (bolool == -2 || bolool == -3) {
+                        tcount = await getMatchByTeam(match.awayId, match.playtime);
+                        console.info(match.id + " => " + match.awayId + " 获取" + tcount + "场");
+                    }
+                    if (bolool == -1 || bolool == -2 || bolool == -3) {
+                        bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+                    }
+					
+					if (!bolool || !bolool.hresult) {
 						noBolool = true;
 					} else {
 						//hresult,aresult,hscore,ascore,hsection,asection
