@@ -103,70 +103,8 @@
                             <col width="80">
                             <col width="140">
                         </colgroup>
-                        <tbody id="matchlist">
-                            <tr class="bet-tb-tr" data-fixtureid="981692" data-infomatchid="143191"
-                                data-homesxname="海于格松" data-awaysxname="斯塔贝克" data-matchdate="2021-05-25"
-                                data-matchtime="00:00" data-rangqiu="-1" data-simpleleague="挪超" data-id="1007136"
-                                data-homeid="3488" data-awayid="507" data-matchid="109" data-processid="26196"
-                                data-processdate="2021-05-24" data-isshow="1" data-processname="1001"
-                                data-buyendtime="2021-05-24 22:00:00" data-isactive="1"
-                                data-subactive="bfdg:1,bfgg:1,bqdg:0,bqgg:1,dxqdg:0,dxqgg:0,hcdg:1,hcgg:1,jqdg:0,jqgg:1,nspfdg:0,nspfgg:1,spfdg:0,spfgg:1"
-                                data-matchnum="周一001" data-isend="0" data-kdg="" data-head="26196|1001|">
-                                <td class="td td-no"><a href="javascript:;" class="bet-evt-hide" title="点击可隐藏该比赛"
-                                        id="link178">周一001<s></s></a></td>
-                                <td class="td td-evt">
-                                    <a href="https://liansai.500.com/zuqiu-6225/" target="_blank"
-                                        style="background:#666666;" title="挪威超级联赛" id="link179">挪超</a>
-                                </td>
-                                <td class="td td-endtime" title="05-25 00:00截止">05-25 00:00</td>
-                                <td class="td td-team">
-                                    <div class="team">
-                                        <span class="team-l"><i title="排名第13">[13]</i><a
-                                                href="https://liansai.500.com/team/3488/" target="_blank" class="team-l"
-                                                title="海于格松" id="link180">海于格松</a></span>
-                                        <i class="team-vs">VS</i>
-                                        <span class="team-r"><a href="https://liansai.500.com/team/507/" target="_blank"
-                                                class="team-r" title="斯塔贝克" id="link181">斯塔贝克</a><i
-                                                title="排名第10">[10]</i></span>
-                                    </div>
-                                </td>
-                                <td class="td td-rang">
-                                    <p class="itm-rangA1" title="不让球">0</p>
-                                    <p class="green  itm-rangA2" title="主队让1球"> -1</p>
-                                </td>
-                                <td class="td td-betbtn">
-                                    <div class="betbtn-row itm-rangB1">
-                                        <p class="betbtn" data-type="nspf" data-value="3" data-sp="1.89">
-                                            <span>1.89</span>
-                                        </p>
-                                        <p class="betbtn" data-type="nspf" data-value="1" data-sp="3.28">
-                                            <span>3.28</span>
-                                        </p>
-                                        <p class="betbtn" data-type="nspf" data-value="0" data-sp="3.30">
-                                            <span>3.30</span>
-                                        </p>
-                                    </div>
-                                    <div class="betbtn-row itm-rangB2">
-                                        <p class="betbtn" data-type="spf" data-value="3" data-sp="3.95">
-                                            <span>3.95</span>
-                                        </p>
-                                        <p class="betbtn" data-type="spf" data-value="1" data-sp="3.50">
-                                            <span>3.50</span>
-                                        </p>
-                                        <p class="betbtn" data-type="spf" data-value="0" data-sp="1.67">
-                                            <span>1.67</span>
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="td td-data"><a href="https://odds.500.com/fenxi/shuju-981692.shtml"
-                                        target="_blank" id="link182">析</a><a
-                                        href="https://odds.500.com/fenxi/yazhi-981692.shtml" target="_blank"
-                                        id="link183">亚</a><a href="https://odds.500.com/fenxi/ouzhi-981692.shtml"
-                                        target="_blank" id="link184">欧</a><a fid="981692" class="tdQing"
-                                        href="https://odds.500.com/fenxi/youliao-981692.shtml?channel=pc_trade"
-                                        style="color:red" target="_blank" id="link185">情</a></td>
-                                <td class="td td-pei"><span>2.00</span><span>3.40</span><span>3.50</span></td>
-                            </tr>
+                        <tbody id="matchlistTable">
+                            
                         </tbody>
                     </table>
                 </div>
@@ -217,14 +155,6 @@
             else return "受" + GoalCn[Math.abs(parseInt(goal * 4))];
         }
     }
-    function Goal2GoalCn2(goal) {
-        if (goal == "")
-            return "";
-        else {
-            if (goal > 14) return goal + "球";
-            return GoalCn2[parseInt(goal * 4)];
-        }
-    }
     // $.ajaxSetup({async:false});
     function tab(idx) {
         if ($("#typeTab").find("p:eq(" + idx + ")").hasClass("betbtn-on")) {
@@ -237,37 +167,79 @@
     var op101 = {};
     var yp101 = {};
     var matchlist = {};
+    async function getYp(id){
+        if(yp101[id]){
+            return yp101[id];
+        }
+        var odds = await getOddsById(id+"-Bet365");
+        if(odds){
+            yp101[id] = [odds.h,Goal2GoalCn(odds.pan),odds.a];
+            op101[id] = [odds.s,odds.p,odds.f];
+        }else{
+            $.ajax({type:"get",url:"http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID="+id+"&companyid=8&company=365",async:false,success:(d)=>{
+                d=safeHtml(d);
+                if(d.indexOf("365")!=-1){
+                    yp101[id]=getOdds(d);
+                    if(yp101[id][0]!=0){
+                        yp101[id][1] = Goal2GoalCn(yp101[id][1]);
+                        odds = {id:id+"-Bet365",company:"Bet365",h:yp101[id][0],pan:yp101[id][1],a:yp101[id][2],matchId:id};
+                        saveOdds(odds);
+                    }
+                }
+            }});
+            if(!yp101[id]){
+                yp101[id]=['0','0','0'];
+            }
+        }
+        return yp101[id];
+    }
+
+    async function getOp(id){
+        if(op101[id]){
+            return op101[id];
+        }
+        var odds = await getOddsById(id+"-Bet365");
+        if(odds){
+            yp101[id] = [odds.h,Goal2GoalCn(odds.pan),odds.a];
+            op101[id] = [odds.s,odds.p,odds.f];
+        }else{
+            $.ajax({type:"get",url:"http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID="+id+"&companyid=8&company=365",async:false,success:(d)=>{
+                d=safeHtml(d);
+                if(d.indexOf("365")!=-1){
+                    op101[id]=getOdds(d);
+                    odds = {id:id+"-Bet365",company:"Bet365",s:op101[id][0],p:op101[id][1],f:op101[id][2],matchId:id};
+                    saveOdds(odds);
+                }
+            }});
+            if(!op101[id]){
+                op101[id]=['0','0','0'];
+            }
+        }
+        return op101[id];
+    }
+
+
+    
+    function getOdds(html) {
+        var tds = $(html).find("table tr:eq(2)").find("td");
+        var company = $(tds[0]).text().trim();
+        var h = $(tds[1]).text().trim();
+        var d = $(tds[2]).text().trim();
+        var a = $(tds[3]).text().trim();
+        if (company.indexOf("365") != -1 && h != "" && d != "" && a != "") {
+            return [isNaN(h) ? 0 : parseFloat(h), isNaN(d) ? 0 : parseFloat(d), isNaN(a) ? 0 : parseFloat(a)];
+        } else {
+            return [0, 0, 0];
+        }
+    }
+
+
     function jingcai() {
         if (!tab(0)) {
             return;
         }
         matchlist = {};
-        $.ajax({
-            url: "http://www.310win.com/data/op101.xml?" + (+new Date),
-            async: false, type: "get", success: function (xml) {
-                $(xml).find("i").each((idx, i) => {
-                    var item = $(i).text().split(",");
-                    var id = item[1];
-                    var cid = item[0];
-                    if (cid == 8) {
-                        op101[id] = [item[3], item[4], item[5]];
-                    }
-                });
-            }
-        });
-        $.ajax({
-            url: "http://www.310win.com/data/yp101.xml?" + (+new Date),
-            async: false, type: "get", success: function (xml) {
-                $(xml).find("i").each((idx, i) => {
-                    var item = $(i).text().split(",");
-                    var id = item[1];
-                    var cid = item[0];
-                    if (cid == 8) {
-                        yp101[id] = [item[3], Goal2GoalCn(item[4]), item[5]];
-                    }
-                });
-            }
-        });
+       
         $.ajax({
             url: "http://www.310win.com/buy/jingcai.aspx?typeID=105&oddstype=2", async: false, type: "get", success: function (d) {
                 d = safeHtml(d);
@@ -309,14 +281,8 @@
                     var h1 = $(rqspf[1]).text();
                     var d1 = $(rqspf[2]).text();
                     var a1 = $(rqspf[3]).text();
-                    var bet365_op = op101[jcmatchId];
-                    if (!bet365_op) {
-                        bet365_op = ['-', '-', '-'];
-                    }
-                    var bet365_yp = yp101[jcmatchId];
-                    if (!bet365_yp) {
-                        bet365_yp = ['-', '-', '-'];
-                    }
+                    var bet365_op = getOp(id);
+                    var bet365_yp = getYp(id);
                     var match = { bet365_op, bet365_yp, leagueId, leagueName, leagueColor, jcmatchId, week, num, playtime, homeName, homeId, awayName, awayId, h, d, a, rq, h1, d1, a1, id, score };
                     matchlist[id] = match;
                 });
@@ -353,8 +319,8 @@
             html.push('<a href="http://www.310win.com/analysis/' + match.id + '.htm" target="_blank">析</a>');
             html.push('<a href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
             html.push('<a href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
-            var op = match.bet365_op;
-            var yp = match.bet365_yp;
+            var op = match.bet365_op || [0,0,0];
+            var yp = match.bet365_yp || [0,0,0];
             if(op && op[0] != '-' && yp && yp[0] != '-'){
                 html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red" >情</a>');
             }
@@ -366,7 +332,7 @@
             html.push('</td>');
             html.push('</tr>');
         }
-        $("#matchlist").html(html.join(''));
+        $("#matchlistTable").html(html.join(''));
     }
 
     function beidan() {
@@ -374,32 +340,7 @@
             return;
         }
         matchlist = {};
-        $.ajax({
-            url: "http://www.310win.com/data/op5.xml?" + (+new Date),
-            async: false, type: "get", success: function (xml) {
-                $(xml).find("i").each((idx, i) => {
-                    var item = $(i).text().split(",");
-                    var id = item[1];
-                    var cid = item[0];
-                    if (cid == 8) {
-                        op101[id] = [item[3], item[4], item[5]];
-                    }
-                });
-            }
-        });
-        $.ajax({
-            url: "http://www.310win.com/data/yp5.xml?" + (+new Date),
-            async: false, type: "get", success: function (xml) {
-                $(xml).find("i").each((idx, i) => {
-                    var item = $(i).text().split(",");
-                    var id = item[1];
-                    var cid = item[0];
-                    if (cid == 8) {
-                        yp101[id] = [item[3],Goal2GoalCn(item[4]), item[5]];
-                    }
-                });
-            }
-        });
+        
         $.ajax({
             url: "http://www.310win.com/buy/DanChang.aspx?typeID=5", async: false, type: "get", success: function (d) {
                 d = safeHtml(d);
@@ -444,16 +385,8 @@
                     var h = $(tds[13]).text();
                     var d = $(tds[14]).text();
                     var a = $(tds[15]).text();
-                    var bet365_op = op101[num];
-                    if (!bet365_op) {
-                        bet365_op = ['-', '-', '-'];
-                    }
-                    op101[jcmatchId] = bet365_op;
-                    delete op101[num];
-                    var bet365_yp = yp101[jcmatchId];
-                    if (!bet365_yp) {
-                        bet365_yp = ['-', '-', '-'];
-                    }
+                    var bet365_op = getOp(id);
+                    var bet365_yp = getYp(id);
                     var match = { bet365_op, bet365_yp, leagueId, leagueName, leagueColor, jcmatchId, week, num, playtime, homeName, homeId, awayName, awayId, h, d, a, rq, id, score, halfscore };
                     matchlist[id] = match;
                 });
@@ -486,8 +419,8 @@
             html.push('<a href="http://www.310win.com/analysis/' + match.id + '.htm" target="_blank">析</a>');
             html.push('<a href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
             html.push('<a href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
-            var op = match.bet365_op;
-            var yp = match.bet365_yp;
+            var op = match.bet365_op || [0,0,0];
+            var yp = match.bet365_yp || [0,0,0];
             if(op && op[0] != '-' && yp && yp[0] != '-'){
                 html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');"  style="color:red" >情</a>');
             }
@@ -499,39 +432,14 @@
             html.push('</td>');
             html.push('</tr>');
         }
-        $("#matchlist").html(html.join(''));
+        $("#matchlistTable").html(html.join(''));
     }
     function zucai() {
         if (!tab(2)) {
             return;
         }
         matchlist = {};
-        $.ajax({
-            url: "http://www.310win.com/data/op1.xml?" + (+new Date),
-            async: false, type: "get", success: function (xml) {
-                $(xml).find("i").each((idx, i) => {
-                    var item = $(i).text().split(",");
-                    var id = item[1];
-                    var cid = item[0];
-                    if (cid == 8) {
-                        op101[id] = [item[3], item[4], item[5]];
-                    }
-                });
-            }
-        });
-        $.ajax({
-            url: "http://www.310win.com/data/yp1.xml?" + (+new Date),
-            async: false, type: "get", success: function (xml) {
-                $(xml).find("i").each((idx, i) => {
-                    var item = $(i).text().split(",");
-                    var id = item[1];
-                    var cid = item[0];
-                    if (cid == 8) {
-                        yp101[id] = [item[3], Goal2GoalCn(item[4]), item[5]];
-                    }
-                });
-            }
-        });
+       
         $.ajax({
             url: "http://www.310win.com/buy/toto14.aspx", async: false, type: "get", success: function (d) {
                 d = safeHtml(d);
@@ -566,14 +474,8 @@
                     ids = $(tds[4]).find("a").attr("onmouseover").split(/[_.]/);
                     var awayId = ids[1];
 
-                    var bet365_op = op101[num];
-                    if (!bet365_op) {
-                        bet365_op = ['-', '-', '-'];
-                    }
-                    var bet365_yp = yp101[num];
-                    if (!bet365_yp) {
-                        bet365_yp = ['-', '-', '-'];
-                    }
+                    var bet365_op = getOp(id);
+                    var bet365_yp = getYp(id);
                     var match = { bet365_op, bet365_yp, leagueId, leagueName, leagueColor, num, playtime, homeName, homeId, awayName, awayId, id };
                     matchlist[id] = match;
                 });
@@ -601,8 +503,8 @@
             html.push('<a href="http://www.310win.com/analysis/' + match.id + '.htm" target="_blank">析</a>');
             html.push('<a href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
             html.push('<a href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
-            var op = match.bet365_op;
-            var yp = match.bet365_yp;
+            var op = match.bet365_op || [0,0,0];
+            var yp = match.bet365_yp || [0,0,0];
             if(op && op[0] != '-' && yp && yp[0] != '-'){
                 html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red" >情</a>');
             }
@@ -614,7 +516,7 @@
             html.push('</td>');
             html.push('</tr>');
         }
-        $("#matchlist").html(html.join(''));
+        $("#matchlistTable").html(html.join(''));
 
     }
     $(() => {

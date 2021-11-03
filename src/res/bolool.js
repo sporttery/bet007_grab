@@ -432,6 +432,93 @@ function getMatchDataFromHistoryHtml(d, id) {
     return getBoloolData(match,all_h,all_a);
 }
 
+function setBolool(match) {
+    $.ajax({
+        url: "http://zq.win007.com/analysis/" + match.id + "cn.htm", async: true, success: function (d) {
+            idx = d.indexOf('var lang = 0;');
+            if (idx > 0) {
+                d = d.substring(idx);
+                idx = d.indexOf("</scirpt");
+                if (idx != -1) {
+                    d = d.substring(0, idx);
+                    eval(d);
+                    var hscore = 0, ascore = 0, hresult = "", aresult = "", hsection = 0, asection = 0;
+                    for (var i = 0; i < h_data.length; i++) {
+                        var matchArr = h_data[i];
+                        homeId = matchArr[4];
+                        awayId = matchArr[6];
+                        homeGoal = matchArr[8];
+                        awayGoal = matchArr[9];
+                        if (homeGoal > awayGoal) {
+                            if (homeId == h2h_home) {
+                                hscore += 3;
+                                hresult += "赢";
+                            } else {
+                                hscore += 0;
+                                hresult += "输";
+                            }
+                        } else if (homeGoal < awayGoal) {
+                            if (homeId == h2h_home) {
+                                hscore += 0;
+                                hresult += "输";
+                            } else {
+                                hscore += 3;
+                                hresult += "赢";
+                            }
+                        } else {
+                            hscore += 1;
+                            hresult += "平";
+                        }
+                    }
+
+                    for (var i = 0; i < a_data.length; i++) {
+                        var matchArr = a_data[i];
+                        homeId = matchArr[4];
+                        awayId = matchArr[6];
+                        homeGoal = matchArr[8];
+                        awayGoal = matchArr[9];
+                        if (homeGoal > awayGoal) {
+                            if (homeId == h2h_away) {
+                                ascore += 3;
+                                aresult += "赢";
+                            } else {
+                                ascore += 0;
+                                aresult += "输";
+                            }
+                        } else if (homeGoal < awayGoal) {
+                            if (homeId == h2h_away) {
+                                ascore += 0;
+                                aresult += "输";
+                            } else {
+                                ascore += 3;
+                                aresult += "赢";
+                            }
+                        } else {
+                            ascore += 1;
+                            aresult += "平";
+                        }
+                    }
+
+                    hsection = getScoreSection(hscore, 30);
+                    asection = getScoreSection(ascore, 30);
+                    bolool = { hscore, ascore, hresult, aresult, hsection, asection ,id:scheduleID};
+                    matchlist[scheduleID].bolool = bolool;
+                    saveBolool(bolool);
+                    var bolool3 = getBoloolFromResult(bolool.hresult, bolool.aresult, 3);
+                    $("#hscore_" + id).text(bolool.hscore);
+                    $("#ascore_" + id).text(bolool.ascore);
+                    $("#hsection_" + id).text(bolool.hsection);
+                    $("#asection_" + id).text(bolool.asection);
+                    $("#hresult_" + id).title(bolool.hresult).text(bolool3.hresult);
+                    $("#aresult_" + id).title(bolool.aresult).text(bolool3.aresult);
+                    $("#hstrong_" + id).text(bolool3.hstrong);
+                    $("#astrong_" + id).text(bolool3.astrong);
+                }
+            }
+        }, type: "get"
+    });
+}
+
 function getBoloolData(match,all_h,all_a){
 	//俱乐部最近33场比赛，要去掉友谊赛
 	//国家队比赛保留友谊赛

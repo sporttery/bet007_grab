@@ -141,7 +141,7 @@ async function getMatchByTeam(page, teamId,nTimeStr) {
         var sdUrl = "http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=1&flesh=";
         var sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
         retry = 1;
-        while (sdContent == "-1" && content.indexOf("System.Web.Mvc.Controller")==-1) {
+        while (sdContent == "-1" && sdContent.indexOf("System.Web.Mvc.Controller")==-1) {
             Logger.info(sdUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
             await Utils.sleep(6 * 1000 * retry++);
             sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
@@ -178,7 +178,7 @@ async function getMatchByTeam(page, teamId,nTimeStr) {
             sdUrl = "http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=" + pageNo + "&flesh=";
             sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
             retry = 1;
-            while (sdContent == "-1" && content.indexOf("System.Web.Mvc.Controller")==-1) {
+            while (sdContent == "-1" && sdContent.indexOf("System.Web.Mvc.Controller")==-1) {
                 Logger.info(sdUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
                 await Utils.sleep(6 * 1000 * retry++);
                 sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
@@ -386,7 +386,29 @@ async function getBoloolListByOdds(europe,asia){
      return DBHelper.query(sql);
 }
 
+async function saveBolool(bolool){
+    return await DBHelper.saveModel(bolool,"t_bolool30");
+}
+
+async function getOddsById(id){
+    sql = "select o.matchId,o.s,o.p,o.f,o.h,o.pan,o.a from t_match_odds o where id = '"+id+"'";
+    var rs = await DBHelper.query(sql);
+    if(rs && rs.length>0){
+        return rs[0];
+    }
+    return null;
+}
+
+async function saveOdds(odds){
+    sql = "insert into t_match_odds(id,matchId,"+(odds.s?"s,p,f,":"")+""+(odds.h?"h,pan,a,":"")+"company) values('"+odds.id+"',"+odds.matchId+","
+    +(odds.s?""+odds.s+","+odds.p+","+odds.f+",":"")+""+(odds.h?""+odds.h+",'"+odds.pan+"',"+odds.a+",":"")+"'"+odds.company+"') ON DUPLICATE KEY UPDATE "
+    +(odds.s?"s=VALUES(s),p=VALUES(p),f=VALUES(f),":"")+""+(odds.h?"h=VALUES(h),pan=VALUES(pan),a=VALUES(a),":"")+" version=version+1";
+    console.info(odds);
+    console.info(sql);
+    return await DBHelper.query(sql);
+}
+
 module.exports = {
     getMatchByTeam,
-    getMatchOdds, getScoreSection, getBoloolById,getBoloolListByOdds
+    getMatchOdds, getScoreSection, getBoloolById,getBoloolListByOdds,saveBolool,getOddsById,saveOdds
 }

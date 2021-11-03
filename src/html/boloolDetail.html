@@ -59,13 +59,13 @@
 		}
 
 		.bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
-			width: 90px;
+			width: 60px;
 		}
 	</style>
 </head>
 
 <body>
-	<div class="container-fluid theme-showcase" role="main">
+	<div class="container-fluid theme-showcase" role="main" style="min-height: 900px; min-width: 1440px; ">
 		<div class="page-header">
 			<div class="view">
 				<table class="table table-bordered" style="width: 94%;">
@@ -79,7 +79,7 @@
 						<td width="50%"><a id="searchBtn" href="javascript:getBoloolList();">查询</a></td>
 					</tr>
 				</table>
-				<table class="table table-bordered"  style="width: 94%;">
+				<table class="table table-bordered" style="width: 94%;">
 					<thead id="thead">
 						<tr>
 							<th rowspan="2">ID/序号</th>
@@ -120,7 +120,7 @@
 		<div class="view">
 			同赔列表 <span id="msg"></span>
 		</div>
-		<div class="view">
+		<div class="view" style="height: 800px; overflow: scroll;">
 			<table class="table table-bordered" style="width: 94%;">
 				<thead>
 					<tr>
@@ -137,7 +137,7 @@
 								<span class="glyphicon glyphicon-sort" aria-hidden="true"></span></button>
 							<div style="display: none">
 								<select id="europeSec" onchange="filterData()"></select>
-								&nbsp;&nbsp;<a href="javascript:sameOdds('europe')">同赔</a>
+								<br /><a href="javascript:sameOdds('europe')">同赔</a>
 								&nbsp;&nbsp;<a href="javascript:allOdds('europe')">全部</a>
 							</div>
 						</th>
@@ -146,7 +146,7 @@
 								<span class="glyphicon glyphicon-sort" aria-hidden="true"></span></button>
 							<div style="display: none">
 								<select id="asiaSec" onchange="filterData()"></select>
-								&nbsp;&nbsp;<a href="javascript:sameOdds('asia')">同赔</a>
+								<br /><a href="javascript:sameOdds('asia')">同赔</a>
 								&nbsp;&nbsp;<a href="javascript:allOdds('asia')">全部</a>
 							</div>
 						</th>
@@ -497,11 +497,14 @@
 			$("#matchAsia").val("-");
 		}
 		html = [];
+		if (!match.score && match.fullscore) {
+			match.score = match.fullscore;
+		}
 		html.push('<tr id="m' + match.id + '" bgcolor="red" style="color:yellow">');
 		html.push("<td>" + match.num + "</td>");
 		html.push("<td>" + match.leagueName + "</td>");
 		html.push("<td>" + match.homeName + "</td>");
-		html.push("<td>" + (match.score && match.score != '-' ? (match.score + "<br/><font color=red>(" + match.halfscore + ")</font>") : "VS") + "</td>");
+		html.push("<td>" + (match.score && match.score != '-' ? match.score : "VS") + "</td>");
 		html.push("<td>" + match.awayName + "</td>");
 		html.push("<td>" + match.playtime + "</td>");
 		html.push("<td>" + match.bet365_op[0] + "</td>");
@@ -512,18 +515,31 @@
 		html.push("<td>" + match.bet365_yp[2] + "</td>");
 		var bolool = match.bolool;
 
-		// console.info(bolool);
-		//hscore,ascore,hresult,aresult,hsection,asection 
-		html.push("<td>" + bolool.hscore + "</td>");
-		html.push("<td>" + bolool.ascore + "</td>");
-		html.push("<td>" + bolool.hsection + "</td>");
-		html.push("<td>" + bolool.asection + "</td>");
-		html.push("<td title='" + bolool.hresult + "'>" + bolool.hresult.substring(0, 3) + "</td>");
-		html.push("<td title='" + bolool.hresult + "'>" + bolool.aresult.substring(0, 3) + "</td>");
-		var hstrong = getStrong(bolool.hscore, bolool.ascore);
-		var astrong = getStrong(bolool.ascore, bolool.hscore);
-		html.push("<td>" + hstrong + "</td>");
-		html.push("<td>" + astrong + "</td>");
+		if (bolool && bolool.hresult) {
+			// console.info(bolool);
+			//hscore,ascore,hresult,aresult,hsection,asection 
+			html.push("<td>" + bolool.hscore + "</td>");
+			html.push("<td>" + bolool.ascore + "</td>");
+			html.push("<td>" + bolool.hsection + "</td>");
+			html.push("<td>" + bolool.asection + "</td>");
+			html.push("<td title='" + bolool.hresult + "'>" + bolool.hresult.substring(0, 3) + "</td>");
+			html.push("<td title='" + bolool.hresult + "'>" + bolool.aresult.substring(0, 3) + "</td>");
+			var hstrong = getStrong(bolool.hscore, bolool.ascore);
+			var astrong = getStrong(bolool.ascore, bolool.hscore);
+			html.push("<td>" + hstrong + "</td>");
+			html.push("<td>" + astrong + "</td>");
+		} else {
+			setBolool(match);
+			html.push("<td id='hscore_" + match.id + "'>--</td>");
+			html.push("<td id='ascore_" + match.id + "'>--</td>");
+			html.push("<td id='hsection_" + match.id + "'>--</td>");
+			html.push("<td id='asection_" + match.id + "'>--</td>");
+			html.push("<td id='hresult_" + match.id + "'>--</td>");
+			html.push("<td id='aresult_" + match.id + "'>--</td>");
+			html.push("<td id='hstrong_" + match.id + "'>--</td>");
+			html.push("<td id='astrong_" + match.id + "'>--</td>");
+		}
+
 
 		html.push("<td>");
 		html.push("	<a href='http://www.310win.com/analysis/" + match.id + ".htm' target='_blank'>析</a></td>");
@@ -570,9 +586,9 @@
 			var asiaMap = {};
 
 			var totalCount = 0, showCount = 0;
-			for(var i=0;i<data.length;i++){
+			for (var i = 0; i < data.length; i++) {
 				var match = data[i];
-				if(!match.id){
+				if (!match.id) {
 					match.id = match.matchId;
 				}
 				if (g_boloolList["bolool_" + match.id]) {
@@ -585,22 +601,22 @@
 				//show = europe==eKey && asia == aKey;
 				var noBolool = false;
 				if (!match.hresult && !match.aresult) {
-					if(match.playtime.substring(0,4)!=new Date().getFullYear()+""){
-						match.playtime = new Date().getFullYear()+"-"+match.playtime ;
+					if (match.playtime.substring(0, 4) != new Date().getFullYear() + "") {
+						match.playtime = new Date().getFullYear() + "-" + match.playtime;
 					}
 					var bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
 					if (bolool == -1 || bolool == -3) {
-                        tcount = await getMatchByTeam(match.homeId, match.playtime);
-                        console.info(match.id + " => " + match.homeId + " 获取" + tcount + "场");
-                    }
-                    if (bolool == -2 || bolool == -3) {
-                        tcount = await getMatchByTeam(match.awayId, match.playtime);
-                        console.info(match.id + " => " + match.awayId + " 获取" + tcount + "场");
-                    }
-                    if (bolool == -1 || bolool == -2 || bolool == -3) {
-                        bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
-                    }
-					
+						tcount = await getMatchByTeam(match.homeId, match.playtime);
+						console.info(match.id + " => " + match.homeId + " 获取" + tcount + "场");
+					}
+					if (bolool == -2 || bolool == -3) {
+						tcount = await getMatchByTeam(match.awayId, match.playtime);
+						console.info(match.id + " => " + match.awayId + " 获取" + tcount + "场");
+					}
+					if (bolool == -1 || bolool == -2 || bolool == -3) {
+						bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+					}
+
 					if (!bolool || !bolool.hresult) {
 						noBolool = true;
 					} else {
@@ -631,9 +647,9 @@
 				html.push('<td>' + match.id + '</td>');
 				html.push('<td>' + match.leagueName + '</td>');
 				html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.homeId + "&pageNo=1&flesh=' target='_blank'>" + match.homeName + "</a></td>");
-				html.push('<td><a href="http://live.win007.com/detail/'+match.id+'cn.htm" target="_blank"><span class="fullscore">' + match.fullscore + "</span><br/>" + match.halfscore + '</a></td>');
+				html.push('<td><a href="http://live.win007.com/detail/' + match.id + 'cn.htm" target="_blank"><span class="fullscore">' + match.fullscore + "</span><br/>" + match.halfscore + '</a></td>');
 				html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.awayId + "&pageNo=1&flesh=' target='_blank'>" + match.awayName + "</a></td>");
-				html.push('<td>' + match.playtime + '</td>');
+				html.push('<td title="' + match.playtime + '">' + match.playtime + '</td>');
 
 				html.push('<td class="' + (europe == eKey ? 'red' : '') + '">' + match.s + '</td>');
 				html.push('<td class="' + (europe == eKey ? 'red' : '') + '">' + match.p + '</td>');
@@ -664,8 +680,8 @@
 					html.push('<td>' + match.ascore + '</td>');
 					html.push('<td>' + match.hsection + '</td>');
 					html.push('<td>' + match.asection + '</td>');
-					html.push('<td title="'+match.hresult+'">' + bolool3.hresult + '</td>');
-					html.push('<td title="'+match.aresult+'">' + bolool3.aresult + '</td>');
+					html.push('<td title="' + match.hresult + '">' + bolool3.hresult + '</td>');
+					html.push('<td title="' + match.aresult + '">' + bolool3.aresult + '</td>');
 					html.push('<td>' + bolool3.hstrong + '</td>');
 					html.push('<td>' + bolool3.astrong + '</td>');
 				}

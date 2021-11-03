@@ -8,8 +8,8 @@ const matchUtil = require("./matchUtils");
     await Puppeteer.launch({
         headless: false,
         defaultViewport: {
-            width: 1440,
-            height: 900
+            width: 1960,
+            height: 1024
         },
         args: ["--no-sandbox", "--disable-setuid-sandbox", '--disable-web-security', "--start-maximized"],
         executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
@@ -115,10 +115,9 @@ const matchUtil = require("./matchUtils");
                 layer.alert("采集完成")
             });
         }
-
         async function getMatchByTeam(teamId, playtime) {
             return await matchUtil.getMatchByTeam(boloolDetailPage, teamId, playtime);
-        }
+        } 
 
         var boloolPage, boloolDetailPage;
         async function boloolDetail(id) {
@@ -144,12 +143,18 @@ const matchUtil = require("./matchUtils");
                 await boloolDetailPage.exposeFunction("getBoloolListByOdds", matchUtil.getBoloolListByOdds);
                 await boloolDetailPage.exposeFunction("getBoloolById", matchUtil.getBoloolById);
                 await boloolDetailPage.exposeFunction("getMatchByTeam", getMatchByTeam);
+                await boloolDetailPage.exposeFunction("saveBolool", matchUtil.saveBolool);
             }
             await boloolDetailPage.goto("file://" + __dirname + "/html/boloolDetail.html?id=" + id);
             await boloolDetailPage.evaluate((match) => {
                 g_match = match;
                 showBolool(match);
             }, match);
+            boloolDetailPage.on('domcontentloaded',()=>{
+                boloolDetailPage.evaluate(()=>{
+                    showBolool(g_match);
+                });
+            });
         }
 
         async function bolool(id) {
@@ -159,6 +164,7 @@ const matchUtil = require("./matchUtils");
                 boloolPage.on('console', msg => console.log('PAGE LOG:', msg.text()));
                 await boloolPage.exposeFunction("getBoloolById", matchUtil.getBoloolById);
                 await boloolPage.exposeFunction("boloolDetail", boloolDetail);
+                await boloolPage.exposeFunction("saveBolool",  matchUtil.saveBolool);
                 boloolPage.on("close", () => {
                     boloolPage = null;
                 })
@@ -169,25 +175,25 @@ const matchUtil = require("./matchUtils");
             });
             matchlist = JSON.parse(matchlist);
             await boloolPage.goto("file://" + __dirname + "/html/bolool.html");
-            for (var key in matchlist) {
-                var match = matchlist[key];
-                if (!match.bolool) {
-                    var bolool = await matchUtil.getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+            // for (var key in matchlist) {
+            //     var match = matchlist[key];
+            //     if (!match.bolool) {
+            //         var bolool = await matchUtil.getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
 
-                    if (bolool == -1 || bolool == -3) {
-                        tcount = await getMatchByTeam(match.homeId, match.playtime);
-                        console.info(match.id + " => " + match.homeId + " 获取" + tcount + "场");
-                    }
-                    if (bolool == -2 || bolool == -3) {
-                        tcount = await getMatchByTeam(match.awayId, match.playtime);
-                        console.info(match.id + " => " + match.awayId + " 获取" + tcount + "场");
-                    }
-                    if (bolool == -1 || bolool == -2 || bolool == -3) {
-                        bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
-                    }
-                    match.bolool = bolool;
-                }
-            }
+            //         if (bolool == -1 || bolool == -3) {
+            //             tcount = await getMatchByTeam(match.homeId, match.playtime);
+            //             console.info(match.id + " => " + match.homeId + " 获取" + tcount + "场");
+            //         }
+            //         if (bolool == -2 || bolool == -3) {
+            //             tcount = await getMatchByTeam(match.awayId, match.playtime);
+            //             console.info(match.id + " => " + match.awayId + " 获取" + tcount + "场");
+            //         }
+            //         if (bolool == -1 || bolool == -2 || bolool == -3) {
+            //             bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
+            //         }
+            //         match.bolool = bolool;
+            //     }
+            // }
             await page.evaluate((_matchlist) => {
                 matchlist = _matchlist;
             }, matchlist);
@@ -195,6 +201,12 @@ const matchUtil = require("./matchUtils");
                 g_match = matchlist;
                 initTable();
             }, matchlist);
+
+            boloolPage.on('domcontentloaded',()=>{
+                boloolPage.evaluate(()=>{
+                    initTable();
+                });
+            })
 
             if (id) {
                 await boloolDetail(id);
@@ -210,7 +222,11 @@ const matchUtil = require("./matchUtils");
         await page.goto("file://" + __dirname + "/index.html");
         await page.exposeFunction("ft2Click", ft2Click);
         await page.exposeFunction("bolool", bolool);
-
+        await page.exposeFunction("getOddsById", matchUtil.getOddsById);
+        await page.exposeFunction("saveOdds", matchUtil.saveOdds);
+        page.on("domcontentloaded",async ()=>{
+            await Util.addCollectionButton(page);
+        });
         await Util.addCollectionButton(page);
     });
 })();

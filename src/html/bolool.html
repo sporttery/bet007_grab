@@ -44,12 +44,12 @@
 </head>
 
 <body>
-	<div class="container-fluid theme-showcase" role="main">
+	<div class="container-fluid theme-showcase" role="main" style="min-height: 900px; min-width: 1440px; ">
 		<div class="page-header">
 			<label for="date">日期</label><input type="text" id="date" class="datetimepicker"
 				data-date-format="yyyy-mm-dd" onchange="showdate(this.value)" />
 		</div>
-		<div class="view">
+		<div class="view" style="height: 800px; overflow: scroll;">
 			<table class="table table-bordered" style="width: 94%;">
 				<thead id="thead"></thead>
 				<tbody id="matchlist"></tbody>
@@ -148,6 +148,7 @@
 	function getStrong(hscore, ascore) {
 		return hscore > ascore ? '强' : hscore == ascore ? '平' : '弱';
 	}
+	
 	async function initTable(matchlist) {
 		if (!matchlist) {
 			matchlist = g_match;
@@ -155,11 +156,14 @@
 		var html = [];
 		for (var key in matchlist) {
 			var match = matchlist[key];
+			if (!match.score && match.fullscore) {
+				match.score = match.fullscore;
+			}
 			html.push('<tr id="m' + match.id + '">');
 			html.push("<td>" + match.num + "</td>");
 			html.push("<td>" + match.leagueName + "</td>");
 			html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.homeId + "&pageNo=1&flesh=' target='_blank'>" + match.homeName + "</a></td>");
-			html.push("<td>" + (match.score && match.score != '-' ? match.score + "<br/><font color=red>(" + match.halfscore + ")</font>" : "VS") + "</td>");
+			html.push("<td>" + (match.score && match.score != '-' ? match.score : "VS") + "</td>");
 			html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.awayId + "&pageNo=1&flesh=' target='_blank'>" + match.awayName + "</a></td>");
 			html.push("<td>" + match.playtime + "</td>");
 			html.push("<td>" + match.bet365_op[0] + "</td>");
@@ -169,20 +173,7 @@
 			html.push("<td>" + match.bet365_yp[1] + "</td>");
 			html.push("<td>" + match.bet365_yp[2] + "</td>");
 			var bolool = match.bolool;
-			if(!bolool){
-				bolool = await getBoloolById(match.id,match.homeId,match.awayId,match.playtime);
-				if (bolool == -1 || bolool == -3) {
-					tcount = await getMatchByTeam(match.homeId, match.playtime);
-					console.info(match.id + " => " + match.homeId + " 获取" + tcount + "场");
-				}
-				if (bolool == -2 || bolool == -3) {
-					tcount = await getMatchByTeam(match.awayId, match.playtime);
-					console.info(match.id + " => " + match.awayId + " 获取" + tcount + "场");
-				}
-				if (bolool == -1 || bolool == -2 || bolool == -3) {
-					bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
-				}
-			}
+			
 			if (bolool && bolool.hresult) {
 				// console.info(bolool);
 				//hscore,ascore,hresult,aresult,hsection,asection 
@@ -196,18 +187,19 @@
 				html.push("<td>" + bolool3.hstrong + "</td>");
 				html.push("<td>" + bolool3.astrong + "</td>");
 			} else {
-				html.push("<td>--</td>");
-				html.push("<td>--</td>");
-				html.push("<td>--</td>");
-				html.push("<td>--</td>");
-				html.push("<td>--</td>");
-				html.push("<td>--</td>");
-				html.push("<td>--</td>");
-				html.push("<td>--</td>");
+				setBolool(match);
+				html.push("<td id='hscore_" + match.id + "'>--</td>");
+				html.push("<td id='ascore_" + match.id + "'>--</td>");
+				html.push("<td id='hsection_" + match.id + "'>--</td>");
+				html.push("<td id='asection_" + match.id + "'>--</td>");
+				html.push("<td id='hresult_" + match.id + "'>--</td>");
+				html.push("<td id='aresult_" + match.id + "'>--</td>");
+				html.push("<td id='hstrong_" + match.id + "'>--</td>");
+				html.push("<td id='astrong_" + match.id + "'>--</td>");
 			}
 			html.push("<td>");
-			if(match.bet365_op && match.bet365_op[0]!='-' && match.bet365_yp && match.bet365_yp[0]!='-' ){
-				html.push("<a href='javascript:boloolDetail("+match.id+")' style='color:red'>情</a>&nbsp;");
+			if (match.bet365_op && match.bet365_op[0] != '-' && match.bet365_yp && match.bet365_yp[0] != '-') {
+				html.push("<a href='javascript:boloolDetail(" + match.id + ")' style='color:red'>情</a>&nbsp;");
 			}
 			html.push("	<a href='http://www.310win.com/analysis/" + match.id + ".htm' target='_blank'>析</a></td>");
 			html.push('</tr>');
