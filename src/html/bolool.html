@@ -48,8 +48,9 @@
 		<div class="page-header">
 			<label for="date">日期</label><input type="text" id="date" class="datetimepicker"
 				data-date-format="yyyy-mm-dd" onchange="showdate(this.value)" />
-				&nbsp;&nbsp;
+			&nbsp;&nbsp;
 			<a href='javascript:void(0)' onclick='setBoloolById()'>获取积分</a>
+			
 		</div>
 		<div class="view">
 			<table class="table table-bordered" style="width: 94%;">
@@ -152,19 +153,21 @@
 	}
 
 	async function setBoloolById(id) {
-    if (!id) {
-        layer.load();
-        for (var key in g_match) {
-            match = g_match[key];
-            setBolool(match);
-            await sleep(1000);
-        }
-        layer.closeAll();
-    } else {
-        var match = g_match[id];
-        setBolool(match);
-    }
-}
+		if (!id) {
+			layer.load();
+			for (var key in g_match) {
+				match = g_match[key];
+				if (!match.bolool || !match.bolool.hresult) {
+					setBolool(match);
+					await sleep(1000);
+				}
+			}
+			layer.closeAll();
+		} else {
+			var match = g_match[id];
+			setBolool(match);
+		}
+	}
 	async function initTable(matchlist) {
 		if (!matchlist) {
 			matchlist = g_match;
@@ -182,11 +185,11 @@
 			html.push("<td>" + (match.score && match.score != '-' ? match.score : "VS") + "</td>");
 			html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.awayId + "&pageNo=1&flesh=' target='_blank'>" + match.awayName + "</a></td>");
 			html.push("<td>" + match.playtime + "</td>");
-			if(!match.bet365_yp){
-				match.bet365_yp=[0,0,0];
+			if (!match.bet365_yp) {
+				match.bet365_yp = [0, 0, 0];
 			}
-			if(!match.bet365_op){
-				match.bet365_op=[0,0,0];
+			if (!match.bet365_op) {
+				match.bet365_op = [0, 0, 0];
 			}
 			html.push("<td>" + match.bet365_op[0] + "</td>");
 			html.push("<td>" + match.bet365_op[1] + "</td>");

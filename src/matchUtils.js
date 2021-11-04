@@ -455,7 +455,7 @@ function getOdds(stdout) {
     var d = $(tds[2]).text().trim();
     var a = $(tds[3]).text().trim();
     if (company.indexOf("365") != -1 && h != "" && d != "" && a != "") {
-        return [isNaN(h) ? 0 : parseFloat(h), isNaN(d) ? 0 : parseFloat(d), isNaN(a) ? 0 : parseFloat(a)];
+        return [isNaN(h) ? 0 : parseFloat(h), isNaN(d) ? d : parseFloat(d), isNaN(a) ? 0 : parseFloat(a)];
     } else {
         return [0, 0, 0];
     }
@@ -470,12 +470,36 @@ async function saveOdds(odds) {
     sql = "insert into t_match_odds(id,matchId," + (odds.s ? "s,p,f," : "") + "" + (odds.h ? "h,pan,a," : "") + "company) values('" + odds.id + "'," + odds.matchId + ","
         + (odds.s ? "" + odds.s + "," + odds.p + "," + odds.f + "," : "") + "" + (odds.h ? "" + odds.h + ",'" + odds.pan + "'," + odds.a + "," : "") + "'" + odds.company + "') ON DUPLICATE KEY UPDATE "
         + (odds.s ? "s=VALUES(s),p=VALUES(p),f=VALUES(f)," : "") + "" + (odds.h ? "h=VALUES(h),pan=VALUES(pan),a=VALUES(a)," : "") + " version=version+1";
-    console.info(odds);
-    console.info(sql);
+    // console.info(odds);
+    // console.info(sql);
     return await DBHelper.query(sql);
+}
+
+
+// async function odds(){
+//     sql = "select m.id from t_match m left t_match_odds b on m.id = b.id where b.id is null limit 100";
+//     while(true){
+//         rs = await DBHelper.query(sql);
+//         if(rs && rs.length>0){
+//             for(var i=0;i<rs.length;i++){
+//                 await getOddsById(rs[i].id);
+//             }
+//         }
+//         if(!rs || rs.length<100){
+//             break;
+//         }
+//     }
+// }
+
+
+async function deleteOddsById(id){
+    var sql = "delete from t_match_odds where id = '" + id+"-Bet365'";
+    console.info(sql);
+    var rs = await DBHelper.query(sql);
+    console.info(rs);
 }
 
 module.exports = {
     getMatchByTeam,
-    getMatchOdds, getScoreSection, getBoloolById, getBoloolListByOdds, saveBolool, getOddsById, saveOdds, ConvertGoal
+    getMatchOdds, getScoreSection, getBoloolById, getBoloolListByOdds, saveBolool, getOddsById, saveOdds, ConvertGoal,deleteOddsById
 }

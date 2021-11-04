@@ -215,16 +215,16 @@
 </body>
 <script type="text/javascript">
 	var descOrAsc = {}, sortData = {}, boloolListEl;
+	
+
 	async function setBoloolById(id) {
 		if (!id) {
 			layer.load();
 			for (var key in g_match) {
 				match = g_match[key];
-				if(!match.hresult|| !match.aresult){
-					if(!match.bolool || !match.bolool.hresult){
-						setBolool(match);
-						await sleep(1000);
-					}
+				if(!match.bolool || !match.bolool.hresult){
+					setBolool(match);
+					await sleep(1000);
 				}
 			}
 			layer.closeAll();
@@ -595,7 +595,7 @@
 		var asia = $("#matchAsia").val();
 		layer.load(2);
 		var data = await getBoloolListByOdds(europe, asia);
-
+		g_match={};
 		if (typeof data == "string") {
 			layer.alert(data);
 		} else {
@@ -626,6 +626,8 @@
 				var noBolool = false;
 				if (!match.hresult && !match.aresult) {
 					noBolool = true;
+				}else{
+					match.bolool={hresult:match.hresult,aresult:match.aresult,hscore:match.hscore,ascore:match.ascore,hsection:match.hsection,asection:match.asection};
 				}
 				var className = "";
 				var bolool3 = { hstrong: "-1", astrong: "-1", hresult: "--", aresult: "--" };

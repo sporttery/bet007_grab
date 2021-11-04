@@ -17,6 +17,7 @@
             color: rgb(0, 255, 98);
             font-size: larger;
         }
+
         .tdQing {
             display: none;
         }
@@ -51,6 +52,9 @@
                                             </p>
                                             <p class="betbtn" onclick="gotoBolool()"><a href="javascript:void(0)"
                                                     style="color: red;">菠萝指数</a>
+                                            </p>
+                                            <p class="betbtn" onclick="refreshOdds()"><a href="javascript:void(0)"
+                                                    style="color: red;">刷新赔率</a>
                                             </p>
                                         </div>
                                     </div>
@@ -337,9 +341,9 @@
             html.push('</tr>');
         }
         $("#matchlistTable").html(html.join(''));
-        setTimeout(()=>{
+        setTimeout(() => {
             setOdds();
-        },500);
+        }, 500);
     }
 
     function beidan() {
@@ -437,9 +441,9 @@
             html.push('</tr>');
         }
         $("#matchlistTable").html(html.join(''));
-        setTimeout(()=>{
+        setTimeout(() => {
             setOdds();
-        },500);
+        }, 500);
     }
     function zucai() {
 
@@ -520,9 +524,9 @@
             html.push('</tr>');
         }
         $("#matchlistTable").html(html.join(''));
-        setTimeout(()=>{
+        setTimeout(() => {
             setOdds();
-        },500);
+        }, 500);
     }
     $(() => {
 
@@ -533,7 +537,7 @@
         } else {
             jingcai();
         }
-        
+
     });
     function gotoBolool(id) {
         bolool(id);

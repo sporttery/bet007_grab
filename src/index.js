@@ -109,6 +109,28 @@ const matchUtil = require("./matchUtils");
             for (var teamId in allTeamIds) {
                 await matchUtil.getMatchByTeam(page, teamId);
             }
+            // var matchlist = await page.evaluate(()=>{
+            //     return JSON.stringify(matchlist);
+            // });
+            // matchlist = JSON.parse(matchlist);
+            // for(var key in matchlist){
+            //     var match = matchlist[key];
+            //     if(!match.bolool){
+            //         var bolool = await matchUtil.getBoloolById(match.id);
+            //         match.bolool = bolool;
+            //     }
+            //     if(!match.bet365_op){
+            //         var id = match.id;
+            //         var odds = await matchUtil.getOddsById(id);
+            //         if(odds){
+            //             match.bet365_yp=[odds.h,matchUtil.ConvertGoal(odds.pan),odds.a];
+            //             match.bet365_op= [odds.s,odds.p,odds.f];
+            //         }
+            //     }
+            // }
+            // await page.evaluate((_matchlist) => {
+            //     matchlist = _matchlist;
+            // }, matchlist);
             await Util.addCollectionButton(page);
             await page.evaluate(() => {
                 layer.closeAll();
@@ -214,7 +236,7 @@ const matchUtil = require("./matchUtils");
                 if(!match.bet365_yp){
                     var odds = await matchUtil.getOddsById(id);
                     if(odds){
-                        match.bet365_yp=[odds.h, matchUtil.ConvertGoal(odds.pan),odds.a];
+                        match.bet365_yp=[odds.h,matchUtil.ConvertGoal(odds.pan),odds.a];
                         match.bet365_op= [odds.s,odds.p,odds.f];
                     }
                 }
@@ -234,6 +256,25 @@ const matchUtil = require("./matchUtils");
             },matchlist);
         }
 
+        async function refreshOdds(){
+            var matchlist = await page.evaluate(() => {
+                layer.load();
+                for(var key in matchlist){
+                    var match = matchlist[key];
+                    match.bet365_yp=null;
+                    match.bet365_op=null;
+                }
+                return JSON.stringify(matchlist);
+            });
+            matchlist = JSON.parse(matchlist);
+            for (var key in matchlist) {
+                var match = matchlist[key];
+                var id = match.id;
+                await matchUtil.deleteOddsById(id);
+            }
+            await setOdds();
+        }
+
         browser.on("disconnected", () => {
             process.exit();
         })
@@ -242,6 +283,7 @@ const matchUtil = require("./matchUtils");
         await page.exposeFunction("ft2Click", ft2Click);
         await page.exposeFunction("bolool", bolool);
         await page.exposeFunction("setOdds", setOdds);
+        await page.exposeFunction("refreshOdds", refreshOdds);
         page.on("domcontentloaded",async ()=>{
             await Util.addCollectionButton(page);
         });

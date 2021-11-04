@@ -135,7 +135,7 @@ function getOdds(stdout) {
     var d = $(tds[2]).text().trim();
     var a = $(tds[3]).text().trim();
     if (company.indexOf("365") != -1 && h != "" && d != "" && a != "") {
-        return [isNaN(h) ? 0 : parseFloat(h), isNaN(d) ? 0 : parseFloat(d), isNaN(a) ? 0 : parseFloat(a)];
+        return [isNaN(h) ? 0 : parseFloat(h), isNaN(d) ? d : parseFloat(d), isNaN(a) ? 0 : parseFloat(a)];
     } else {
         return [0, 0, 0];
     }

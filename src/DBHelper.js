@@ -1,20 +1,20 @@
 const mysql = require("mysql")
 const Logger = require('./Logger');
-// const dbConfig = {
-//     host: '56f2cff845240.gz.cdb.myqcloud.com',
-//     port: 17816,
-//     user: 'cdb_outerroot',
-//     password: '1111111',
-//     database: 'bolool'
-// };
-
 const dbConfig = {
-    host: '127.0.0.1',
-    port: 3306,
-    user: 'root',
-    password: '876543219',
+    host: '56f2cff845240.gz.cdb.myqcloud.com',
+    port: 17816,
+    user: 'cdb_outerroot',
+    password: 'cdb_outerroot',
     database: 'bolool'
 };
+
+// const dbConfig = {
+//     host: '127.0.0.1',
+//     port: 3306,
+//     user: 'root',
+//     password: '876543219',
+//     database: 'bolool'
+// };
 
 const pool = mysql.createPool(dbConfig);
 
