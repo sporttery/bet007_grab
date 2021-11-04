@@ -53,8 +53,8 @@ async function main() {
                 var europeUrl = "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=" + companyIdData.e + "&company=" + companyName;
                 var curl = 'curl ' + proxyIp + '  -m 30 "' + europeUrl + '" -s | iconv -f gbk -t utf-8'
                 var odata = { id, europeOdds: null, asiaOdds: false, company: companyName, len: 99999999 };
-                // var response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 10);
-                var response = await Utils.getByCurl(curl);
+                var response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 3);
+                // var response = await Utils.getByCurl(curl);
                 if (response) {
                     console.info(europeUrl + " 获取完成");
                     odds = getOdds(response);
@@ -62,8 +62,8 @@ async function main() {
                     odata.europeOdds = odds;
                     var asiaUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=" + companyIdData.a + "&company=" + companyName;
                     curl = 'curl ' + proxyIp + '  -m 30 "' + asiaUrl + '" -s | iconv -f gbk -t utf-8'
-                    // response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 10);
-                    response = await Utils.getByCurl(curl);
+                    response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 3);
+                    // response = await Utils.getByCurl(curl);
                     if (response) {
                         console.info(asiaUrl + " 获取完成");
                         odds = getOdds(response);
@@ -318,8 +318,8 @@ async function convertOdds() {
 
 if (process.argv[2] == "convert") {
     convertOdds();
-} else if (process.argv[2] == "main") {
-    main();
-} else {
+} else if (process.argv[2] == "main1") {
     main1();
+} else {
+    main();
 }
