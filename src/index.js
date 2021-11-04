@@ -211,10 +211,12 @@ const matchUtil = require("./matchUtils");
             for (var key in matchlist) {
                 var match = matchlist[key];
                 var id = match.id;
-                var odds = await matchUtil.getOddsById(id);
-                if(odds){
-                    match.bet365_yp=[odds.h, matchUtil.ConvertGoal(odds.pan),odds.a];
-                    match.bet365_op= [odds.s,odds.p,odds.f];
+                if(!match.bet365_yp){
+                    var odds = await matchUtil.getOddsById(id);
+                    if(odds){
+                        match.bet365_yp=[odds.h, matchUtil.ConvertGoal(odds.pan),odds.a];
+                        match.bet365_op= [odds.s,odds.p,odds.f];
+                    }
                 }
             }
             await page.evaluate((_matchlist)=>{
@@ -228,6 +230,7 @@ const matchUtil = require("./matchUtils");
                         tr.find(".tdQing").show();
                     }
                 }
+                layer.closeAll();
             },matchlist);
         }
 

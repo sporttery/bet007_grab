@@ -182,6 +182,12 @@
 			html.push("<td>" + (match.score && match.score != '-' ? match.score : "VS") + "</td>");
 			html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.awayId + "&pageNo=1&flesh=' target='_blank'>" + match.awayName + "</a></td>");
 			html.push("<td>" + match.playtime + "</td>");
+			if(!match.bet365_yp){
+				match.bet365_yp=[0,0,0];
+			}
+			if(!match.bet365_op){
+				match.bet365_op=[0,0,0];
+			}
 			html.push("<td>" + match.bet365_op[0] + "</td>");
 			html.push("<td>" + match.bet365_op[1] + "</td>");
 			html.push("<td>" + match.bet365_op[2] + "</td>");

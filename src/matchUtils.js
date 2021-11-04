@@ -286,6 +286,7 @@ async function getBoloolById(id) {
     if (rs && rs.length > 0) {
         return rs[0];
     }
+/*
     retry = 2;
     count = 1;
     do {
@@ -380,6 +381,7 @@ async function getBoloolById(id) {
         }
         console.info("第" + count + "次重试");
     } while (count++ < retry);
+*/
     return null;
 }
 

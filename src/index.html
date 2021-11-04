@@ -247,7 +247,7 @@
             return;
         }
         matchlist = {};
-
+        layer.load();
         $.ajax({
             url: "http://www.310win.com/buy/jingcai.aspx?typeID=105&oddstype=2", async: false, type: "get", success: function (d) {
                 d = safeHtml(d);
@@ -347,7 +347,7 @@
             return;
         }
         matchlist = {};
-
+        layer.load();
         $.ajax({
             url: "http://www.310win.com/buy/DanChang.aspx?typeID=5", async: false, type: "get", success: function (d) {
                 d = safeHtml(d);
@@ -442,11 +442,12 @@
         },500);
     }
     function zucai() {
+
         if (!tab(2)) {
             return;
         }
         matchlist = {};
-
+        layer.load();
         $.ajax({
             url: "http://www.310win.com/buy/toto14.aspx", async: false, type: "get", success: function (d) {
                 d = safeHtml(d);
@@ -524,6 +525,7 @@
         },500);
     }
     $(() => {
+
         if (location.href.indexOf("type=2") != -1) {
             beidan();
         } else if (location.href.indexOf("type=3") != -1) {
