@@ -173,6 +173,27 @@ function getScoreSection(score, count) {
         return 10 - parseInt(score / 10);
     }
 }
+
+/**
+4      * 创建比较参数函数
+5      * @param propertyName 属性名
+6      * @returns {Function} 返回比较函数
+7      */
+function sortBy(propertyName) {
+    return function (src, tar) {
+        //获取比较的值
+        var v1 = src[propertyName];
+        var v2 = tar[propertyName];
+        if (v1 > v2) {
+            return 1;
+        }
+        if (v1 < v2) {
+            return -1;
+        }
+        return 0;
+    };
+}
+
 /**
  * 从tr中获取比赛数据
  */
@@ -520,8 +541,8 @@ function setBolool(match) {
                     $("#ascore_" + bolool.id).text(bolool.ascore);
                     $("#hsection_" + bolool.id).text(bolool.hsection);
                     $("#asection_" + bolool.id).text(bolool.asection);
-                    $("#hresult_" + bolool.id).attr("title",bolool.hresult).text(bolool3.hresult);
-                    $("#aresult_" + bolool.id).attr("title",bolool.aresult).text(bolool3.aresult);
+                    $("#hresult_" + bolool.id).attr("title", bolool.hresult).text(bolool3.hresult);
+                    $("#aresult_" + bolool.id).attr("title", bolool.aresult).text(bolool3.aresult);
                     $("#hstrong_" + bolool.id).text(bolool3.hstrong);
                     $("#astrong_" + bolool.id).text(bolool3.astrong);
                 } else {

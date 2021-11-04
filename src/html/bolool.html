@@ -55,7 +55,7 @@
 		<div class="view">
 			<table class="table table-bordered" style="width: 94%;">
 				<thead id="thead"></thead>
-				<tbody id="matchlist"></tbody>
+				<tbody id="matchlistTable"></tbody>
 			</table>
 		</div>
 	</div>
@@ -173,8 +173,14 @@
 			matchlist = g_match;
 		}
 		var html = [];
+		var arr = [];
 		for (var key in matchlist) {
 			var match = matchlist[key];
+			arr.push(match);
+		}
+		arr.sort(sortBy("playtime"))
+		for (var key in arr) {
+			var match = arr[key];
 			if (!match.score && match.fullscore) {
 				match.score = match.fullscore;
 			}
@@ -229,7 +235,7 @@
 			html.push("	<a href='http://www.310win.com/analysis/" + match.id + ".htm' target='_blank'>析</a></td>");
 			html.push('</tr>');
 		}
-		$("#matchlist").html(html.join(""));
+		$("#matchlistTable").html(html.join(""));
 		layer.closeAll();
 	}
 

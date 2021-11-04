@@ -398,19 +398,27 @@ async function getByCurl(curl, chk, retry) {
         }
         var count = 1;
         do {
-            var body = child_process.execSync(curl).toString("utf-8");
-            if (chk(body)) {
-                return body;
-            }
-            if (count < retry) {
-                var sleepMs = count * 1200;
-                console.info("第" + count + "次获取数据失败，暂停" + (sleepMs) + "ms后再次尝试");
-                await sleep(sleepMs);
+            try {
+                var body = child_process.execSync(curl).toString("utf-8");
+                if (chk(body)) {
+                    return body;
+                }
+                if (count < retry) {
+                    var sleepMs = 5000 + count * 1200;
+                    console.info("第" + count + "次获取数据失败，暂停" + (sleepMs) + "ms后再次尝试");
+                    await sleep(sleepMs);
+                }
+            } catch (error) {
+                count--;
             }
         } while (count++ < retry);
         return null;
     } else {
-        return child_process.execSync(curl).toString("utf-8");
+        try {
+            return child_process.execSync(curl).toString("utf-8");
+        } catch (error) {
+            return getByCurl(curl, chk, retry) ;
+        }
     }
 
 }
