@@ -8,8 +8,8 @@ const matchUtil = require("./matchUtils");
     await Puppeteer.launch({
         headless: false,
         defaultViewport: {
-            width: 1960,
-            height: 1024
+            width: 1400,
+            height: 800
         },
         args: ["--no-sandbox", "--disable-setuid-sandbox", '--disable-web-security', "--start-maximized"],
         executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
