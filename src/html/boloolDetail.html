@@ -76,7 +76,9 @@
 						<td class="aRight">亚盘</td>
 						<td class="aLeft"><input type="text" value="" id="matchAsia" maxlength="15"
 								onkeyup="changeOdds()" /></td>
-						<td width="50%"><a id="searchBtn" href="javascript:getBoloolList();">查询</a></td>
+						<td width="50%"><a id="searchBtn" href="javascript:getBoloolList();">查询</a>
+							&nbsp;&nbsp;<a href='javascript:void(0)' onclick='setBoloolById()'>获取积分</a>
+						</td>
 					</tr>
 				</table>
 				<table class="table table-bordered" style="width: 94%;">
@@ -201,13 +203,36 @@
 				</thead>
 				<tbody id="boloolList">
 
-				</tbody>
+				</tbody>				
 			</table>
 		</div>
 	</div>
+	<p></p>
+	<p></p>
+	<p></p>
+	<p></p>
+	<p></p>
 </body>
 <script type="text/javascript">
 	var descOrAsc = {}, sortData = {}, boloolListEl;
+	async function setBoloolById(id) {
+		if (!id) {
+			layer.load();
+			for (var key in g_match) {
+				match = g_match[key];
+				if(!match.hresult|| !match.aresult){
+					if(!match.bolool || !match.bolool.hresult){
+						setBolool(match);
+						await sleep(1000);
+					}
+				}
+			}
+			layer.closeAll();
+		} else {
+			var match = g_match[id];
+			setBolool(match);
+		}
+	}
 	function sortBy(by) {
 		var list = sortData[by];
 		if (!descOrAsc[by]) {
@@ -404,7 +429,7 @@
 			}
 			trs.filter(":visible").each((idx, el) => {
 				var id = el.id;
-				var bolool = g_boloolList[id];
+				var bolool = g_match[id];
 
 			});
 		}
@@ -529,8 +554,7 @@
 			html.push("<td>" + hstrong + "</td>");
 			html.push("<td>" + astrong + "</td>");
 		} else {
-			setBolool(match);
-			html.push("<td id='hscore_" + match.id + "'>--</td>");
+			html.push("<td id='hscore_" + match.id + "'><a href='javascript:void(0)' onclick='setBoloolById(" + match.id + ")'>获取</a></td>");
 			html.push("<td id='ascore_" + match.id + "'>--</td>");
 			html.push("<td id='hsection_" + match.id + "'>--</td>");
 			html.push("<td id='asection_" + match.id + "'>--</td>");
@@ -550,7 +574,7 @@
 		getBoloolList();
 
 	}
-	var g_match = {}, topN = 30, ids = [], g_boloolList = {}, thisMatch = {};
+	var g_match = {}, topN = 30, ids = [], thisMatch = {};
 	var params = getRequest();
 	$(() => {
 		if (!params) {
@@ -591,7 +615,7 @@
 				if (!match.id) {
 					match.id = match.matchId;
 				}
-				if (g_boloolList["bolool_" + match.id]) {
+				if (g_match[match.id]) {
 					return false;
 				}
 				totalCount++;
@@ -601,33 +625,7 @@
 				//show = europe==eKey && asia == aKey;
 				var noBolool = false;
 				if (!match.hresult && !match.aresult) {
-					if (match.playtime.substring(0, 4) != new Date().getFullYear() + "") {
-						match.playtime = new Date().getFullYear() + "-" + match.playtime;
-					}
-					var bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
-					if (bolool == -1 || bolool == -3) {
-						tcount = await getMatchByTeam(match.homeId, match.playtime);
-						console.info(match.id + " => " + match.homeId + " 获取" + tcount + "场");
-					}
-					if (bolool == -2 || bolool == -3) {
-						tcount = await getMatchByTeam(match.awayId, match.playtime);
-						console.info(match.id + " => " + match.awayId + " 获取" + tcount + "场");
-					}
-					if (bolool == -1 || bolool == -2 || bolool == -3) {
-						bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
-					}
-
-					if (!bolool || !bolool.hresult) {
-						noBolool = true;
-					} else {
-						//hresult,aresult,hscore,ascore,hsection,asection
-						match.hscore = bolool.hscore;
-						match.ascore = bolool.ascore;
-						match.hresult = bolool.hresult;
-						match.aresult = bolool.aresult;
-						match.hsection = bolool.hsection;
-						match.asection = bolool.asection;
-					}
+					noBolool = true;
 				}
 				var className = "";
 				var bolool3 = { hstrong: "-1", astrong: "-1", hresult: "--", aresult: "--" };
@@ -667,14 +665,14 @@
 				asiaMap[aKey].push(match.id);
 				//hresult,aresult,hscore,ascore,hsection,asection
 				if (noBolool) {
-					html.push('<td class="hscore">--</td>');
-					html.push('<td>--</td>');
-					html.push('<td>--</td>');
-					html.push('<td>--</td>');
-					html.push('<td>--</td>');
-					html.push('<td>--</td>');
-					html.push('<td>--</td>');
-					html.push('<td>--</td>');
+					html.push("<td id='hscore_" + match.id + "'><a href='javascript:void(0)' onclick='setBoloolById(" + match.id + ")'>获取</a></td>");
+					html.push("<td id='ascore_" + match.id + "'>--</td>");
+					html.push("<td id='hsection_" + match.id + "'>--</td>");
+					html.push("<td id='asection_" + match.id + "'>--</td>");
+					html.push("<td id='hresult_" + match.id + "'>--</td>");
+					html.push("<td id='aresult_" + match.id + "'>--</td>");
+					html.push("<td id='hstrong_" + match.id + "'>--</td>");
+					html.push("<td id='astrong_" + match.id + "'>--</td>");
 				} else {
 					html.push('<td>' + match.hscore + '</td>');
 					html.push('<td>' + match.ascore + '</td>');
@@ -690,7 +688,7 @@
 				html.push('<a class="ao jc-link"  href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
 				html.push('<a class="ao jc-link" href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
 				html.push('</td>   ');
-				g_boloolList["bolool_" + match.id] = match;
+				g_match[match.id] = match;
 				html.push('</tr>');
 			};
 			ids = noBoloolIds;

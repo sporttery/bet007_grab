@@ -147,15 +147,17 @@ const matchUtil = require("./matchUtils");
             }
             await boloolDetailPage.goto("file://" + __dirname + "/html/boloolDetail.html?id=" + id);
             await boloolDetailPage.evaluate((match) => {
-                g_match = match;
                 showBolool(match);
             }, match);
             boloolDetailPage.on('domcontentloaded',()=>{
-                boloolDetailPage.evaluate(()=>{
-                    showBolool(g_match);
-                });
+                boloolDetailPage.evaluate((match)=>{
+                    showBolool(match);
+                },match);
             });
         }
+
+
+        
 
         async function bolool(id) {
             Logger.info("打开菠萝指数");
@@ -175,25 +177,13 @@ const matchUtil = require("./matchUtils");
             });
             matchlist = JSON.parse(matchlist);
             await boloolPage.goto("file://" + __dirname + "/html/bolool.html");
-            // for (var key in matchlist) {
-            //     var match = matchlist[key];
-            //     if (!match.bolool) {
-            //         var bolool = await matchUtil.getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
-
-            //         if (bolool == -1 || bolool == -3) {
-            //             tcount = await getMatchByTeam(match.homeId, match.playtime);
-            //             console.info(match.id + " => " + match.homeId + " 获取" + tcount + "场");
-            //         }
-            //         if (bolool == -2 || bolool == -3) {
-            //             tcount = await getMatchByTeam(match.awayId, match.playtime);
-            //             console.info(match.id + " => " + match.awayId + " 获取" + tcount + "场");
-            //         }
-            //         if (bolool == -1 || bolool == -2 || bolool == -3) {
-            //             bolool = await getBoloolById(match.id, match.homeId, match.awayId, match.playtime);
-            //         }
-            //         match.bolool = bolool;
-            //     }
-            // }
+            for (var key in matchlist) {
+                var match = matchlist[key];
+                if (!match.bolool) {
+                    var bolool = await matchUtil.getBoloolById(match.id);
+                    match.bolool = bolool;
+                }
+            }
             await page.evaluate((_matchlist) => {
                 matchlist = _matchlist;
             }, matchlist);
@@ -213,7 +203,33 @@ const matchUtil = require("./matchUtils");
                 await boloolDetailPage.bringToFront();
             }
         }
-
+        async function setOdds(){
+            var matchlist = await page.evaluate(() => {
+                return JSON.stringify(matchlist);
+            });
+            matchlist = JSON.parse(matchlist);
+            for (var key in matchlist) {
+                var match = matchlist[key];
+                var id = match.id;
+                var odds = await matchUtil.getOddsById(id);
+                if(odds){
+                    match.bet365_yp=[odds.h, matchUtil.ConvertGoal(odds.pan),odds.a];
+                    match.bet365_op= [odds.s,odds.p,odds.f];
+                }
+            }
+            await page.evaluate((_matchlist)=>{
+                matchlist=_matchlist;
+                for(var key in matchlist){
+                    var match = matchlist[key];
+                    if(match.bet365_yp && match.bet365_yp[0] != 0  && match.bet365_op && match.bet365_op[0] != 0){
+                        var tr = $("#m"+key);
+                        tr.find(".td-pei div:eq(0)").html('<span>'+match.bet365_op[0]+'</span><span>'+match.bet365_op[1]+'</span><span>'+match.bet365_op[2]+'</span>');
+                        tr.find(".td-pei div:eq(1)").html('<span>'+match.bet365_yp[0]+'</span><span>'+match.bet365_yp[1]+'</span><span>'+match.bet365_yp[2]+'</span>');
+                        tr.find(".tdQing").show();
+                    }
+                }
+            },matchlist);
+        }
 
         browser.on("disconnected", () => {
             process.exit();
@@ -222,8 +238,7 @@ const matchUtil = require("./matchUtils");
         await page.goto("file://" + __dirname + "/index.html");
         await page.exposeFunction("ft2Click", ft2Click);
         await page.exposeFunction("bolool", bolool);
-        await page.exposeFunction("getOddsById", matchUtil.getOddsById);
-        await page.exposeFunction("saveOdds", matchUtil.saveOdds);
+        await page.exposeFunction("setOdds", setOdds);
         page.on("domcontentloaded",async ()=>{
             await Util.addCollectionButton(page);
         });

@@ -25,7 +25,7 @@ function getStrong(hscore, ascore) {
  * @return {[string]}       [参数集合]
  */
 function getRequest(urlStr) {
-	var url;
+    var url;
     if (typeof urlStr == "undefined") {
         url = decodeURI(location.search); //获取url中"?"符后的字符串
     } else {
@@ -42,130 +42,130 @@ function getRequest(urlStr) {
     return theRequest;
 }
 
-function showHistoryCallback(id,hOra){
-	return function(data){
-		console.log(data);
-		g_match["_"+id].matchlist = JSON.parse(data.matchlist);
-		showHistory(id,hOra);
-	}
+function showHistoryCallback(id, hOra) {
+    return function (data) {
+        console.log(data);
+        g_match["_" + id].matchlist = JSON.parse(data.matchlist);
+        showHistory(id, hOra);
+    }
 }
-function showHistory(id,hOra){
-	layer.load(2);
-	var match = g_match["_"+id];
-	var matchlist = match.matchlist;
-	if(matchlist){
-		layer.closeAll();
-		historyArray = matchlist[hOra];
-		var html=[];
-		for(var i=0;i<historyArray.length;i++){
-			var m = historyArray[i];
-			html.push('<tr>');
-			html.push('<td><a href="https://www.okooo.com/soccer/league/'+m.leagueId+'/" target="_blank">'+m.leagueName+'</a></td>');
-			m.playtime=m.playtime+"";
-			var playtime = m.playtime.substring(0,4)+"-"+m.playtime.substring(4,6)+"-" + m.playtime.substring(6,8) + " " + m.playtime.substring(8,10)+ ":"+m.playtime.substring(10,12)+":00";
-			html.push('<td><a href="https://www.okooo.com/soccer/match/'+m.id+'/history/" target="_blank">'+playtime+'</a></td>');
-			html.push('<td><a href="https://www.okooo.com/soccer/team/'+m.homeId+'/" target="_blank">'+m.homeName+'</a></td>');
-			html.push('<td><a href="https://www.okooo.com/soccer/team/'+m.awayId+'/" target="_blank">'+m.awayName+'</a></td>');
-			html.push('<td><a href="https://www.okooo.com/soccer/match/'+m.id+'/" target="_blank"><font color=red>'+m.fullscore+'</font>('+m.halfscore+')</a></td>');
-			html.push('<td>'+m.hgoalscore+'</td>');
-			html.push('<td>'+m.hresult+'</td>');
-			html.push('</tr>');
-		}
-		var matchHistoryTip = $("#matchHistoryTip");
-		if(matchHistoryTip.length==0){
-			matchHistoryTip = $('<div id="matchHistoryTip" style="background-color: purple; text-align: center; color: #fff" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><h3 style="color: #fff;" class="matchTitle">xxx比赛的菠萝数据</h3></div><div class="modal-body"><table class="table table-bordered"><thead><tr><th>赛事</th><th>时间</th><th>主队</th><th>客队</th><th>比分</th><th>积分</th><th>结果</th></tr></thead><tbody></tbody></table></div><div class="modal-footer"><button class="btn" data-dismiss="modal" aria-hidden="true" style="color: red;">关闭</button></div></div>');
-			matchHistoryTip.appendTo($("body"));
-		}
-		matchHistoryTip.find("tbody").html(html.join(""));
-		matchHistoryTip.find(".matchTitle").text(match.homeName + " VS " + match.awayName + "  "+ match.playtime);
-		/* layer.open({
-			  title: match.homeName + " VS " + match.awayName + "  "+ match.playtime
-			  ,content: $("#matchHistoryTip").html()
-		}); */     
-		matchHistoryTip.removeClass("hide");
-		matchHistoryTip.modal("show");
-	}else{
-		console.log("异步加载数据.."+id);
-		$.get("/api/getHistoryById?id="+id,showHistoryCallback(id,hOra));
-	}
-}
-
-function setMatchBoloolData(id,data){
-	if(g_match["_"+id]){
-		g_match["_"+id].matchlist=JSON.parse(data.matchListHistory.matchlist);
-		g_match["_"+id].boloolData=data.boloolData;
-		g_match["_"+id].match=data.match;
-		tr = g_match["_"+id].tr;
-		if(!tr){
-			tr = $("#m"+id);
-			g_match["_"+id].tr = tr;
-		}
-		tr.find(".season").text(data.match.seasonName + " " + data.match.round);
-		if(data.match.fullscore.length>2){
-			var teamInfo = tr.find(".teamInfo");
-			teamInfo.html(teamInfo.html().replace("VS",'<font color=red>'+data.match.fullscore+"</font>("+data.match.halfscore+")"));
-		}
-		changeTopN(id);
-	}
-	trBolool = $("#bolool_"+id);
-	if(trBolool.length == 1){
-		var hscore = trBolool.find(".hscore");
-		var bolool = data.boloolData["top"+topN];
-		var bolool3 = getBoloolFromResult(bolool.hresult,bolool.aresult,3);
-		trBolool.attr({"data-hsection":bolool.hsection,"data-asection":bolool.asection,"data-hstrong":bolool3.hstrong,"data-astrong":bolool3.astrong,"data-hscore":bolool.hscore,"data-ascore":bolool.ascore});
-		hscore.text(bolool.hscore);
-		(hscore=hscore.next()).text(bolool.ascore);
-		(hscore=hscore.next()).text(bolool.hsection);
-		(hscore=hscore.next()).text(bolool.asection);
-		(hscore=hscore.next()).text(bolool3.hresult);
-		(hscore=hscore.next()).text(bolool3.aresult);
-		(hscore=hscore.next()).text(bolool3.hstrong);
-		(hscore=hscore.next()).text(bolool3.astrong);
-	}
-	
-	if(ids && id==ids[ids.length-1]){
-		if(typeof finishLoad == "function"){
-			finishLoad();
-		} else{
-			layer.closeAll();
-		}
-	}
+function showHistory(id, hOra) {
+    layer.load(2);
+    var match = g_match["_" + id];
+    var matchlist = match.matchlist;
+    if (matchlist) {
+        layer.closeAll();
+        historyArray = matchlist[hOra];
+        var html = [];
+        for (var i = 0; i < historyArray.length; i++) {
+            var m = historyArray[i];
+            html.push('<tr>');
+            html.push('<td><a href="https://www.okooo.com/soccer/league/' + m.leagueId + '/" target="_blank">' + m.leagueName + '</a></td>');
+            m.playtime = m.playtime + "";
+            var playtime = m.playtime.substring(0, 4) + "-" + m.playtime.substring(4, 6) + "-" + m.playtime.substring(6, 8) + " " + m.playtime.substring(8, 10) + ":" + m.playtime.substring(10, 12) + ":00";
+            html.push('<td><a href="https://www.okooo.com/soccer/match/' + m.id + '/history/" target="_blank">' + playtime + '</a></td>');
+            html.push('<td><a href="https://www.okooo.com/soccer/team/' + m.homeId + '/" target="_blank">' + m.homeName + '</a></td>');
+            html.push('<td><a href="https://www.okooo.com/soccer/team/' + m.awayId + '/" target="_blank">' + m.awayName + '</a></td>');
+            html.push('<td><a href="https://www.okooo.com/soccer/match/' + m.id + '/" target="_blank"><font color=red>' + m.fullscore + '</font>(' + m.halfscore + ')</a></td>');
+            html.push('<td>' + m.hgoalscore + '</td>');
+            html.push('<td>' + m.hresult + '</td>');
+            html.push('</tr>');
+        }
+        var matchHistoryTip = $("#matchHistoryTip");
+        if (matchHistoryTip.length == 0) {
+            matchHistoryTip = $('<div id="matchHistoryTip" style="background-color: purple; text-align: center; color: #fff" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><h3 style="color: #fff;" class="matchTitle">xxx比赛的菠萝数据</h3></div><div class="modal-body"><table class="table table-bordered"><thead><tr><th>赛事</th><th>时间</th><th>主队</th><th>客队</th><th>比分</th><th>积分</th><th>结果</th></tr></thead><tbody></tbody></table></div><div class="modal-footer"><button class="btn" data-dismiss="modal" aria-hidden="true" style="color: red;">关闭</button></div></div>');
+            matchHistoryTip.appendTo($("body"));
+        }
+        matchHistoryTip.find("tbody").html(html.join(""));
+        matchHistoryTip.find(".matchTitle").text(match.homeName + " VS " + match.awayName + "  " + match.playtime);
+        /* layer.open({
+              title: match.homeName + " VS " + match.awayName + "  "+ match.playtime
+              ,content: $("#matchHistoryTip").html()
+        }); */
+        matchHistoryTip.removeClass("hide");
+        matchHistoryTip.modal("show");
+    } else {
+        console.log("异步加载数据.." + id);
+        $.get("/api/getHistoryById?id=" + id, showHistoryCallback(id, hOra));
+    }
 }
 
-function matchHistoryCallback(id){
-	return function(d){
-		d=safeHtml(d);
-		var data = getMatchDataFromHistoryHtml(d,id);
-		if(data && data.match){
-			$.post("/api/saveBolool",{match:JSON.stringify(data.match),matchlist:data.matchListHistory.matchlist,bolool:JSON.stringify(data.boloolData)},function(cc){
-				console.log(cc);
-			}); 
-			setMatchBoloolData(id,data);
-		}
-	}
+function setMatchBoloolData(id, data) {
+    if (g_match["_" + id]) {
+        g_match["_" + id].matchlist = JSON.parse(data.matchListHistory.matchlist);
+        g_match["_" + id].boloolData = data.boloolData;
+        g_match["_" + id].match = data.match;
+        tr = g_match["_" + id].tr;
+        if (!tr) {
+            tr = $("#m" + id);
+            g_match["_" + id].tr = tr;
+        }
+        tr.find(".season").text(data.match.seasonName + " " + data.match.round);
+        if (data.match.fullscore.length > 2) {
+            var teamInfo = tr.find(".teamInfo");
+            teamInfo.html(teamInfo.html().replace("VS", '<font color=red>' + data.match.fullscore + "</font>(" + data.match.halfscore + ")"));
+        }
+        changeTopN(id);
+    }
+    trBolool = $("#bolool_" + id);
+    if (trBolool.length == 1) {
+        var hscore = trBolool.find(".hscore");
+        var bolool = data.boloolData["top" + topN];
+        var bolool3 = getBoloolFromResult(bolool.hresult, bolool.aresult, 3);
+        trBolool.attr({ "data-hsection": bolool.hsection, "data-asection": bolool.asection, "data-hstrong": bolool3.hstrong, "data-astrong": bolool3.astrong, "data-hscore": bolool.hscore, "data-ascore": bolool.ascore });
+        hscore.text(bolool.hscore);
+        (hscore = hscore.next()).text(bolool.ascore);
+        (hscore = hscore.next()).text(bolool.hsection);
+        (hscore = hscore.next()).text(bolool.asection);
+        (hscore = hscore.next()).text(bolool3.hresult);
+        (hscore = hscore.next()).text(bolool3.aresult);
+        (hscore = hscore.next()).text(bolool3.hstrong);
+        (hscore = hscore.next()).text(bolool3.astrong);
+    }
+
+    if (ids && id == ids[ids.length - 1]) {
+        if (typeof finishLoad == "function") {
+            finishLoad();
+        } else {
+            layer.closeAll();
+        }
+    }
 }
 
-function getBoloolFromResult(hResult,aResult,topN){
-	if(!topN){
-		topN=3;
-	}
-	if(!hResult || !aResult || hResult.length<topN || aResult.length<topN){
-		return {hresult:"--",aresult:"--",hscore:"--",ascore:"--",hstrong:"--",astrong:"--"};
-	}
-	var hresult=hResult.substring(0,topN).replace(/赢/g,"3").replace(/平/g,"1").replace(/输/g,"0");
-	var aresult=aResult.substring(0,topN).replace(/赢/g,"3").replace(/平/g,"1").replace(/输/g,"0");
-	var hscore=sum(hresult.split(/|/));
-	var ascore=sum(aresult.split(/|/));
-	var hstrong=getStrong(hscore,ascore);
-	var astrong=getStrong(ascore,hscore);
-	return {hresult,aresult,hscore,ascore,hstrong,astrong};
+function matchHistoryCallback(id) {
+    return function (d) {
+        d = safeHtml(d);
+        var data = getMatchDataFromHistoryHtml(d, id);
+        if (data && data.match) {
+            $.post("/api/saveBolool", { match: JSON.stringify(data.match), matchlist: data.matchListHistory.matchlist, bolool: JSON.stringify(data.boloolData) }, function (cc) {
+                console.log(cc);
+            });
+            setMatchBoloolData(id, data);
+        }
+    }
+}
+
+function getBoloolFromResult(hResult, aResult, topN) {
+    if (!topN) {
+        topN = 3;
+    }
+    if (!hResult || !aResult || hResult.length < topN || aResult.length < topN) {
+        return { hresult: "--", aresult: "--", hscore: "--", ascore: "--", hstrong: "--", astrong: "--" };
+    }
+    var hresult = hResult.substring(0, topN).replace(/赢/g, "3").replace(/平/g, "1").replace(/输/g, "0");
+    var aresult = aResult.substring(0, topN).replace(/赢/g, "3").replace(/平/g, "1").replace(/输/g, "0");
+    var hscore = sum(hresult.split(/|/));
+    var ascore = sum(aresult.split(/|/));
+    var hstrong = getStrong(hscore, ascore);
+    var astrong = getStrong(ascore, hscore);
+    return { hresult, aresult, hscore, ascore, hstrong, astrong };
 }
 
 //获取分区
 function getScoreSection(score, count) {
     score = parseInt(score)
-    if(isNaN(score)){
-    	return -1;
+    if (isNaN(score)) {
+        return -1;
     }
     if (count < 33) {
         return 9 - parseInt(score / 10);
@@ -311,16 +311,16 @@ function getBolool(hbolool, abolool) {
     return bolool;
 }
 
-function getMatchDataFromHistoryJson(json){
-	if(json.matchlist){
-		var matchlist = JSON.parse(json.matchlist);
-		var match = json;
-		var all_h = matchlist.h;
-		var all_a = matchlist.a;
-		var boloolData = getBoloolData(match,all_h, all_a);
-		return boloolData;
-	}
-	return null;
+function getMatchDataFromHistoryJson(json) {
+    if (json.matchlist) {
+        var matchlist = JSON.parse(json.matchlist);
+        var match = json;
+        var all_h = matchlist.h;
+        var all_a = matchlist.a;
+        var boloolData = getBoloolData(match, all_h, all_a);
+        return boloolData;
+    }
+    return null;
 }
 
 function getMatchDataFromHistoryHtml(d, id) {
@@ -329,8 +329,8 @@ function getMatchDataFromHistoryHtml(d, id) {
     var tds = tr.find("td");
     var ahref = $(tds[0]).find("a").attr("href");
     var leagueUrl = "";
-    if(ahref){
-    	leagueUrl=ahref.split("/");
+    if (ahref) {
+        leagueUrl = ahref.split("/");
     }
     var seasonId = parseInt(leagueUrl[5]) || 0;
     var lunci = d.find("#lunci");
@@ -429,8 +429,17 @@ function getMatchDataFromHistoryHtml(d, id) {
         }
     });
 
-    return getBoloolData(match,all_h,all_a);
+    return getBoloolData(match, all_h, all_a);
 }
+
+async function sleep(time = 0) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve();
+        }, time);
+    })
+};
+
 
 function setBolool(match) {
     $.ajax({
@@ -438,7 +447,7 @@ function setBolool(match) {
             idx = d.indexOf('var lang = 0;');
             if (idx > 0) {
                 d = d.substring(idx);
-                idx = d.indexOf("</scirpt");
+                idx = d.indexOf("</script");
                 if (idx != -1) {
                     d = d.substring(0, idx);
                     eval(d);
@@ -501,27 +510,35 @@ function setBolool(match) {
 
                     hsection = getScoreSection(hscore, 30);
                     asection = getScoreSection(ascore, 30);
-                    bolool = { hscore, ascore, hresult, aresult, hsection, asection ,id:scheduleID};
-                    matchlist[scheduleID].bolool = bolool;
-                    saveBolool(bolool);
+                    var bolool = { hscore, ascore, hresult, aresult, hsection, asection, id: scheduleID };
+                    g_match[scheduleID].bolool = bolool;
+                    if (typeof saveBolool != "undefined") {
+                        saveBolool(bolool);
+                    }
                     var bolool3 = getBoloolFromResult(bolool.hresult, bolool.aresult, 3);
-                    $("#hscore_" + id).text(bolool.hscore);
-                    $("#ascore_" + id).text(bolool.ascore);
-                    $("#hsection_" + id).text(bolool.hsection);
-                    $("#asection_" + id).text(bolool.asection);
-                    $("#hresult_" + id).title(bolool.hresult).text(bolool3.hresult);
-                    $("#aresult_" + id).title(bolool.aresult).text(bolool3.aresult);
-                    $("#hstrong_" + id).text(bolool3.hstrong);
-                    $("#astrong_" + id).text(bolool3.astrong);
+                    $("#hscore_" + bolool.id).text(bolool.hscore);
+                    $("#ascore_" + bolool.id).text(bolool.ascore);
+                    $("#hsection_" + bolool.id).text(bolool.hsection);
+                    $("#asection_" + bolool.id).text(bolool.asection);
+                    $("#hresult_" + bolool.id).attr("title",bolool.hresult).text(bolool3.hresult);
+                    $("#aresult_" + bolool.id).attr("title",bolool.aresult).text(bolool3.aresult);
+                    $("#hstrong_" + bolool.id).text(bolool3.hstrong);
+                    $("#astrong_" + bolool.id).text(bolool3.astrong);
+                } else {
+                    layer.tips("获取失败！", "#hscore_" + bolool.id);
                 }
+            } else {
+                layer.tips("获取失败！", "#hscore_" + match.id);
             }
-        }, type: "get"
+        }, type: "GET", error: () => {
+            layer.tips("获取失败！", "#hscore_" + match.id);
+        }
     });
 }
 
-function getBoloolData(match,all_h,all_a){
-	//俱乐部最近33场比赛，要去掉友谊赛
-	//国家队比赛保留友谊赛
+function getBoloolData(match, all_h, all_a) {
+    //俱乐部最近33场比赛，要去掉友谊赛
+    //国家队比赛保留友谊赛
     var isCountryTeamA = false,
         isCountryTeamH = false;
     if (typeof g_team == "object") {
@@ -564,7 +581,7 @@ function getBoloolData(match,all_h,all_a){
     bolool.id = match.id;
     boloolData["top" + topN] = bolool;
 
-   
+
 
 
     var matchListHistory = {
