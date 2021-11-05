@@ -139,7 +139,7 @@ const matchUtil = require("./matchUtils");
         }
         async function getMatchByTeam(teamId, playtime) {
             return await matchUtil.getMatchByTeam(boloolDetailPage, teamId, playtime);
-        } 
+        }
 
         var boloolPage, boloolDetailPage;
         async function boloolDetail(id) {
@@ -148,7 +148,13 @@ const matchUtil = require("./matchUtils");
                 return JSON.stringify(matchlist);
             });
             matchlist = JSON.parse(matchlist);
-            var match = matchlist[id];
+            var match;
+            for (var i = 0; i < matchlist.length; i++) {
+                if (id == matchlist[i].id) {
+                    match = matchlist[i];
+                    break;
+                }
+            }
             if (!match) {
                 Logger.error("找不到对应的比赛ID=" + id);
                 await boloolPage.evaluate((id) => {
@@ -171,15 +177,15 @@ const matchUtil = require("./matchUtils");
             await boloolDetailPage.evaluate((match) => {
                 showBolool(match);
             }, match);
-            boloolDetailPage.on('domcontentloaded',()=>{
-                boloolDetailPage.evaluate((match)=>{
+            boloolDetailPage.on('domcontentloaded', () => {
+                boloolDetailPage.evaluate((match) => {
                     showBolool(match);
-                },match);
+                }, match);
             });
         }
 
 
-        
+
 
         async function bolool(id) {
             Logger.info("打开菠萝指数");
@@ -188,7 +194,7 @@ const matchUtil = require("./matchUtils");
                 boloolPage.on('console', msg => console.log('PAGE LOG:', msg.text()));
                 await boloolPage.exposeFunction("getBoloolById", matchUtil.getBoloolById);
                 await boloolPage.exposeFunction("boloolDetail", boloolDetail);
-                await boloolPage.exposeFunction("saveBolool",  matchUtil.saveBolool);
+                await boloolPage.exposeFunction("saveBolool", matchUtil.saveBolool);
                 boloolPage.on("close", () => {
                     boloolPage = null;
                 })
@@ -209,14 +215,18 @@ const matchUtil = require("./matchUtils");
             await page.evaluate((_matchlist) => {
                 matchlist = _matchlist;
             }, matchlist);
-            await boloolPage.evaluate((matchlist) => {
-                g_match = matchlist;
-                initTable();
+            await boloolPage.evaluate((_matchlist) => {
+                g_match = {};
+                matchlist = _matchlist;
+                for (var i = 0; i < matchlist.length; i++) {
+                    g_match[matchlist[i].id] = matchlist[i];
+                }
+                initTable(matchlist);
             }, matchlist);
 
-            boloolPage.on('domcontentloaded',()=>{
-                boloolPage.evaluate(()=>{
-                    initTable();
+            boloolPage.on('domcontentloaded', () => {
+                boloolPage.evaluate(() => {
+                    initTable(matchlist);
                 });
             })
 
@@ -225,53 +235,104 @@ const matchUtil = require("./matchUtils");
                 await boloolDetailPage.bringToFront();
             }
         }
-        async function setOdds(){
-            var matchlist = await page.evaluate(() => {
-                return JSON.stringify(matchlist);
-            });
-            matchlist = JSON.parse(matchlist);
-            for (var key in matchlist) {
-                var match = matchlist[key];
-                var id = match.id;
-                if(!match.bet365_yp){
-                    var odds = await matchUtil.getOddsById(id);
-                    if(odds){
-                        match.bet365_yp=[odds.h,matchUtil.ConvertGoal(odds.pan),odds.a];
-                        match.bet365_op= [odds.s,odds.p,odds.f];
-                    }
+        async function setOdds(id) {
+            if (id) {
+                await matchUtil.deleteOddsById(id);
+                var odds = await matchUtil.getOddsById(id);
+                if (odds) {
+                    odds.pan = matchUtil.ConvertGoal(odds.pan);
+                    await page.evaluate((odds, id) => {
+                        var match;
+                        for (var i = 0; i < matchlist.length; i++) {
+                            if (id == matchlist[i].id) {
+                                match = matchlist[i];
+                                break;
+                            }
+                        }
+                        var tr = $("#m" + match.id);
+                        if (match) {
+                            match.bet365_yp = [odds.h, odds.pan, odds.a];
+                            match.bet365_op = [odds.s, odds.p, odds.f];
+                            tr.find(".td-pei div:eq(0)").html('<span>' + match.bet365_op[0] + '</span><span>' + match.bet365_op[1] + '</span><span>' + match.bet365_op[2] + '</span>');
+                            tr.find(".td-pei div:eq(1)").html('<span>' + match.bet365_yp[0] + '</span><span>' + match.bet365_yp[1] + '</span><span>' + match.bet365_yp[2] + '</span>');
+                            tr.find(".tdQing").show();
+                        } else {
+                            tr.find(".td-pei div:eq(0)").html('<span><a href="javascript:setOdds(' + match.id + ')">获取赔率</a></span>');
+                        }
+                    }, odds, id);
+                } else {
+                    await page.evaluate((id) => {
+                        var tr = $("#m" + id);
+                        layer.tips("没有获取到数据", tr.find(".td-pei div")[0]);
+                    }, id);
                 }
-            }
-            await page.evaluate((_matchlist)=>{
-                matchlist=_matchlist;
-                for(var key in matchlist){
+            } else {
+                var matchlist = await page.evaluate(() => {
+                    return JSON.stringify(matchlist);
+                });
+                matchlist = JSON.parse(matchlist);
+                var ids = [];
+                for (var key in matchlist) {
                     var match = matchlist[key];
-                    if(match.bet365_yp && match.bet365_yp[0] != 0  && match.bet365_op && match.bet365_op[0] != 0){
-                        var tr = $("#m"+key);
-                        tr.find(".td-pei div:eq(0)").html('<span>'+match.bet365_op[0]+'</span><span>'+match.bet365_op[1]+'</span><span>'+match.bet365_op[2]+'</span>');
-                        tr.find(".td-pei div:eq(1)").html('<span>'+match.bet365_yp[0]+'</span><span>'+match.bet365_yp[1]+'</span><span>'+match.bet365_yp[2]+'</span>');
-                        tr.find(".tdQing").show();
+                    var id = match.id;
+                    ids.push(id);
+                }
+
+                var oddsArr = await matchUtil.getOddsByIdArr(ids);
+                var oddsMap = {};
+                oddsArr.forEach(odds => {
+                    oddsMap[odds.matchId] = odds;
+                });
+                for (var key in matchlist) {
+                    var match = matchlist[key];
+                    var id = match.id;
+                    var odds = oddsMap[id];
+                    if (!odds || (odds.s == 0 && odds.h == 0)) {
+                        odds = await matchUtil.getOddsById(id);
+                    }
+                    if (odds) {
+                        match.bet365_yp = [odds.h, matchUtil.ConvertGoal(odds.pan), odds.a];
+                        match.bet365_op = [odds.s, odds.p, odds.f];
                     }
                 }
-                layer.closeAll();
-            },matchlist);
+
+
+                await page.evaluate((_matchlist) => {
+                    matchlist = _matchlist;
+                    for (var key in matchlist) {
+                        var match = matchlist[key];
+                        var tr = $("#m" + match.id);
+                        if (match.bet365_yp && match.bet365_yp[0] != 0 && match.bet365_op && match.bet365_op[0] != 0) {
+                            tr.find(".td-pei div:eq(0)").html('<span>' + match.bet365_op[0] + '</span><span>' + match.bet365_op[1] + '</span><span>' + match.bet365_op[2] + '</span>');
+                            tr.find(".td-pei div:eq(1)").html('<span>' + match.bet365_yp[0] + '</span><span>' + match.bet365_yp[1] + '</span><span>' + match.bet365_yp[2] + '</span>');
+                            tr.find(".tdQing").show();
+                        } else {
+                            tr.find(".td-pei div:eq(0)").html('<span><a href="javascript:setOdds(' + match.id + ')">获取赔率</a></span>');
+                        }
+                    }
+                    layer.closeAll();
+                }, matchlist);
+            }
         }
 
-        async function refreshOdds(){
+        async function refreshOdds() {
             var matchlist = await page.evaluate(() => {
                 layer.load();
-                for(var key in matchlist){
+                for (var key in matchlist) {
                     var match = matchlist[key];
-                    match.bet365_yp=null;
-                    match.bet365_op=null;
+                    match.bet365_yp = null;
+                    match.bet365_op = null;
                 }
                 return JSON.stringify(matchlist);
             });
             matchlist = JSON.parse(matchlist);
+            var ids = [];
             for (var key in matchlist) {
                 var match = matchlist[key];
                 var id = match.id;
-                await matchUtil.deleteOddsById(id);
+                ids.push(id);
             }
+            await matchUtil.deleteOddsById(ids.join(","));
             await setOdds();
         }
 
@@ -284,7 +345,7 @@ const matchUtil = require("./matchUtils");
         await page.exposeFunction("bolool", bolool);
         await page.exposeFunction("setOdds", setOdds);
         await page.exposeFunction("refreshOdds", refreshOdds);
-        page.on("domcontentloaded",async ()=>{
+        page.on("domcontentloaded", async () => {
             await Util.addCollectionButton(page);
         });
         await Util.addCollectionButton(page);

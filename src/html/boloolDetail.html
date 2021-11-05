@@ -205,6 +205,9 @@
 
 				</tbody>				
 			</table>
+			<p></p>
+			<p></p>
+			<p></p>
 		</div>
 	</div>
 	<p></p>
@@ -547,12 +550,13 @@
 			html.push("<td>" + bolool.ascore + "</td>");
 			html.push("<td>" + bolool.hsection + "</td>");
 			html.push("<td>" + bolool.asection + "</td>");
-			html.push("<td title='" + bolool.hresult + "'>" + bolool.hresult.substring(0, 3) + "</td>");
-			html.push("<td title='" + bolool.hresult + "'>" + bolool.aresult.substring(0, 3) + "</td>");
-			var hstrong = getStrong(bolool.hscore, bolool.ascore);
-			var astrong = getStrong(bolool.ascore, bolool.hscore);
-			html.push("<td>" + hstrong + "</td>");
-			html.push("<td>" + astrong + "</td>");
+			var bolool3 = getBoloolFromResult(bolool.hresult, bolool.aresult, 3);
+			thisMatch.hstrong = bolool3.hstrong;
+			thisMatch.astrong = bolool3.astrong;
+			html.push("<td title='" + bolool.hresult + "'>" + bolool3.hresult + "</td>");
+			html.push("<td title='" + bolool.hresult + "'>" + bolool3.aresult + "</td>");
+			html.push("<td>" + bolool3.hstrong + "</td>");
+			html.push("<td>" + bolool3.astrong + "</td>");
 		} else {
 			html.push("<td id='hscore_" + match.id + "'><a href='javascript:void(0)' onclick='setBoloolById(" + match.id + ")'>获取</a></td>");
 			html.push("<td id='ascore_" + match.id + "'>--</td>");

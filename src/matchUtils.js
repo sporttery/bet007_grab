@@ -390,7 +390,7 @@ async function getBoloolListByOdds(europe, asia) {
     var asiaOdds = asia.split(" ");
     var pan = asiaOdds[1];
     var sql = "SELECT o.matchId,o.s,o.p,o.f,o.h,o.pan,o.a,m.leagueId,m.leagueName,m.homeId,m.homeName,m.awayId,m.awayName,m.fullscore,m.halfscore, date_format(m.playtime,'%m-%d %H:%i') as playtime," +
-        "b.hscore,ascore,hresult,aresult,hsection,asection from t_match_odds o left join t_match m on o.matchId=m.id left join t_bolool30 b on m.id = b.id where company='BET365'" +
+        "b.hscore,ascore,hresult,aresult,hsection,asection from t_match_odds o inner join t_match m on o.matchId=m.id left join t_bolool30 b on m.id = b.id where company='BET365'" +
         " and (s=" + europeOdds[0] + " and p=" + europeOdds[1] +
         " and f=" + europeOdds[2] + ") or (h=" + asiaOdds[0] + "  and a=" + asiaOdds[2] + " and pan='" + pan + "') order by m.playtime desc ";
     console.info(sql);
@@ -404,7 +404,7 @@ var proxy = { data: false };
 async function getOddsById(id) {
     sql = "select o.matchId,o.s,o.p,o.f,o.h,o.pan,o.a from t_match_odds o where id = '" + id + "-Bet365'";
     var rs = await DBHelper.query(sql);
-    if (rs && rs.length > 0) {
+    if (rs && rs.length > 0 && (rs[0].s != 0 || rs[0].h != 0)) {
         return rs[0];
     }
     retry = 2;
@@ -415,7 +415,8 @@ async function getOddsById(id) {
         var europeUrl = "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
         var curl = 'curl ' + proxyIp + ' "' + europeUrl + '" -s | iconv -f gbk -t utf-8'
         var odata = { id, europeOdds: null, asiaOdds: false, company: "Bet365", len: 99999999 };
-        var response = await Utils.getByCurl(curl);
+        // var response = await Utils.getByCurl(curl);
+        var response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 3);
         if (response) {
             console.info(europeUrl + " 获取完成");
             odds = getOdds(response);
@@ -423,14 +424,17 @@ async function getOddsById(id) {
             odata.europeOdds = odds;
             var asiaUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
             curl = 'curl ' + proxyIp + ' "' + asiaUrl + '" -s | iconv -f gbk -t utf-8'
-            // response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 1);
-            response = await Utils.getByCurl(curl);
+            response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 5);
+            // response = await Utils.getByCurl(curl);
             if (response) {
                 console.info(asiaUrl + " 获取完成");
                 odds = getOdds(response);
                 // console.info(odds);
                 odata.asiaOdds = odds;
                 odds = getOddsData(odata);
+                if(odds.s == 0 && odds.h == 0){
+                    return null;
+                }
                 await DBHelper.saveModel(odds, "t_match_odds");
                 return odds;
             } else {
@@ -493,13 +497,29 @@ async function saveOdds(odds) {
 
 
 async function deleteOddsById(id){
-    var sql = "delete from t_match_odds where id = '" + id+"-Bet365'";
+    var idArr = (id+"").split(",");
+    var values = [];
+    for(var i=0;i<idArr.length;i++){
+        values.push("'"+idArr[i]+"-Bet365'");
+    }
+    var sql = "delete from t_match_odds where id in ("+values.join(",")+")";
     console.info(sql);
     var rs = await DBHelper.query(sql);
     console.info(rs);
 }
 
+async function getOddsByIdArr(idArr){
+    var values = [];
+    for(var i=0;i<idArr.length;i++){
+        values.push("'"+idArr[i]+"-Bet365'");
+    }
+    var sql = "select o.matchId,o.s,o.p,o.f,o.h,o.pan,o.a from t_match_odds o where id in ("+values.join(",")+")";
+    var rs = await DBHelper.query(sql);
+    return rs;
+}
+
 module.exports = {
     getMatchByTeam,
-    getMatchOdds, getScoreSection, getBoloolById, getBoloolListByOdds, saveBolool, getOddsById, saveOdds, ConvertGoal,deleteOddsById
+    getMatchOdds, getScoreSection, getBoloolById, getBoloolListByOdds, saveBolool, getOddsById, saveOdds, ConvertGoal,
+    deleteOddsById,getOddsByIdArr
 }

@@ -95,7 +95,7 @@
 			}
 		}
 	}
-	var g_match = {}, g_team, g_data, updateData = {};
+	var g_match = {}, g_team, g_data, updateData = {},matchlist=[];
 	var params = getRequest();
 	$(() => {
 		var headhtml = [];
@@ -169,18 +169,11 @@
 		}
 	}
 	async function initTable(matchlist) {
-		if (!matchlist) {
-			matchlist = g_match;
-		}
+		
 		var html = [];
-		var arr = [];
+		
 		for (var key in matchlist) {
 			var match = matchlist[key];
-			arr.push(match);
-		}
-		arr.sort(sortBy("playtime"))
-		for (var key in arr) {
-			var match = arr[key];
 			if (!match.score && match.fullscore) {
 				match.score = match.fullscore;
 			}

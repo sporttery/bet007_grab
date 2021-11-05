@@ -50,12 +50,9 @@
                                             <p class="betbtn" onclick="beidan()"><a href="javascript:void(0)">北单</a></p>
                                             <p class="betbtn" onclick="zucai()"><a href="javascript:void(0)">足彩14场</a>
                                             </p>
-                                            <p class="betbtn" onclick="gotoBolool()"><a href="javascript:void(0)"
-                                                    style="color: red;">菠萝指数</a>
-                                            </p>
-                                            <p class="betbtn" onclick="refreshOdds()"><a href="javascript:void(0)"
-                                                    style="color: red;">刷新赔率</a>
-                                            </p>
+                                            &nbsp;&nbsp;&nbsp;<a href="javascript:gotoBolool()" style="color: blue;cursor: pointer;line-height:38px;">菠萝指数</a> &nbsp;
+                                            <a href="javascript:setOddsByIds()" style="color: blue;cursor: pointer;line-height:38px;">批量获取赔率</a>&nbsp;
+                                            <a href="javascript:refreshOdds()" style="color: blue;cursor: pointer;line-height:38px;">赔率不准</a>&nbsp;
                                         </div>
                                     </div>
                                 </td>
@@ -174,12 +171,12 @@
     }
     var op101 = {};
     var yp101 = {};
-    var matchlist = {};
+    var matchlist = [];
     async function getYp(id) {
         if (yp101[id]) {
             return yp101[id];
         }
-        var odds = await getOddsById(id + "-Bet365");
+        var odds = await getOddsById(id);
         if (odds) {
             yp101[id] = [odds.h, Goal2GoalCn(odds.pan), odds.a];
             op101[id] = [odds.s, odds.p, odds.f];
@@ -239,18 +236,28 @@
         var d = $(tds[2]).text().trim();
         var a = $(tds[3]).text().trim();
         if (company.indexOf("365") != -1 && h != "" && d != "" && a != "") {
-            return [isNaN(h) ? 0 : parseFloat(h), isNaN(d) ? 0 : parseFloat(d), isNaN(a) ? 0 : parseFloat(a)];
+            return [isNaN(h) ? 0 : parseFloat(h), isNaN(d) ? d : parseFloat(d), isNaN(a) ? 0 : parseFloat(a)];
         } else {
             return [0, 0, 0];
         }
     }
 
 
+    function setOddsByIds(){
+        for(var key in matchlist){
+            var match = matchlist[key];
+            if(!match.bet365_yp){
+                layer.load();
+                setOdds(match.id);
+            }
+        }
+    }
+
     function jingcai() {
         if (!tab(0)) {
             return;
         }
-        matchlist = {};
+        matchlist = [];
         layer.load();
         $.ajax({
             url: "http://www.310win.com/buy/jingcai.aspx?typeID=105&oddstype=2", async: false, type: "get", success: function (d) {
@@ -295,14 +302,14 @@
                     var a1 = $(rqspf[3]).text();
 
                     var match = { leagueId, leagueName, leagueColor, jcmatchId, week, num, playtime, homeName, homeId, awayName, awayId, h, d, a, rq, h1, d1, a1, id, score };
-                    matchlist[id] = match;
+                    matchlist.push(match) ;
                 });
             }
         })
         var html = [];
         for (var key in matchlist) {
             var match = matchlist[key];
-            html.push('<tr class="bet-tb-tr" id="m' + key + '">');
+            html.push('<tr class="bet-tb-tr" id="m' + match.id + '">');
             html.push('<td class="td td-no"><a href="javascript:;" class="bet-evt-hide" >' + match.week + match.num + '</a></td>');
             html.push('<td class="td td-evt"><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html" target="_blank" style="background:' + match.leagueColor + ';" >' + match.leagueName + '</a></td>');
             html.push('<td class="td td-endtime" title="' + match.playtime + '截止">' + match.playtime.substring(5) + '</td>');
@@ -333,7 +340,7 @@
             html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red" >情</a>');
 
             html.push('</td><td class="td td-pei">');
-            html.push('<div class="betbtn-row itm-rangB1">');
+            html.push('<div class="betbtn-row itm-rangB1"><span><a href="javascript:setOdds('+match.id+')">获取赔率</a></span>');
             html.push('</div>');
             html.push('<div class="betbtn-row itm-rangB2">');
             html.push('</div>');
@@ -350,7 +357,7 @@
         if (!tab(1)) {
             return;
         }
-        matchlist = {};
+        matchlist = [];
         layer.load();
         $.ajax({
             url: "http://www.310win.com/buy/DanChang.aspx?typeID=5", async: false, type: "get", success: function (d) {
@@ -398,11 +405,10 @@
                     var a = $(tds[15]).text();
 
                     var match = { leagueId, leagueName, leagueColor, jcmatchId, week, num, playtime, homeName, homeId, awayName, awayId, h, d, a, rq, id, score, halfscore };
-                    matchlist[id] = match;
+                    matchlist.push(match);
                 });
             }
         })
-        // console.info(matchlist);
         var html = [];
         for (var key in matchlist) {
             var match = matchlist[key];
@@ -433,7 +439,7 @@
             html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');"  style="color:red" >情</a>');
 
             html.push('</td><td class="td td-pei">');
-            html.push('<div class="betbtn-row itm-rangB1">');
+            html.push('<div class="betbtn-row itm-rangB1"><span><a href="javascript:setOdds('+match.id+')">获取赔率</a></span>');
             html.push('</div>');
             html.push('<div class="betbtn-row itm-rangB2">');
             html.push('</div>');
@@ -450,7 +456,7 @@
         if (!tab(2)) {
             return;
         }
-        matchlist = {};
+        matchlist = [];
         layer.load();
         $.ajax({
             url: "http://www.310win.com/buy/toto14.aspx", async: false, type: "get", success: function (d) {
@@ -487,12 +493,11 @@
                     var awayId = ids[1];
 
                     var match = { leagueId, leagueName, leagueColor, num, playtime, homeName, homeId, awayName, awayId, id };
-                    matchlist[id] = match;
+                    matchlist.push(match) ;
                 });
             }
         })
         var html = [];
-        // console.info(matchlist);
         for (var key in matchlist) {
             var match = matchlist[key];
             html.push('<tr class="bet-tb-tr" id="m' + match.id + '">');
@@ -516,7 +521,7 @@
             html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red" >情</a>');
 
             html.push('</td><td class="td td-pei">');
-            html.push('<div class="betbtn-row itm-rangB1">');
+            html.push('<div class="betbtn-row itm-rangB1"><span><a href="javascript:setOdds('+match.id+')">获取赔率</a></span>');
             html.push('</div>');
             html.push('<div class="betbtn-row itm-rangB2">');
             html.push('</div>');
