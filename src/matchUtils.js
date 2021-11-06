@@ -435,7 +435,7 @@ async function getOddsById(id) {
                 if(odds.s == 0 && odds.h == 0){
                     return null;
                 }
-                await DBHelper.saveModel(odds, "t_match_odds");
+                await DBHelper.saveModel(odds, "t_match_odds",true);
                 return odds;
             } else {
                 proxy = await Utils.getProxy();

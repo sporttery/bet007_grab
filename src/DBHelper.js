@@ -53,14 +53,14 @@ const updateKey = { "fullscore": true, "halfscore": true, "result": true, "homeR
  * 单个更新入库
  * @param model 
  */
-async function saveModel(model, tableName = "t_match") {
+async function saveModel(model, tableName = "t_match",focusUpdate = false) {
     Logger.info("数据入库 " + tableName, model);
     let columns = [], values = [], params = [], update = [], updateValue = [];
     for (var key in model) {
         columns.push(key);
         values.push("?");
         params.push(model[key]);
-        if (updateKey[key]) {
+        if (updateKey[key] || focusUpdate) {
             update.push(key + "=?");
             updateValue.push(model[key]);
         }
