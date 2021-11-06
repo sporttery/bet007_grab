@@ -237,7 +237,7 @@ const matchUtil = require("./matchUtils");
         }
         async function setOdds(id) {
             if (id) {
-                await matchUtil.deleteOddsById(id);
+                // await matchUtil.deleteOddsById(id);
                 var odds = await matchUtil.getOddsById(id);
                 if (odds) {
                     odds.pan = matchUtil.ConvertGoal(odds.pan);
@@ -259,11 +259,13 @@ const matchUtil = require("./matchUtils");
                         } else {
                             tr.find(".td-pei div:eq(0)").html('<span><a href="javascript:setOdds(' + match.id + ')">获取赔率</a></span>');
                         }
+                        layer.closeAll();
                     }, odds, id);
                 } else {
                     await page.evaluate((id) => {
                         var tr = $("#m" + id);
                         layer.tips("没有获取到数据", tr.find(".td-pei div")[0]);
+                        setTimeout(()=>{layer.closeAll()},1000);
                     }, id);
                 }
             } else {
