@@ -164,6 +164,7 @@ const urls = [
   { "name": "A3冠军杯", "url": "http://zq.win007.com/cn/CupMatch/187.html","id":187 },
   { "name": "大冠杯", "url": "http://zq.win007.com/cn/CupMatch/543.html","id":543 },
   { "name": "世界杯", "url": "http://zq.win007.com/cn/CupMatch/75.html","id":75 },
+  { "name": "球会友谊", "url": "http://zq.win007.com/cn/CupMatch/41.html","id":41 },
   { "name": "欧洲预选", "url": "http://zq.win007.com/cn/CupMatch/650.html","id":650 },
   { "name": "亚洲预选", "url": "http://zq.win007.com/cn/CupMatch/648.html","id":648 },
   { "name": "南美预选", "url": "http://zq.win007.com/cn/CupMatch/652.html","id":652 },
