@@ -450,6 +450,79 @@ async function getOddsById(id) {
     return null;
 }
 
+async function getAsiaOdds(id) {
+    sql = "select o.matchId,o.h,o.pan,o.a from t_match_odds o where id = '" + id + "-Bet365'";
+    var rs = await DBHelper.query(sql);
+    if (rs && rs.length > 0 &&   rs[0].h != 0&& rs[0].h!= null ) {
+        return rs[0];
+    }
+    retry = 2;
+    count = 1;
+    do {
+        var proxyIp = (proxy.data ? " -x socks5://" + proxy.data[0].ip + ":" + proxy.data[0].port : "");
+        //同步处理
+        var asiaUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
+        var curl = 'curl ' + proxyIp + ' "' + asiaUrl + '" -s | iconv -f gbk -t utf-8'
+        response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 5);
+        // response = await Utils.getByCurl(curl);
+        if (response) {
+            console.info(asiaUrl + " 获取完成");
+            odds = getOdds(response);
+            console.info(odds);
+            if(odds[0]!=0 && !isNaN(odds[0])){
+                sql = "insert into t_match_odds(id,matchId,h,pan,a,company) values('"+id+"-Bet365',"+id+","+odds[0]+",'"+odds[1]+"',"+odds[2]+",'Bet365') ON DUPLICATE KEY UPDATE h=values(h),pan=values(pan),a=values(a) ";
+                var rs = await DBHelper.query(sql);
+                console.info(rs);
+                return {matchId:id,h:odds[0],pan:odds[1],a:odds[2]};
+            }else{
+                return null;
+            }
+        } else {
+            proxy = await Utils.getProxy();
+            console.error("获取新的代理IP" + JSON.stringify(proxy));
+        }
+        console.info("第" + count + "次重试");
+    } while (count++ < retry);
+    return null;
+}
+
+
+async function getEuropeOdds(id) {
+    sql = "select o.matchId,o.s,o.p,o.f from t_match_odds o where id = '" + id + "-Bet365'";
+    var rs = await DBHelper.query(sql);
+    if (rs && rs.length > 0 &&  rs[0].s != 0 && rs[0].s != null ) {
+        return rs[0];
+    }
+    retry = 2;
+    count = 1;
+    do {
+        var proxyIp = (proxy.data ? " -x socks5://" + proxy.data[0].ip + ":" + proxy.data[0].port : "");
+        //同步处理
+        var europeUrl = "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
+        var curl = 'curl ' + proxyIp + ' "' + europeUrl + '" -s | iconv -f gbk -t utf-8'
+        // var response = await Utils.getByCurl(curl);
+        var response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 3);
+        if(response){
+            console.info(europeUrl + " 获取完成");
+            odds = getOdds(response);
+            console.info(odds);
+            if(odds[0]!=0 && !isNaN(odds[0])){
+                sql = "insert into t_match_odds(id,matchId,s,p,f,company) values('"+id+"-Bet365',"+id+","+odds[0]+",'"+odds[1]+"',"+odds[2]+",'Bet365') ON DUPLICATE KEY UPDATE s=values(s),p=values(p),f=values(f) ";
+                var rs = await DBHelper.query(sql);
+                console.info(rs);
+                return {matchId:id,s:odds[0],p:odds[1],f:odds[2]};;
+            }else{
+                return null;
+            }
+        } else {
+            proxy = await Utils.getProxy();
+            console.error("获取新的代理IP" + JSON.stringify(proxy));
+        }
+        console.info("第" + count + "次重试");
+    } while (count++ < retry);
+    return null;
+}
+
 function getOdds(stdout) {
     var nH = Utils.safeHtml(stdout);
     const $ = cheerio.load(nH, { decodeEntities: false }, false);
@@ -521,5 +594,5 @@ async function getOddsByIdArr(idArr){
 module.exports = {
     getMatchByTeam,
     getMatchOdds, getScoreSection, getBoloolById, getBoloolListByOdds, saveBolool, getOddsById, saveOdds, ConvertGoal,
-    deleteOddsById,getOddsByIdArr
+    deleteOddsById,getOddsByIdArr,getEuropeOdds,getAsiaOdds
 }

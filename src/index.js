@@ -141,6 +141,17 @@ const matchUtil = require("./matchUtils");
             return await matchUtil.getMatchByTeam(boloolDetailPage, teamId, playtime);
         }
 
+        async function saveBolool(bolool = { hscore, ascore, hresult, aresult, hsection, asection, id }){
+            await matchUtil.saveBolool(bolool);
+            await page.evaluate(bolool=>{
+                for(var i=0;i<matchlist.length;i++){
+                    if(matchlist[i].id==bolool.id){
+                        matchlist[i].bolool=bolool;
+                    }
+                }
+            },bolool);
+        }
+
         var boloolPage, boloolDetailPage;
         async function boloolDetail(id) {
             Logger.info("打开菠萝指数详情，id=" + id);
@@ -171,7 +182,9 @@ const matchUtil = require("./matchUtils");
                 await boloolDetailPage.exposeFunction("getBoloolListByOdds", matchUtil.getBoloolListByOdds);
                 await boloolDetailPage.exposeFunction("getBoloolById", matchUtil.getBoloolById);
                 await boloolDetailPage.exposeFunction("getMatchByTeam", getMatchByTeam);
-                await boloolDetailPage.exposeFunction("saveBolool", matchUtil.saveBolool);
+                await boloolDetailPage.exposeFunction("saveBolool", saveBolool);
+                await boloolDetailPage.exposeFunction("getEuropeOdds", matchUtil.getEuropeOdds);
+                await boloolDetailPage.exposeFunction("getAsiaOdds", matchUtil.getAsiaOdds);
             }
             await boloolDetailPage.goto("file://" + __dirname + "/html/boloolDetail.html?id=" + id);
             await boloolDetailPage.evaluate((match) => {
@@ -194,7 +207,7 @@ const matchUtil = require("./matchUtils");
                 boloolPage.on('console', msg => console.log('PAGE LOG:', msg.text()));
                 await boloolPage.exposeFunction("getBoloolById", matchUtil.getBoloolById);
                 await boloolPage.exposeFunction("boloolDetail", boloolDetail);
-                await boloolPage.exposeFunction("saveBolool", matchUtil.saveBolool);
+                await boloolPage.exposeFunction("saveBolool", saveBolool);
                 boloolPage.on("close", () => {
                     boloolPage = null;
                 })
@@ -243,29 +256,37 @@ const matchUtil = require("./matchUtils");
                     odds.pan = matchUtil.ConvertGoal(odds.pan);
                     await page.evaluate((odds, id) => {
                         var match;
+
                         for (var i = 0; i < matchlist.length; i++) {
                             if (id == matchlist[i].id) {
                                 match = matchlist[i];
                                 break;
                             }
                         }
+
                         var tr = $("#m" + match.id);
                         if (match) {
                             match.bet365_yp = [odds.h, odds.pan, odds.a];
                             match.bet365_op = [odds.s, odds.p, odds.f];
+
                             tr.find(".td-pei div:eq(0)").html('<span>' + match.bet365_op[0] + '</span><span>' + match.bet365_op[1] + '</span><span>' + match.bet365_op[2] + '</span>');
                             tr.find(".td-pei div:eq(1)").html('<span>' + match.bet365_yp[0] + '</span><span>' + match.bet365_yp[1] + '</span><span>' + match.bet365_yp[2] + '</span>');
                             tr.find(".tdQing").show();
+
                         } else {
+
                             tr.find(".td-pei div:eq(0)").html('<span><a href="javascript:setOdds(' + match.id + ')">获取赔率</a></span>');
+
                         }
                         layer.closeAll();
                     }, odds, id);
                 } else {
                     await page.evaluate((id) => {
                         var tr = $("#m" + id);
+
                         layer.tips("没有获取到数据", tr.find(".td-pei div")[0]);
-                        setTimeout(()=>{layer.closeAll()},1000);
+
+                        setTimeout(() => { layer.closeAll() }, 1000);
                     }, id);
                 }
             } else {

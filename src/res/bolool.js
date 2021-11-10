@@ -460,7 +460,95 @@ async function sleep(time = 0) {
         }, time);
     })
 };
+async function setBoloolById(id) {
+    if (!id) {
+        layer.load();
+        for (var key in g_match) {
+            match = g_match[key];
+            if (!match.bolool || !match.bolool.hresult) {
+                setBolool(match);
+                await sleep(1000);
+            }
+        }
+        layer.closeAll();
+    } else {
+        var match = g_match[id];
+        setBolool(match);
+    }
+}
 
+async function setOddsById(id) {
+    if (id) {
+        var tr = $("#bolool_" + id);
+        if (!tr) {
+            tr = $("#m_" + id);
+        }
+        var match = g_match[id];
+        if (match) {
+            if (!match.h) {
+                odds = await getAsiaOdds(id);
+                if (odds && odds.h && odds.h != '0' && !isNaN(odds.h)) {
+                    match.h = odds.h;
+                    match.pan = odds.pan;
+                    match.a = odds.a;
+                    var oddsStr = odds.h + " " + odds.pan + " " + odds.a;
+                    tr.attr("data-asia", oddsStr);
+                    if (!asiaMap[oddsStr]) {
+                        asiaMap[oddsStr] = [];
+                    }
+                    asiaMap[oddsStr].push(match.id);
+                    if (oddsStr == $("#matchAsia").val()) {
+                        tr.find("#h_" + match.id).addClass("red").text(odds.h);
+                        tr.find("#pan_" + match.id).addClass("red").text(odds.pan);
+                        tr.find("#a_" + match.id).addClass("red").text(odds.a);
+                    } else {
+                        tr.find("#h_" + match.id).text(odds.h);
+                        tr.find("#pan_" + match.id).text(odds.pan);
+                        tr.find("#a_" + match.id).text(odds.a);
+                    }
+                } else {
+                    layer.tips("获取失败", tr.find("#h_" + match.id)[0]);
+                }
+            }
+            if (!match.s) {
+                odds = await getEuropeOdds(id);
+                if (odds && odds.s && odds.s != '0' && !isNaN(odds.s)) {
+                    match.s = odds.s;
+                    match.p = odds.p;
+                    match.f = odds.f;
+                    var oddsStr = odds.s + " " + odds.p + " " + odds.f;
+                    tr.attr("data-europe", oddsStr);
+                    if (!europeMap[oddsStr]) {
+                        europeMap[oddsStr] = [];
+                    }
+                    europeMap[oddsStr].push(match.id);
+                    if (oddsStr == $("#matchEurope").val()) {
+                        tr.find("#s_" + match.id).addClass("red").text(odds.s);
+                        tr.find("#p_" + match.id).addClass("red").text(odds.p);
+                        tr.find("#f_" + match.id).addClass("red").text(odds.f);
+                    } else {
+                        tr.find("#s_" + match.id).text(odds.s);
+                        tr.find("#p_" + match.id).text(odds.p);
+                        tr.find("#f_" + match.id).text(odds.f);
+                    }
+                } else {
+                    layer.tips("获取失败", tr.find("#s_" + match.id)[0]);
+                }
+            }
+        } else {
+            layer.alert("比赛ID" + id + " 错误 ");
+        }
+    } else {
+        layer.load();
+        for (var key in g_match) {
+            var match = g_match[key];
+            var id = match.id;
+            await setOddsById(id);
+        }
+        oddsSec();
+        layer.closeAll();
+    }
+}
 
 function setBolool(match) {
     $.ajax({
@@ -545,6 +633,12 @@ function setBolool(match) {
                     $("#aresult_" + bolool.id).attr("title", bolool.aresult).text(bolool3.aresult);
                     $("#hstrong_" + bolool.id).text(bolool3.hstrong);
                     $("#astrong_" + bolool.id).text(bolool3.astrong);
+                    $("#bolool_" + bolool.id).removeClass("noBolool").attr({
+                        "data-hsection": bolool.hsection,
+                        "data-asection": bolool.asection, "data-hscore": bolool.hscore,
+                        "data-ascore": bolool.ascore, "data-hstrong": bolool3.hstrong,
+                        "data-astrong": bolool3.astrong
+                    });
                 } else {
                     layer.tips("获取失败！", "#hscore_" + bolool.id);
                 }
@@ -553,6 +647,7 @@ function setBolool(match) {
             }
         }, type: "GET", error: () => {
             layer.tips("获取失败！", "#hscore_" + match.id);
+            window.open("http://zq.win007.com/analysis/" + match.id + "cn.htm");
         }
     });
 }
