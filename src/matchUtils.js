@@ -398,7 +398,7 @@ async function getBoloolListByOdds(europe, asia) {
 }
 
 async function saveBolool(bolool) {
-    return await DBHelper.saveModel(bolool, "t_bolool30");
+    return await DBHelper.saveModel(bolool, "t_bolool30",true);
 }
 var proxy = { data: false };
 async function getOddsById(id) {

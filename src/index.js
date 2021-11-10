@@ -182,6 +182,7 @@ const matchUtil = require("./matchUtils");
                 await boloolDetailPage.exposeFunction("saveBolool", saveBolool);
                 await boloolDetailPage.exposeFunction("getEuropeOdds", matchUtil.getEuropeOdds);
                 await boloolDetailPage.exposeFunction("getAsiaOdds", matchUtil.getAsiaOdds);
+                await boloolDetailPage.exposeFunction("deleteOddsById", matchUtil.deleteOddsById);
             }
             await boloolDetailPage.goto("file://" + __dirname + "/html/boloolDetail.html?id=" + id);
             await boloolDetailPage.evaluate((match) => {
@@ -205,6 +206,9 @@ const matchUtil = require("./matchUtils");
                 await boloolPage.exposeFunction("getBoloolById", matchUtil.getBoloolById);
                 await boloolPage.exposeFunction("boloolDetail", boloolDetail);
                 await boloolPage.exposeFunction("saveBolool", saveBolool);
+                await boloolPage.exposeFunction("deleteOddsById", matchUtil.deleteOddsById);
+                await boloolPage.exposeFunction("getEuropeOdds", matchUtil.getEuropeOdds);
+                await boloolPage.exposeFunction("getAsiaOdds", matchUtil.getAsiaOdds);
                 boloolPage.on("close", () => {
                     boloolPage = null;
                 })

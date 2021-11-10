@@ -228,11 +228,13 @@
 			html.push("<td>");
 
 			if (match.bet365_op && match.bet365_op[0] != '-' && match.bet365_yp && match.bet365_yp[0] != '-') {
-				html.push("<a href='javascript:boloolDetail(" + match.id + ")' style='color:red'>情</a>&nbsp;");
+				html.push("<a href='javascript:boloolDetail(" + match.id + ")' style='color:red'>情</a>");
 			}
-			html.push("	<a href='javascript:setOddsById("+match.id+")'>赔</a>&nbsp;");
-			html.push("	<a href='javascript:setBoloolById(" + match.id + ")'>积</a>&nbsp;");
-			html.push("	<a href='http://www.310win.com/analysis/" + match.id + ".htm' target='_blank'>析</a></td>");
+			html.push("<a class='btn btn-link'  href='javascript:refreshOddsById("+match.id+")' style='color:red'>赔</a>");
+			html.push("<a class='btn btn-link'  href='javascript:setBoloolById(" + match.id + ")' style='color:red'>积</a>");
+            html.push('<br/><a  class="btn btn-link"   href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
+            html.push('<a class="btn btn-link"   href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
+			html.push("	<a class='btn btn-link'   href='http://www.310win.com/analysis/" + match.id + ".htm' target='_blank'>析</a></td>");
 			html.push('</tr>');
 		}
 		$("#matchlistTable").html(html.join(""));

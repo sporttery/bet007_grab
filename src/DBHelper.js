@@ -61,8 +61,10 @@ async function saveModel(model, tableName = "t_match",focusUpdate = false) {
         values.push("?");
         params.push(model[key]);
         if (updateKey[key] || focusUpdate) {
-            update.push(key + "=?");
-            updateValue.push(model[key]);
+            if(key != "id"){
+                update.push(key + "=?");
+                updateValue.push(model[key]);
+            }
         }
     }
     params = params.concat(updateValue);

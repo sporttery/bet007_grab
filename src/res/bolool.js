@@ -477,10 +477,34 @@ async function setBoloolById(id) {
     }
 }
 
+function refreshOddsById(id){
+    var match = g_match[id];
+    if (match) {
+        layer.load();
+        match.h=false;
+        match.s=false;
+        var tr = $("#bolool_" + id);
+        if (!tr|| tr.length == 0) {
+            tr = $("#m_" + id);
+        }
+        tr.find("#h_" + match.id).text("--");
+        tr.find("#pan_" + match.id).text("--");
+        tr.find("#a_" + match.id).text("--");
+        tr.find("#s_" + match.id).text("--");
+        tr.find("#p_" + match.id).text("--");
+        tr.find("#f_" + match.id).text("--");
+        setTimeout( async ()=>{
+           await deleteOddsById(id);
+           await setOddsById(id);
+           layer.closeAll();
+        },500);
+    }
+}
+var europeMap = {},asiaMap = {};
 async function setOddsById(id) {
     if (id) {
         var tr = $("#bolool_" + id);
-        if (!tr) {
+        if (!tr || tr.length == 0) {
             tr = $("#m_" + id);
         }
         var match = g_match[id];
@@ -545,7 +569,9 @@ async function setOddsById(id) {
             var id = match.id;
             await setOddsById(id);
         }
-        oddsSec();
+        if(typeof oddsSec != "undefined"){
+            oddsSec();
+        } 
         layer.closeAll();
     }
 }

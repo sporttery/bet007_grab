@@ -163,7 +163,7 @@
 						<th colspan="2" style="text-align:center">强弱<label for="sameStrong"
 								style="cursor: pointer; font-size: 22px; color: red;"><input id="sameStrong"
 									type="checkbox" onchange="sameStrong()" />同</label></th>
-						<th rowspan="2" style="text-align:center">分析</th>
+						<th rowspan="2" style="text-align:center">操作</th>
 					</tr>
 					<tr>
 						<!-- europe -->
@@ -686,11 +686,11 @@
 					html.push('<td>' + bolool3.astrong + '</td>');
 				}
 				html.push('<td>   ');
-				html.push("	<a href='javascript:setOddsById("+match.id+")'>赔</a>&nbsp;");
-				html.push("	<a href='javascript:setBoloolById(" + match.id + ")'>积</a>&nbsp;");
+				html.push("<a class='btn btn-link'  href='javascript:refreshOddsById("+match.id+")' style='color:red'>赔</a>");
+				html.push("<a class='btn btn-link'  href='javascript:setBoloolById(" + match.id + ")' style='color:red'>积</a>");
+				html.push('<br/><a class="ao jc-link" href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>&nbsp;');
+				html.push('<a class="ao jc-link"  href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>&nbsp;');
 				html.push('<a class="ao jc-link" href="http://www.310win.com/analysis/' + match.id + '.htm" target="_blank">析</a>');
-				// html.push('<a class="ao jc-link"  href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
-				// html.push('<a class="ao jc-link" href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
 				html.push('</td>   ');
 				g_match[match.id] = match;
 				html.push('</tr>');
@@ -707,20 +707,22 @@
 	function oddsSec(){
 		var europe = $("#matchEurope").val();
 		var asia = $("#matchAsia").val();
-		html = [allOption];
-		var keys = Object.keys(europeMap);
-		keys.sort();
-		keys.forEach((key) => {
-			html.push('<option value="' + key + '" class="' + (key == europe ? "sameOdds" : "") + '">' + key + '</option>');
-		});
-		$("#europeSec").html(html.join('')).parent().show();
-		html = [allOption];
-		var keys = Object.keys(asiaMap);
-		keys.sort();
-		keys.forEach((key) => {
-			html.push('<option value="' + key + '" class="' + (key == asia ? "sameOdds" : "") + '">' + key + '</option>');
-		});
-		$("#asiaSec").html(html.join('')).parent().show();
+		if($("#europeSec").length==1){
+			html = [allOption];
+			var keys = Object.keys(europeMap);
+			keys.sort();
+			keys.forEach((key) => {
+				html.push('<option value="' + key + '" class="' + (key == europe ? "sameOdds" : "") + '">' + key + '</option>');
+			});
+			$("#europeSec").html(html.join('')).parent().show();
+			html = [allOption];
+			var keys = Object.keys(asiaMap);
+			keys.sort();
+			keys.forEach((key) => {
+				html.push('<option value="' + key + '" class="' + (key == asia ? "sameOdds" : "") + '">' + key + '</option>');
+			});
+			$("#asiaSec").html(html.join('')).parent().show();
+		}
 	}
 </script>
 
