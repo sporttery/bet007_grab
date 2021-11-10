@@ -7,10 +7,7 @@ const matchUtil = require("./matchUtils");
 (async () => {
     await Puppeteer.launch({
         headless: false,
-        defaultViewport: {
-            width: 1400,
-            height: 800
-        },
+        defaultViewport:null,
         args: ["--no-sandbox", "--disable-setuid-sandbox", '--disable-web-security', "--start-maximized"],
         executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
         // ignoreDefaultArgs:['--enable-automation'],

@@ -52,7 +52,7 @@
                                             </p>
                                             &nbsp;&nbsp;&nbsp;<a href="javascript:gotoBolool()" style="color: blue;cursor: pointer;line-height:38px;">菠萝指数</a> &nbsp;
                                             <a href="javascript:setOddsByIds()" style="color: blue;cursor: pointer;line-height:38px;">批量获取赔率</a>&nbsp;
-                                            <a href="javascript:refreshOdds()" style="color: blue;cursor: pointer;line-height:38px;">赔率不准</a>&nbsp;
+                                            <a href="javascript:resetOdds()" style="color: blue;cursor: pointer;line-height:38px;">赔率不准</a>&nbsp;
                                         </div>
                                     </div>
                                 </td>
@@ -140,6 +140,12 @@
     </div>
 </body>
 <script>
+    function resetOdds(){
+        layer.confirm("这个操作会删除赔率重新获取，时间会比较久，确认要这样做？",(b)=>{
+            refreshOdds();
+            layer.close(b);
+        });
+    }
     loadCNZZ = function () {
 
     }
