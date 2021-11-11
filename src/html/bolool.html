@@ -196,10 +196,18 @@
 			if (!match.bet365_op) {
 				match.bet365_op = [0, 0, 0];
 			}
-			html.push("<td id='s_"+match.id+"'>" + match.bet365_op[0] + "</td>");
+			if(match.bet365_op[0]==0){
+				html.push("<td id='s_"+match.id+"'><a href='javascript:void(0)' onclick='refreshOddsById(" + match.id + ")'>赔率</a></td>");
+			}else{
+				html.push("<td id='s_"+match.id+"'>" + match.bet365_op[0] + "</td>");
+			}
 			html.push("<td id='p_"+match.id+"'>" + match.bet365_op[1] + "</td>");
 			html.push("<td id='f_"+match.id+"'>" + match.bet365_op[2] + "</td>");
-			html.push("<td id='h_"+match.id+"'>" + match.bet365_yp[0] + "</td>");
+			if(match.bet365_yp[0]==0){
+				html.push("<td id='h_"+match.id+"'><a href='javascript:void(0)' onclick='refreshOddsById(" + match.id + ")'>赔率</a></td>");
+			}else{
+				html.push("<td id='h_"+match.id+"'>" + match.bet365_yp[0] + "</td>");
+			}
 			html.push("<td id='pan_"+match.id+"'>" + match.bet365_yp[1] + "</td>");
 			html.push("<td id='a_"+match.id+"'>" + match.bet365_yp[2] + "</td>");
 			var bolool = match.bolool;
