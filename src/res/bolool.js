@@ -505,7 +505,7 @@ async function setOddsById(id) {
     if (id) {
         var tr = $("#bolool_" + id);
         if (!tr || tr.length == 0) {
-            tr = $("#m_" + id);
+            tr = $("#m" + id);
         }
         var match = g_match[id];
         if (match) {

@@ -180,6 +180,9 @@
 			if (!match.score && match.fullscore) {
 				match.score = match.fullscore;
 			}
+			if(!match.num){
+				match.num = match.id;
+			}
 			html.push('<tr id="m' + match.id + '">');
 			html.push("<td>" + match.num + "</td>");
 			html.push("<td>" + match.leagueName + "</td>");
