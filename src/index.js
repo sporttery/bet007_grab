@@ -369,9 +369,10 @@ const matchUtil = require("./matchUtils");
         await page.exposeFunction("bolool", bolool);
         await page.exposeFunction("setOdds", setOdds);
         await page.exposeFunction("refreshOdds", refreshOdds);
-        page.on("domcontentloaded", async () => {
-            await Util.addCollectionButton(page);
-        });
-        await Util.addCollectionButton(page);
+        await page.exposeFunction("getMatchByDate", matchUtil.getMatchByDate);
+        // page.on("domcontentloaded", async () => {
+        //     await Util.addCollectionButton(page);
+        // });
+        // await Util.addCollectionButton(page);
     });
 })();

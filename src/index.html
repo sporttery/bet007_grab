@@ -5,13 +5,28 @@
     <meta charset="utf-8">
     <title>【竞彩足球让球胜平负】投注|代销_足彩_足球彩票_500彩票网</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <link href="https://trade.500cache.com//public/css/dxt/global_dxt.css?v=1608120126" rel="stylesheet"
+    
+    <link rel="stylesheet" href="./res/bootstrap.min.css" />
+
+	<!-- 可选的Bootstrap主题文件（一般不用引入） -->
+	<link rel="stylesheet" href="./res/bootstrap-theme.min.css" />
+
+	<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+	<script src="./res/jquery.min.js"></script>
+
+	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+	<script src="./res/bootstrap.min.js"></script>
+	<script src="./res/bootstrap-paginator.min.js"></script>
+	<link rel="stylesheet" href="./res/datetimepicker.css" />
+	<script src="./res/bootstrap-datetimepicker.min.js"></script>
+	<link rel="stylesheet" href="./res/headshrinker.min.css" />
+    <script src="res/layer-v2.3/layer/layer.js"></script>
+    <link href="https://trade.500cache.com/public/css/dxt/global_dxt.css?v=1608120126" rel="stylesheet"
         type="text/css" />
     <link
         href="https://trade.500cache.com/??/newtrade/css/newAlert.css,/newtrade/css/button.css,/newtrade/css/dxt/jc.css,/newtrade/css/dxt/process.css?v=1619146661"
         rel="stylesheet" type="text/css" />
-    <script src="https://cdn.bootcss.com/jquery/3.2.0/jquery.min.js"></script>
-    <script src="res/layer-v2.3/layer/layer.js"></script>
+   
     <style>
         #typeTab .betbtn-on a {
             color: rgb(0, 255, 98);
@@ -50,10 +65,16 @@
                                             <p class="betbtn" onclick="beidan()"><a href="javascript:void(0)">北单</a></p>
                                             <p class="betbtn" onclick="zucai()"><a href="javascript:void(0)">足彩14场</a>
                                             </p>
+                                            <p class="betbtn" id="dateTab"><a href="javascript:void(0)"></a>
+                                            </p>
                                             &nbsp;&nbsp;&nbsp;<a href="javascript:gotoBolool()" style="color: blue;cursor: pointer;line-height:38px;">菠萝指数</a> &nbsp;
                                             <a href="javascript:setOddsByIds()" style="color: blue;cursor: pointer;line-height:38px;">批量获取赔率</a>&nbsp;
                                             <a href="javascript:resetOdds()" style="color: blue;cursor: pointer;line-height:38px;">赔率不准</a>&nbsp;
+                                            &nbsp;&nbsp;
+                                        <label for="date">日期</label><input type="text" id="date" class="datetimepicker"
+				                                    data-date-format="yyyy-mm-dd" onchange="showdate(this.value)" />
                                         </div>
+			
                                     </div>
                                 </td>
                             </tr>
@@ -140,6 +161,7 @@
     </div>
 </body>
 <script>
+    
     function resetOdds(){
         layer.confirm("这个操作会删除赔率重新获取，时间会比较久，确认要这样做？",(b)=>{
             refreshOdds();
@@ -167,7 +189,13 @@
         }
     }
     // $.ajaxSetup({async:false});
-    function tab(idx) {
+    function tab(idx,date) {
+        if(date){
+            $("#dateTab").find("a").text(date);
+        }else{
+            $("#dateTab").find("a").text('');
+            $("#date").val('');
+        }
         if ($("#typeTab").find("p:eq(" + idx + ")").hasClass("betbtn-on")) {
             return false;
         }
@@ -539,8 +567,83 @@
             setOdds();
         }, 500);
     }
-    $(() => {
+    function showdate(date){
+        if(date==""){
+            return;
+        }
+        (async(date)=>{
+            tab(3,date);            
+            matchlist=await getMatchByDate(date);
+            if(matchlist && matchlist.length>0){
+                var html = [];
+                for(var i=0;i<matchlist.length;i++){
+                    var match = matchlist[i];
+                    if(match.hscore && match.hscore!=0){
+                        match.bolool={hscore:match.hscore,ascore:match.ascore,hresult:match.hresult,aresult:match.aresult,hsection:match.hsection,asection:match.asection};
+                    }
+                    if(match.h && match.h!=0){
+                        match.bet365_yp=[match.h,match.pan,match.a];
+                    }
+                    if(match.s && match.s!=0){
+                        match.bet365_op=[match.s,match.p,match.f];
+                    }
+                    html.push('<tr class="bet-tb-tr" id="m' + match.id + '">');
+                    html.push('<td class="td td-no"><a href="javascript:;" class="bet-evt-hide" >' + match.id + '</a></td>');
+                    html.push('<td class="td td-evt"><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html" target="_blank" style="color:#000">' + match.leagueName + '</a></td>');
+                    html.push('<td class="td td-endtime" title="' + match.playtime + '截止">' + (match.playtime.substring(5)) + '</td>');
+                    html.push('<td class="td td-team">');
+                    html.push('<div class="team">');
+                    html.push('<span class="team-l"><a href="http://zq.win007.com/cn/team/TeamSche/' + match.homeId + '.html" target="_blank" class="team-l">' + match.homeName.split("(")[0].substring(0,5) + '</a></span>');
+                    if(match.fullscore){
+                        html.push('<i class="team-vs"> '+(match.fullscore+"<br/><font color=red>("+match.halfscore+")</font>")+' </i>');
+                    }else{
+                        
+                        html.push('<i class="team-vs"> VS </i>');
+                    }
+                    html.push('<span class="team-r"><a href="http://zq.win007.com/cn/team/TeamSche/' + match.awayId + '.html" target="_blank" class="team-r" >' + match.awayName.split("(")[0].substring(0,5) + '</a></span>');
+                    html.push('</div>');
+                    html.push('</td>');
+                    html.push('<td class="td td-rang">--</td>');
+                    html.push('<td class="td td-betbtn">--</td>');
 
+                    html.push('<td class="td td-data">');
+                    html.push('<a href="http://www.310win.com/analysis/' + match.id + '.htm" target="_blank">析</a>');
+                    html.push('<a href="http://www.310win.com/handicap/' + match.id + '.html" target="_blank">亚</a>');
+                    html.push('<a href="http://www.310win.com/1x2/' + match.id + '.html" target="_blank">欧</a>');
+                    html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red;'+(match.s && match.s != 0 && match.h && match.h !=0 ? "display:block;":"")+'" >情</a>');
+
+                    html.push('</td><td class="td td-pei">');
+                    html.push('<div class="betbtn-row itm-rangB1">');
+                    if(match.s && match.s != 0){
+                        html.push('<span>'+match.s+'</span><span>'+match.p+'</span><span>'+match.f+'</span>');
+                    }else{
+                        html.push('<span><a href="javascript:setOdds('+match.id+')">获取赔率</a></span>');
+                    }
+                    html.push('</div>');
+                    html.push('<div class="betbtn-row itm-rangB2">');
+                    if(match.h && match.h != 0){
+                        html.push('<span>'+match.h+'</span><span>'+match.pan+'</span><span>'+match.a+'</span>');
+                    }else{
+                        html.push('<span><a href="javascript:setOdds('+match.id+')">获取赔率</a></span>');
+                    }
+                    html.push('</div>');
+                    html.push('</td>');
+                    html.push('</tr>');
+                }
+                $("#matchlistTable").html(html.join(''));
+            }else{
+                matchlist=[];
+                $("#matchlistTable").html('<tr><td colspan=8>'+date+'没有数据</td></tr>');
+            }
+        })(date);    
+    }
+    $(() => {
+        $(".datetimepicker").datetimepicker({
+            minView: "month", //选择日期后，不会再跳转去选择时分秒 
+            language: 'zh-CN',
+            autoclose: true,
+            format: 'yyyy-mm-dd'
+        });
         if (location.href.indexOf("type=2") != -1) {
             beidan();
         } else if (location.href.indexOf("type=3") != -1) {

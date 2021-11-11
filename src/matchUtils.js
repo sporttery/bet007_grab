@@ -591,8 +591,15 @@ async function getOddsByIdArr(idArr){
     return rs;
 }
 
+async function getMatchByDate(date){
+    var sql = "select m.id,homeId,homeName,leagueId,leagueName,awayId,awayName,fullscore,halfscore,date_format(m.playtime,'%Y-%m-%d %H:%i') as playtime,"
+    +"o.s,o.p,o.f,o.h,o.pan,o.a,hscore,ascore,hresult,aresult,hsection,asection from t_match m left join t_match_odds o on m.id = o.matchId left join t_bolool30 b on m.id = b.id where m.playtime between '"+date+" 00:00:00' and '"+date+" 23:59:59'  order by playtime asc";
+    console.info(sql);
+    return await DBHelper.query(sql);
+}
+
 module.exports = {
     getMatchByTeam,
     getMatchOdds, getScoreSection, getBoloolById, getBoloolListByOdds, saveBolool, getOddsById, saveOdds, ConvertGoal,
-    deleteOddsById,getOddsByIdArr,getEuropeOdds,getAsiaOdds
+    deleteOddsById,getOddsByIdArr,getEuropeOdds,getAsiaOdds,getMatchByDate
 }
