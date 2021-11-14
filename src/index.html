@@ -206,75 +206,7 @@
     var op101 = {};
     var yp101 = {};
     var matchlist = [];
-    async function getYp(id) {
-        if (yp101[id]) {
-            return yp101[id];
-        }
-        var odds = await getOddsById(id);
-        if (odds) {
-            yp101[id] = [odds.h, Goal2GoalCn(odds.pan), odds.a];
-            op101[id] = [odds.s, odds.p, odds.f];
-        } else {
-            $.ajax({
-                type: "get", url: "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=365", async: false, success: (d) => {
-                    d = safeHtml(d);
-                    if (d.indexOf("365") != -1) {
-                        yp101[id] = getOdds(d);
-                        if (yp101[id][0] != 0) {
-                            yp101[id][1] = Goal2GoalCn(yp101[id][1]);
-                            odds = { id: id + "-Bet365", company: "Bet365", h: yp101[id][0], pan: yp101[id][1], a: yp101[id][2], matchId: id };
-                            saveOdds(odds);
-                        }
-                    }
-                }
-            });
-            if (!yp101[id]) {
-                yp101[id] = ['0', '0', '0'];
-            }
-        }
-        return yp101[id];
-    }
 
-    async function getOp(id) {
-        if (op101[id]) {
-            return op101[id];
-        }
-        var odds = await getOddsById(id + "-Bet365");
-        if (odds) {
-            yp101[id] = [odds.h, Goal2GoalCn(odds.pan), odds.a];
-            op101[id] = [odds.s, odds.p, odds.f];
-        } else {
-            $.ajax({
-                type: "get", url: "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=365", async: false, success: (d) => {
-                    d = safeHtml(d);
-                    if (d.indexOf("365") != -1) {
-                        op101[id] = getOdds(d);
-                        odds = { id: id + "-Bet365", company: "Bet365", s: op101[id][0], p: op101[id][1], f: op101[id][2], matchId: id };
-                        saveOdds(odds);
-                    }
-                }
-            });
-            if (!op101[id]) {
-                op101[id] = ['0', '0', '0'];
-            }
-        }
-        return op101[id];
-    }
-
-
-
-    function getOdds(html) {
-        var tds = $(html).find("table tr:eq(2)").find("td");
-        var company = $(tds[0]).text().trim();
-        var h = $(tds[1]).text().trim();
-        var d = $(tds[2]).text().trim();
-        var a = $(tds[3]).text().trim();
-        if (company.indexOf("365") != -1 && h != "" && d != "" && a != "") {
-            return [isNaN(h) ? 0 : parseFloat(h), isNaN(d) ? d : parseFloat(d), isNaN(a) ? 0 : parseFloat(a)];
-        } else {
-            return [0, 0, 0];
-        }
-    }
 
 
     function setOddsByIds(){
@@ -439,6 +371,7 @@
                     var a = $(tds[15]).text();
 
                     var match = { leagueId, leagueName, leagueColor, jcmatchId, week, num, playtime, homeName, homeId, awayName, awayId, h, d, a, rq, id, score, halfscore };
+                    
                     matchlist.push(match);
                 });
             }

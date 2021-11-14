@@ -7,10 +7,10 @@ const matchUtil = require("./matchUtils");
 (async () => {
     await Puppeteer.launch({
         headless: false,
-        defaultViewport:null,
-        args: ["--no-sandbox", "--disable-setuid-sandbox", '--disable-web-security', "--start-maximized"],
+        defaultViewport: null,
+        args: ['--disable-web-security', "--start-maximized"],
         executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-        // ignoreDefaultArgs:['--enable-automation'],
+        ignoreDefaultArgs: ['--enable-automation'],
         ignoreHTTPSErrors: true,
         // devtools: true
     }).then(async browser => {
@@ -118,7 +118,7 @@ const matchUtil = require("./matchUtils");
             //     }
             //     if(!match.bet365_op){
             //         var id = match.id;
-            //         var odds = await matchUtil.getOddsById(id);
+            //         var odds = await matchUtil.getOddsById(id,page);
             //         if(odds){
             //             match.bet365_yp=[odds.h,matchUtil.ConvertGoal(odds.pan),odds.a];
             //             match.bet365_op= [odds.s,odds.p,odds.f];
@@ -138,15 +138,23 @@ const matchUtil = require("./matchUtils");
             return await matchUtil.getMatchByTeam(boloolDetailPage, teamId, playtime);
         }
 
-        async function saveBolool(bolool = { hscore, ascore, hresult, aresult, hsection, asection, id }){
+        async function saveBolool(bolool = { hscore, ascore, hresult, aresult, hsection, asection, id }) {
             await matchUtil.saveBolool(bolool);
-            await page.evaluate(bolool=>{
-                for(var i=0;i<matchlist.length;i++){
-                    if(matchlist[i].id==bolool.id){
-                        matchlist[i].bolool=bolool;
+            await page.evaluate(bolool => {
+                for (var i = 0; i < matchlist.length; i++) {
+                    if (matchlist[i].id == bolool.id) {
+                        matchlist[i].bolool = bolool;
                     }
                 }
-            },bolool);
+            }, bolool);
+        }
+
+        async function getEuropeOdds(id) {
+            return await matchUtil.getEuropeOdds(id, page);
+        }
+
+        async function getAsiaOdds(id) {
+            return await matchUtil.getAsiaOdds(id, page);
         }
 
         var boloolPage, boloolDetailPage;
@@ -180,8 +188,8 @@ const matchUtil = require("./matchUtils");
                 await boloolDetailPage.exposeFunction("getBoloolById", matchUtil.getBoloolById);
                 await boloolDetailPage.exposeFunction("getMatchByTeam", getMatchByTeam);
                 await boloolDetailPage.exposeFunction("saveBolool", saveBolool);
-                await boloolDetailPage.exposeFunction("getEuropeOdds", matchUtil.getEuropeOdds);
-                await boloolDetailPage.exposeFunction("getAsiaOdds", matchUtil.getAsiaOdds);
+                await boloolDetailPage.exposeFunction("getEuropeOdds", getEuropeOdds);
+                await boloolDetailPage.exposeFunction("getAsiaOdds", getAsiaOdds);
                 await boloolDetailPage.exposeFunction("deleteOddsById", matchUtil.deleteOddsById);
             }
             await boloolDetailPage.goto("file://" + __dirname + "/html/boloolDetail.html?id=" + id);
@@ -252,7 +260,7 @@ const matchUtil = require("./matchUtils");
         async function setOdds(id) {
             if (id) {
                 // await matchUtil.deleteOddsById(id);
-                var odds = await matchUtil.getOddsById(id);
+                var odds = await matchUtil.getOddsById(id, page);
                 if (odds) {
                     odds.pan = matchUtil.ConvertGoal(odds.pan);
                     await page.evaluate((odds, id) => {
@@ -311,8 +319,27 @@ const matchUtil = require("./matchUtils");
                     var match = matchlist[key];
                     var id = match.id;
                     var odds = oddsMap[id];
+
                     if (!odds || (odds.s == 0 && odds.h == 0)) {
-                        odds = await matchUtil.getOddsById(id);
+                        odds = await matchUtil.getOddsById(id, page);
+                    }
+                    if (odds) {
+                        if (odds.s == null || odds.s == 0) {
+                            var europeOdds = await matchUtil.getEuropeOdds(id, page);
+                            if (europeOdds) {
+                                odds.s = europeOdds.s;
+                                odds.p = europeOdds.p;
+                                odds.f = europeOdds.f;
+                            }
+                        }
+                        if (odds.h == null || odds.h == 0) {
+                            var asiaOdds = await matchUtil.getAsiaOdds(id, page);
+                            if (asiaOdds) {
+                                odds.h = asiaOdds.h;
+                                odds.pan = asiaOdds.pan;
+                                odds.a = asiaOdds.a;
+                            }
+                        }
                     }
                     if (odds) {
                         match.bet365_yp = [odds.h, matchUtil.ConvertGoal(odds.pan), odds.a];

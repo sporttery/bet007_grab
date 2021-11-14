@@ -423,30 +423,69 @@ async function getByCurl(curl, chk, retry) {
 
 }
 
-async function getFromUrl(page, url) {
+async function getFromUrl(page, url, chk, retry) {
     var content;
     if (!page) {
-        content = await getByCurl("curl -s \"" + url + "\"");
+        content = await getByCurl("curl -s \"" + url + "\"",chk, retry);
     } else {
-        content = await page.evaluate((url) => {
-            var content = "";
-            $.ajax({
-                url: url,
-                type: 'get',
-                async: false,
-                success: function (c) {
-                    content = c.replace(/\w's/g, "`s");
-                }, error: function (err) {
-                    console.log(JSON.stringify(err));
-                    content = "-1";
+        if(chk){
+            if(!retry){
+                retry = 5;
+            }
+            var count=1;
+            do{
+                try {
+                    content = await page.evaluate((url) => {
+                        var content = "";
+                        $.ajax({
+                            url: url,
+                            type: 'get',
+                            async: false,
+                            success: function (c) {
+                                content = c.replace(/\w's/g, "`s");
+                            }, error: function (err) {
+                                console.log(JSON.stringify(err));
+                                content = "-1";
+                            }
+                        });
+                        return content;
+                    }, url);
+                    if (content != "" && chk(content)) {
+                        console.log(url + ",成功从网络中获取");
+                        return content;
+                    }
+                    
+                    if (count < retry) {
+                        var sleepMs = 5000 + count * 1200;
+                        console.info("第" + count + "次获取数据失败，暂停" + (sleepMs) + "ms后再次尝试");
+                        await sleep(sleepMs);
+                    }
+                } catch (error) {
+                    count--;
                 }
-            });
-            return content;
-        }, url);
+            }while(count++<retry);
+        }else{
 
-        if (content != "") {
-            console.log(url + ",成功从网络中获取");
-            return content;
+            content = await page.evaluate((url) => {
+                var content = "";
+                $.ajax({
+                    url: url,
+                    type: 'get',
+                    async: false,
+                    success: function (c) {
+                        content = c.replace(/\w's/g, "`s");
+                    }, error: function (err) {
+                        console.log(JSON.stringify(err));
+                        content = "-1";
+                    }
+                });
+                return content;
+            }, url);
+    
+            if (content != "") {
+                console.log(url + ",成功从网络中获取");
+                return content;
+            }
         }
         return "";
     }

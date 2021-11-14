@@ -17,9 +17,11 @@ function ConvertGoal(goal) { //数字盘口转汉汉字
     }
 }
 
-async function getMatchOdds(page, matchId) {
+async function getMatchOdds(page, matchId,flag = 'all'/*||'europe'||'asia'*/) {
     var limit = 100;
+    var oddsData = {};
     while (true) {
+        oddsData={};
         var ids;
         if (matchId) {
             Logger.info("指定了matchId=" + matchId);
@@ -28,78 +30,15 @@ async function getMatchOdds(page, matchId) {
             ids = await DBHelper.query("select m.id from t_match m left join t_match_odds o on m.id = o.matchId where o.id is null ORDER BY RAND() limit " + limit);
         }
         var len = ids.length;
-        var oddsData = {};
         for (var i = 0; i < len; i++) {
             var id = ids[i]["id"];
             Logger.info("正在获取第" + (i + 1) + "个Id=" + id + "的赔率,还剩 " + (len - i - 1));
-            var europeOddsUrl = "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
-            var content = await Utils.getFromUrl(page, europeOddsUrl);
-            retry = 1;
-            while (content.indexOf("id=\"odds\"") == -1 && content.indexOf("System.Web.Mvc.Controller") == -1) {
-                Logger.info(europeOddsUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
-                await page.waitForTimeout(6 * 1000 * retry++);
-                content = await Utils.getFromUrl(page, europeOddsUrl);
-                if (retry > 10) {
-                    break;
-                }
-            }
-            if (content.indexOf("id=\"odds\"") == -1) {
-                continue;
-            }
-            var nH = Utils.safeHtml(content);
-            var europeOdds = await page.evaluate((nH) => {
-                var tds = $(nH).find("table tr:eq(2)").find("td");
-                var company = $(tds[0]).text().trim();
-                var h = $(tds[1]).text().trim();
-                var d = $(tds[2]).text().trim();
-                var a = $(tds[3]).text().trim();
-                if (company.indexOf("365") != -1 && h != "" && d != "" && a != "") {
-                    return [isNaN(h) ? 0 : parseFloat(h), isNaN(d) ? 0 : parseFloat(d), isNaN(a) ? 0 : parseFloat(a)];
-                } else {
-                    return [0, 0, 0];
-                }
-            }, nH);
-            await page.waitForTimeout(1000);
-            var asiaOddsUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
-            content = await Utils.getFromUrl(page, asiaOddsUrl);
-            retry = 1;
-            while (content.indexOf("id=\"odds\"") == -1 && content.indexOf("System.Web.Mvc.Controller") == -1) {
-                Logger.info(asiaOddsUrl + "返回错误的数据，" + (6 * retry) + "秒后重试第" + retry + "次");
-                await page.waitForTimeout(6 * 1000 * retry++);
-                content = await Utils.getFromUrl(page, asiaOddsUrl);
-                if (retry > 10) {
-                    break;
-                }
-            }
-            if (content.indexOf("id=\"odds\"") == -1) {
-                continue;
-            }
-            nH = Utils.safeHtml(content);
-            var asiaOdds = await page.evaluate((nH) => {
-                var tds = $(nH).find("table tr:eq(2)").find("td");
-                var company = $(tds[0]).text().trim();
-                var h = $(tds[1]).text().trim();
-                var pan = $(tds[2]).text().trim();
-                var a = $(tds[3]).text().trim();
-                if (company.indexOf("365") != -1 && h != "" && a != "") {
-                    return [isNaN(h) ? 0 : parseFloat(h), pan, isNaN(a) ? 0 : parseFloat(a)];
-                } else {
-                    return [0, 0, 0];
-                }
-            }, nH);
+
+            var    europeOdds = await getEuropeOdds(id,page);
+            var    asiaOdds = await getAsiaOdds(id,page);
             Logger.info("europeOdds:", europeOdds, "asiaOdds:", asiaOdds);
 
-            if (europeOdds[0] === null) {
-                europeOdds = [0, 0, 0];
-            }
-            if (asiaOdds[0] === null) {
-                asiaOdds = [0, '', 0];
-            }
-            if (asiaOdds[1] != '') {
-                asiaOdds[1] = ConvertGoal(asiaOdds[1]);
-            }
-
-            var odds = { id: id + "-Bet365", company: "Bet365", s: europeOdds[0], p: europeOdds[1], f: europeOdds[2], h: asiaOdds[0], pan: asiaOdds[1], a: asiaOdds[2], matchId: id };
+            var odds = { id: id + "-Bet365", company: "Bet365", s: europeOdds.s, p: europeOdds.p, f: europeOdds.f, h: asiaOdds.h, pan: asiaOdds.pan, a: asiaOdds.a, matchId: id };
             oddsData[id] = odds;
         }
         if (len > 0) {
@@ -118,6 +57,10 @@ async function getMatchOdds(page, matchId) {
         if (len < limit) {
             break;
         }
+    }
+
+    if(matchId){
+        return oddsData[matchId];
     }
 
 }
@@ -286,102 +229,6 @@ async function getBoloolById(id) {
     if (rs && rs.length > 0) {
         return rs[0];
     }
-/*
-    retry = 2;
-    count = 1;
-    do {
-        var proxyIp = (proxy.data ? " -x socks5://" + proxy.data[0].ip + ":" + proxy.data[0].port : "");
-        //同步处理
-        var europeUrl = "http://zq.win007.com/analysis/" + id + "cn.htm";
-        var curl = 'curl ' + proxyIp + ' "' + europeUrl + '" -s | iconv -f gbk -t utf-8'
-        var response = await Utils.getByCurl(curl);
-        if (response) {
-            console.info(europeUrl + " 获取完成");
-            var d = response;
-            var idx = d.indexOf('var lang = 0;');
-            if (idx > 0) {
-                d = d.substring(idx);
-                idx = d.indexOf("</script");
-                if (idx != -1) {
-                    d = d.substring(0, idx);
-                    eval(d);
-                    var hscore = 0, ascore = 0, hresult = "", aresult = "", hsection = 0, asection = 0;
-                    for (var i = 0; i < h_data.length; i++) {
-                        var matchArr = h_data[i];
-                        homeId = matchArr[4];
-                        awayId = matchArr[6];
-                        homeGoal = matchArr[8];
-                        awayGoal = matchArr[9];
-                        if (homeGoal > awayGoal) {
-                            if (homeId == h2h_home) {
-                                hscore += 3;
-                                hresult += "赢";
-                            } else {
-                                hscore += 0;
-                                hresult += "输";
-                            }
-                        } else if (homeGoal < awayGoal) {
-                            if (homeId == h2h_home) {
-                                hscore += 0;
-                                hresult += "输";
-                            } else {
-                                hscore += 3;
-                                hresult += "赢";
-                            }
-                        } else {
-                            hscore += 1;
-                            hresult += "平";
-                        }
-                    }
-
-                    for (var i = 0; i < a_data.length; i++) {
-                        var matchArr = a_data[i];
-                        homeId = matchArr[4];
-                        awayId = matchArr[6];
-                        homeGoal = matchArr[8];
-                        awayGoal = matchArr[9];
-                        if (homeGoal > awayGoal) {
-                            if (homeId == h2h_away) {
-                                ascore += 3;
-                                aresult += "赢";
-                            } else {
-                                ascore += 0;
-                                aresult += "输";
-                            }
-                        } else if (homeGoal < awayGoal) {
-                            if (homeId == h2h_away) {
-                                ascore += 0;
-                                aresult += "输";
-                            } else {
-                                ascore += 3;
-                                aresult += "赢";
-                            }
-                        } else {
-                            ascore += 1;
-                            aresult += "平";
-                        }
-                    }
-
-                    hsection = getScoreSection(hscore, 30);
-                    asection = getScoreSection(ascore, 30);
-                    bolool = { hscore, ascore, hresult, aresult, hsection, asection, id: scheduleID };
-                    await saveBolool(saveBolool);
-                    return bolool;
-                } else {
-                    proxy = await Utils.getProxy();
-                    console.error("获取新的代理IP" + JSON.stringify(proxy));
-                }
-            } else {
-                proxy = await Utils.getProxy();
-                console.error("获取新的代理IP" + JSON.stringify(proxy));
-            }
-        } else {
-            proxy = await Utils.getProxy();
-            console.error("获取新的代理IP" + JSON.stringify(proxy));
-        }
-        console.info("第" + count + "次重试");
-    } while (count++ < retry);
-*/
     return null;
 }
 
@@ -401,60 +248,55 @@ async function saveBolool(bolool) {
     return await DBHelper.saveModel(bolool, "t_bolool30",true);
 }
 var proxy = { data: false };
-async function getOddsById(id) {
+async function getOddsById(id,page) {
     sql = "select o.matchId,o.s,o.p,o.f,o.h,o.pan,o.a from t_match_odds o where id = '" + id + "-Bet365'";
     var rs = await DBHelper.query(sql);
     if (rs && rs.length > 0 && (rs[0].s != 0 || rs[0].h != 0)) {
         return rs[0];
     }
-    retry = 2;
-    count = 1;
-    do {
-        var proxyIp = (proxy.data ? " -x socks5://" + proxy.data[0].ip + ":" + proxy.data[0].port : "");
-        //同步处理
-        var europeUrl = "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
-        var curl = 'curl ' + proxyIp + ' "' + europeUrl + '" -s | iconv -f gbk -t utf-8'
-        var odata = { id, europeOdds: null, asiaOdds: false, company: "Bet365", len: 99999999 };
-        // var response = await Utils.getByCurl(curl);
-        var response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 3);
-        if (response) {
-            console.info(europeUrl + " 获取完成");
-            odds = getOdds(response);
-            // console.info(odds);
-            odata.europeOdds = odds;
-            var asiaUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
-            curl = 'curl ' + proxyIp + ' "' + asiaUrl + '" -s | iconv -f gbk -t utf-8'
-            response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 5);
-            // response = await Utils.getByCurl(curl);
-            if (response) {
-                console.info(asiaUrl + " 获取完成");
-                odds = getOdds(response);
-                // console.info(odds);
-                odata.asiaOdds = odds;
-                odds = getOddsData(odata);
-                if(odds.s == 0 && odds.h == 0){
-                    return null;
-                }
-                await DBHelper.saveModel(odds, "t_match_odds",true);
-                return odds;
-            } else {
-                proxy = await Utils.getProxy();
-                console.error("获取新的代理IP" + JSON.stringify(proxy));
-            }
-        } else {
-            proxy = await Utils.getProxy();
-            console.error("获取新的代理IP" + JSON.stringify(proxy));
+    var asiaOdds,europeOdds;
+    if(rs.length>0 && rs[0].s != 0 ){
+        europeOdds = {s:rs[0].s,p:rs[0].p,f:rs[0].f};
+    }else{
+        europeOdds = await getEuropeOdds(id,page);
+        if(!europeOdds){
+            europeOdds={s:0,p:0,f:0};
         }
-        console.info("第" + count + "次重试");
-    } while (count++ < retry);
-    return null;
+    }
+    if(rs.length>0 && rs[0].h != 0 ){
+        asiaOdds = {h:rs[0].h,pan:rs[0].pan,a:rs[0].a};
+    }else{
+        asiaOdds = await getAsiaOdds(id,page);
+        if(!asiaOdds){
+            asiaOdds={h:0,pan:'-',a:0};
+        }
+    }
+    var odds = {matchId:id,h:asiaOdds.h,pan:asiaOdds.pan,a:asiaOdds.a,s:europeOdds.s,p:europeOdds.p,f:europeOdds.f,company:'Bet365',id:id+'-Bet365'};
+    return odds;
 }
 
-async function getAsiaOdds(id) {
+async function getAsiaOdds(id,page) {
     sql = "select o.matchId,o.h,o.pan,o.a from t_match_odds o where id = '" + id + "-Bet365'";
     var rs = await DBHelper.query(sql);
     if (rs && rs.length > 0 &&   rs[0].h != 0&& rs[0].h!= null ) {
         return rs[0];
+    }
+    if(page){
+        var asiaOddsUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
+        var response = await Utils.getFromUrl(page, asiaOddsUrl,(r) => { return r.indexOf('id="odds"') != -1},3);
+        if (response && response.indexOf('id="odds"')!=-1) {
+            console.info(asiaOddsUrl + " 获取完成");
+            odds = getOdds(response);
+            console.info(odds);
+            if(odds[0]!=0 && !isNaN(odds[0])){
+                sql = "insert into t_match_odds(id,matchId,h,pan,a,company) values('"+id+"-Bet365',"+id+","+odds[0]+",'"+odds[1]+"',"+odds[2]+",'Bet365') ON DUPLICATE KEY UPDATE h=values(h),pan=values(pan),a=values(a) ";
+                var rs = await DBHelper.query(sql);
+                console.info(rs);
+                return {matchId:id,h:odds[0],pan:odds[1],a:odds[2]};
+            }else{
+                return null;
+            }
+        }
     }
     retry = 2;
     count = 1;
@@ -463,6 +305,7 @@ async function getAsiaOdds(id) {
         //同步处理
         var asiaUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
         var curl = 'curl ' + proxyIp + ' "' + asiaUrl + '" -s | iconv -f gbk -t utf-8'
+        console.info(curl);
         response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 5);
         // response = await Utils.getByCurl(curl);
         if (response) {
@@ -487,11 +330,28 @@ async function getAsiaOdds(id) {
 }
 
 
-async function getEuropeOdds(id) {
+async function getEuropeOdds(id,page) {
     sql = "select o.matchId,o.s,o.p,o.f from t_match_odds o where id = '" + id + "-Bet365'";
     var rs = await DBHelper.query(sql);
     if (rs && rs.length > 0 &&  rs[0].s != 0 && rs[0].s != null ) {
         return rs[0];
+    }
+    if(page){
+        var europeUrl = "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
+        var response = await Utils.getFromUrl(page, europeUrl,(r) => { return r.indexOf('id="odds"') != -1 },3);
+        if (response && response.indexOf('id="odds"')!=-1) {
+            console.info(europeUrl + " 获取完成");
+            odds = getOdds(response);
+            console.info(odds);
+            if(odds[0]!=0 && !isNaN(odds[0])){
+                sql = "insert into t_match_odds(id,matchId,s,p,f,company) values('"+id+"-Bet365',"+id+","+odds[0]+",'"+odds[1]+"',"+odds[2]+",'Bet365') ON DUPLICATE KEY UPDATE s=values(s),p=values(p),f=values(f) ";
+                var rs = await DBHelper.query(sql);
+                console.info(rs);
+                return {matchId:id,s:odds[0],p:odds[1],f:odds[2]};;
+            }else{
+                return null;
+            }
+        }
     }
     retry = 2;
     count = 1;
@@ -532,7 +392,7 @@ function getOdds(stdout) {
     var d = $(tds[2]).text().trim();
     var a = $(tds[3]).text().trim();
     if (company.indexOf("365") != -1 && h != "" && d != "" && a != "") {
-        return [isNaN(h) ? 0 : parseFloat(h), isNaN(d) ? d : parseFloat(d), isNaN(a) ? 0 : parseFloat(a)];
+        return [isNaN(h) ? 0 : parseFloat(h), d, isNaN(a) ? 0 : parseFloat(a)];
     } else {
         return [0, 0, 0];
     }
