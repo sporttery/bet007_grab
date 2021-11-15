@@ -647,8 +647,13 @@ function setBolool(match) {
                     asection = getScoreSection(ascore, 30);
                     var bolool = { hscore, ascore, hresult, aresult, hsection, asection, id: scheduleID };
                     g_match[scheduleID].bolool = bolool;
-                    if (typeof saveBolool != "undefined") {
-                        saveBolool(bolool);
+                    var playtime = g_match[scheduleID].playtime;
+                    var dt = Date.parse(playtime.replace(/-/g, "/"));
+                    if(dt<new Date().getTime()){
+                        //已经开打的比赛，要入库
+                        if (typeof saveBolool != "undefined" && g_match[scheduleID]) {
+                            saveBolool(bolool);
+                        }
                     }
                     var bolool3 = getBoloolFromResult(bolool.hresult, bolool.aresult, 3);
                     $("#hscore_" + bolool.id).text(bolool.hscore);

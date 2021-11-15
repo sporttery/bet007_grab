@@ -275,8 +275,8 @@ const matchUtil = require("./matchUtils");
 
                         var tr = $("#m" + match.id);
                         if (match) {
-                            match.bet365_yp = [odds.h, odds.pan, odds.a];
-                            match.bet365_op = [odds.s, odds.p, odds.f];
+                            match.bet365_yp = [odds.h?odds.h:0, odds.pan?odds.pan:'-', odds.a?odds.a:0];
+                            match.bet365_op = [odds.s?odds.s:0, odds.p?odds.p:0, odds.f?odds.f:0];
 
                             tr.find(".td-pei div:eq(0)").html('<span>' + match.bet365_op[0] + '</span><span>' + match.bet365_op[1] + '</span><span>' + match.bet365_op[2] + '</span>');
                             tr.find(".td-pei div:eq(1)").html('<span>' + match.bet365_yp[0] + '</span><span>' + match.bet365_yp[1] + '</span><span>' + match.bet365_yp[2] + '</span>');
@@ -342,8 +342,8 @@ const matchUtil = require("./matchUtils");
                         }
                     }
                     if (odds) {
-                        match.bet365_yp = [odds.h, matchUtil.ConvertGoal(odds.pan), odds.a];
-                        match.bet365_op = [odds.s, odds.p, odds.f];
+                        match.bet365_yp = [odds.h?odds.h:0, odds.pan?matchUtil.ConvertGoal(odds.pan):'', odds.a?odds.a:0];
+                        match.bet365_op = [odds.s?odds.s:0, odds.p?odds.p:0, odds.f?odds.f:0];
                     }
                 }
 
