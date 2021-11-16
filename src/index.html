@@ -165,7 +165,21 @@
     </div>
 </body>
 <script>
-
+function formatDate(date, fmt = "yyyy-MM-dd hh:mm:ss") {
+    var o = {
+        "M+": date.getMonth() + 1, //月份 
+        "d+": date.getDate(), //日 
+        "h+": date.getHours(), //小时 
+        "m+": date.getMinutes(), //分 
+        "s+": date.getSeconds(), //秒 
+        "q+": Math.floor((date.getMonth() + 3) / 3), //季度 
+        "S": date.getMilliseconds() //毫秒 
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
     function resetOdds() {
         layer.confirm("这个操作会删除赔率重新获取，时间会比较久，确认要这样做？", (b) => {
             refreshOdds();
@@ -211,6 +225,10 @@
     var yp101 = {};
     var matchlist = [];
 
+    var matchIssue = new Date(Date.now()+1000*60*60*24);
+    matchIssue.setHours(11);
+
+    var todayStr = formatDate(matchIssue,"yyyy-MM-dd hh:mm");
 
 
     function setOddsByIds() {
@@ -252,6 +270,9 @@
                         }
                     }
                     var playtime = $(tds[2]).attr("title").replace("开赛时间：", "");
+                    // if(playtime > todayStr){ //超过11点的，暂时不显示
+                    //     return true;
+                    // }
                     var homeName = $(tds[4]).text().trim();
                     var score = $(tds[6]).text();
                     var awayName = $(tds[7]).text().trim();
@@ -356,6 +377,9 @@
                         return true;
                     }
                     var playtime = playtimestr.replace("开赛时间：", "").replace("截止时间：", "");
+                    if(playtime > todayStr){ //超过11点的，暂时不显示
+                        return true;
+                    }
                     var homeName = $(tds[4]).text().trim();
                     var rq = $(tds[5]).text().trim();
                     if (rq == "") {
@@ -454,6 +478,9 @@
                     var playtime = $(tds[2]).text().trim();
                     if (playtime.substring(0, 2) != "20") {
                         playtime = new Date().getFullYear() + "-" + playtime;
+                    }
+                    if(playtime > todayStr){ //超过次日11点的，暂时不显示
+                        return true;
                     }
                     var homeName = $(tds[3]).text().trim();
                     var awayName = $(tds[4]).text().trim();
