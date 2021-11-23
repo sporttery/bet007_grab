@@ -479,9 +479,9 @@ function formatDate(date, fmt = "yyyy-MM-dd hh:mm:ss") {
                     if (playtime.substring(0, 2) != "20") {
                         playtime = new Date().getFullYear() + "-" + playtime;
                     }
-                    if(playtime > todayStr){ //超过次日11点的，暂时不显示
-                        return true;
-                    }
+                    //if(playtime > todayStr){ //超过次日11点的，暂时不显示
+                     //   return true;
+                    //}
                     var homeName = $(tds[3]).text().trim();
                     var awayName = $(tds[4]).text().trim();
                     var ids = $(tds[3]).find("a").attr("onmouseover").split(/[_.]/);
