@@ -2,6 +2,7 @@ const Utils = require("./Utils");
 const Logger = require("./Logger");
 const DBHelper = require("./DBHelper");
 const cheerio = require('cheerio');
+const Config = require("./Config");
 
 var GoalCn = "平手,平手/半球,半球,半球/一球,一球,一球/球半,球半,球半/两球,两球,两球/两球半,两球半,两球半/三球,三球,三球/三球半,三球半,三球半/四球,四球,四球/四球半,四球半,四球半/五球,五球,五/五球半,五球半,五球半/六,六球,六球/六球半,六球半,六球半/七球,七球,七球/七球半,七球半,七球半/八球,八球,八球/八球半,八球半,八球半/九球,九球,九球/九球半,九球半,九球半/十球,十球".split(",");
 function ConvertGoal(goal) { //数字盘口转汉汉字	
@@ -458,8 +459,12 @@ async function getMatchByDate(date){
     return await DBHelper.query(sql);
 }
 
+function getLeaugeConfig(){
+    return Config.urls;
+}
+
 module.exports = {
     getMatchByTeam,
     getMatchOdds, getScoreSection, getBoloolById, getBoloolListByOdds, saveBolool, getOddsById, saveOdds, ConvertGoal,
-    deleteOddsById,getOddsByIdArr,getEuropeOdds,getAsiaOdds,getMatchByDate
+    deleteOddsById,getOddsByIdArr,getEuropeOdds,getAsiaOdds,getMatchByDate,getLeaugeConfig
 }

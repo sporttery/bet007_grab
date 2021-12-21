@@ -193,9 +193,10 @@ const matchUtil = require("./matchUtils");
                 await boloolDetailPage.exposeFunction("deleteOddsById", matchUtil.deleteOddsById);
             }
             await boloolDetailPage.goto("file://" + __dirname + "/html/boloolDetail.html?id=" + id);
-            await boloolDetailPage.evaluate((match) => {
-                showBolool(match);
-            }, match);
+            let leaugeConfig = matchUtil.getLeaugeConfig();
+            await boloolDetailPage.evaluate((match,leaugeConfig) => {
+                showBolool(match,leaugeConfig);
+            }, match,leaugeConfig);
             boloolDetailPage.on('domcontentloaded', () => {
                 boloolDetailPage.evaluate((match) => {
                     showBolool(match);
@@ -217,6 +218,7 @@ const matchUtil = require("./matchUtils");
                 await boloolPage.exposeFunction("deleteOddsById", matchUtil.deleteOddsById);
                 await boloolPage.exposeFunction("getEuropeOdds", matchUtil.getEuropeOdds);
                 await boloolPage.exposeFunction("getAsiaOdds", matchUtil.getAsiaOdds);
+                
                 boloolPage.on("close", () => {
                     boloolPage = null;
                 })

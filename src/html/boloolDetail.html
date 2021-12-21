@@ -481,9 +481,13 @@
 
 		layer.closeAll();
 	}
-
-	function showBolool(match) {
+	var g_leaugeConfig,g_leagueIds={};
+	function showBolool(match,leaugeConfig) {
 		thisMatch = match;
+		g_leaugeConfig = leaugeConfig;
+		g_leaugeConfig.forEach(urlinfo => {
+			g_leagueIds[urlinfo.id] = urlinfo;
+		});
 		var bolool = thisMatch.bolool;
 		if (!bolool) {
 			layer.alert("没有菠萝数据1");
@@ -610,6 +614,9 @@
 				if (g_match[match.id]) {
 					return false;
 				}
+				if(!g_leagueIds[match.leagueId]){
+					continue;
+				}
 				totalCount++;
 				var eKey = match.s + " " + match.p + " " + match.f;
 				var aKey = match.h + " " + match.pan + " " + match.a;
@@ -637,7 +644,7 @@
 					'" data-hsection="' + match.hsection + '" data-asection="' + match.asection + '" data-hstrong="' + bolool3.hstrong + '" data-astrong="' + bolool3.astrong +
 					'" data-hscore="' + match.hscore + '" data-ascore="' + match.ascore + '" data-playtime="' + match.playtime + '">');
 				html.push('<td>' + match.id + '</td>');
-				html.push('<td>' + match.leagueName + '</td>');
+				html.push('<td><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html" target="_blank">' + match.leagueName + '</a></td>');
 				html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.homeId + "&pageNo=1&flesh=' target='_blank'>" + match.homeName + "</a></td>");
 				html.push('<td><a href="http://live.win007.com/detail/' + match.id + 'cn.htm" target="_blank"><span class="fullscore">' + match.fullscore + "</span><br/>" + match.halfscore + '</a></td>');
 				html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.awayId + "&pageNo=1&flesh=' target='_blank'>" + match.awayName + "</a></td>");
