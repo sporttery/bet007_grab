@@ -484,10 +484,13 @@
 	var g_leaugeConfig,g_leagueIds={};
 	function showBolool(match,leaugeConfig) {
 		thisMatch = match;
-		g_leaugeConfig = leaugeConfig;
-		g_leaugeConfig.forEach(urlinfo => {
-			g_leagueIds[urlinfo.id] = urlinfo;
-		});
+		if(leaugeConfig){
+			g_leaugeConfig = leaugeConfig;
+			console.info(leaugeConfig);
+			g_leaugeConfig.forEach(urlinfo => {
+				g_leagueIds[urlinfo.id] = urlinfo;
+			});
+		}
 		var bolool = thisMatch.bolool;
 		if (!bolool) {
 			layer.alert("没有菠萝数据1");
