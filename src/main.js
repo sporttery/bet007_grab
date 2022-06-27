@@ -7,7 +7,7 @@ const Config = require("./Config")
 //找到某场比赛的结果，返回数组var arrLeague=[0,0,0,0,0];
 //[isFinish,h_score,a_score,h_half_score,a_half_score]
 //获得某场比赛的赔率
-//http://vip.win007.com/changeDetail/1x2.aspx?id=1720887&companyid=8&l=0
+//http://vip.titan007.com/changeDetail/1x2.aspx?id=1720887&companyid=8&l=0
 //companyid={"bet365":8,"立博":4,"皇冠":3"} 
 //
 
@@ -343,14 +343,14 @@ async function getData(page, urlData, otherSeason = false) {
 }
 
 
-//http://vip.win007.com/changeDetail/1x2.aspx?id=1714900&companyid=8&l=0
+//http://vip.titan007.com/changeDetail/1x2.aspx?id=1714900&companyid=8&l=0
 //companyid={"bet365":8,"立博":4}
 async function doGetOdds(page, id) {
     if (id > 0) {
         const insert_time = Utils.formatDate(new Date());
         const company = 8;
         const mid = id;
-        let url = "http://vip.win007.com/changeDetail/1x2.aspx?id=" + mid + "&companyid=" + company + "&l=0";
+        let url = "http://vip.titan007.com/changeDetail/1x2.aspx?id=" + mid + "&companyid=" + company + "&l=0";
         let odds = { mid, company, insert_time };
 
         if (urlCache[url]) {

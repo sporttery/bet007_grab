@@ -13,13 +13,13 @@
 
 7、根据比赛id，获取赔率 
     欧盘
-    http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=1806655&company=Bet365&companyid=8
+    http://vip.titan007.com/ChangeDetail/Standard_all.aspx?ID=1806655&company=Bet365&companyid=8
     http://data.310win.com/changeDetail/1x2.aspx?id=2071146&companyid=8&l=0
     http://1x2d.win007.com/1910109.js?r=007132665582558691738
     亚盘
-    http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=1806655&companyid=8&company=Bet365
+    http://vip.titan007.com/ChangeDetail/Asian_all.aspx?ID=1806655&companyid=8&company=Bet365
     http://data.310win.com/changeDetail/handicap.aspx?id=2071146&companyid=8&l=0
-    http://vip.win007.com/AsianOdds_n.aspx?id=1910109&l=0
+    http://vip.titan007.com/AsianOdds_n.aspx?id=1910109&l=0
     
 8、程序： mainNew.js
 

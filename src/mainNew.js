@@ -136,7 +136,7 @@ var g_browser, g_url_idx = 0, vipPage, zqPage;
 
         Logger.info("正在打开浏览器，进入球探主页");
         await zqPage.goto("http://zq.win007.com/");
-        await vipPage.goto("http://vip.win007.com");
+        await vipPage.goto("http://vip.titan007.com");
         await zqPage
             .addScriptTag({
                 url: 'https://cdn.bootcss.com/jquery/3.2.0/jquery.min.js'

@@ -228,7 +228,7 @@ const matchUtil = require("./matchUtils");
                 return JSON.stringify(matchlist);
             });
             matchlist = JSON.parse(matchlist);
-            await boloolPage.goto("file://" + __dirname + "/html/bolool.html");
+            await boloolPage.goto("file://" + __dirname + "/html/bolool.html?v=123");
             for (var key in matchlist) {
                 var match = matchlist[key];
                 if (!match.bolool) {
@@ -393,7 +393,7 @@ const matchUtil = require("./matchUtils");
             process.exit();
         })
         Logger.info("正在打开浏览器，进入球探主页");
-        await page.goto("file://" + __dirname + "/index.html");
+        await page.goto("file://" + __dirname + "/index.html?v=123");
         await page.exposeFunction("ft2Click", ft2Click);
         await page.exposeFunction("bolool", bolool);
         await page.exposeFunction("setOdds", setOdds);

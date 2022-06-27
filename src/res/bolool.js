@@ -578,7 +578,7 @@ async function setOddsById(id) {
 
 function setBolool(match) {
     $.ajax({
-        url: "http://zq.win007.com/analysis/" + match.id + "cn.htm", async: true, success: function (d) {
+        url: "http://zq.titan007.com/analysis/" + match.id + "cn.htm", async: true, success: function (d) {
             idx = d.indexOf('var lang = 0;');
             if (idx > 0) {
                 d = d.substring(idx);
@@ -678,7 +678,7 @@ function setBolool(match) {
             }
         }, type: "GET", error: () => {
             layer.tips("获取失败！", "#hscore_" + match.id);
-            window.open("http://zq.win007.com/analysis/" + match.id + "cn.htm");
+            window.open("http://zq.titan007.com/analysis/" + match.id + "cn.htm");
         }
     });
 }

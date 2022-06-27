@@ -21,10 +21,10 @@
     <script src="./res/bootstrap-datetimepicker.min.js"></script>
     <link rel="stylesheet" href="./res/headshrinker.min.css" />
     <script src="res/layer-v2.3/layer/layer.js"></script>
-    <link href="https://trade.500cache.com/public/css/dxt/global_dxt.css?v=1608120126" rel="stylesheet"
+    <link href="./res/global_dxt.css?v=1608120126" rel="stylesheet"
         type="text/css" />
     <link
-        href="https://trade.500cache.com/??/newtrade/css/newAlert.css,/newtrade/css/button.css,/newtrade/css/dxt/jc.css,/newtrade/css/dxt/process.css?v=1619146661"
+        href="./res/trade.css"
         rel="stylesheet" type="text/css" />
 
     <style>
@@ -302,13 +302,13 @@ function formatDate(date, fmt = "yyyy-MM-dd hh:mm:ss") {
             var match = matchlist[key];
             html.push('<tr class="bet-tb-tr" id="m' + match.id + '">');
             html.push('<td class="td td-no"><a href="javascript:;" class="bet-evt-hide" >' + match.week + match.num + '</a></td>');
-            html.push('<td class="td td-evt"><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html" target="_blank" style="background:' + match.leagueColor + ';" >' + match.leagueName + '</a></td>');
+            html.push('<td class="td td-evt"><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html?v=123" target="_blank" style="background:' + match.leagueColor + ';" >' + match.leagueName + '</a></td>');
             html.push('<td class="td td-endtime" title="' + match.playtime + '截止">' + match.playtime.substring(5) + '</td>');
             html.push('<td class="td td-team">');
             html.push('<div class="team">');
-            html.push('<span class="team-l"><a href="http://zq.win007.com/cn/team/TeamSche/' + match.homeId + '.html" target="_blank" class="team-l">' + match.homeName + '</a></span>');
+            html.push('<span class="team-l"><a href="http://zq.titan007.com/cn/team/TeamSche/' + match.homeId + '.html?v=123" target="_blank" class="team-l">' + match.homeName + '</a></span>');
             html.push('<i class="team-vs">VS</i>');
-            html.push('<span class="team-r"><a href="http://zq.win007.com/cn/team/TeamSche/' + match.awayId + '.html" target="_blank" class="team-r" >' + match.awayName + '</a></span>');
+            html.push('<span class="team-r"><a href="http://zq.titan007.com/cn/team/TeamSche/' + match.awayId + '.html?v=123" target="_blank" class="team-r" >' + match.awayName + '</a></span>');
             html.push('</div>');
             html.push('</td>');
             html.push('<td class="td td-rang"><p class="itm-rangA1" title="不让球">0</p><p class="green  itm-rangA2"> ' + match.rq + '</p></td>');
@@ -325,9 +325,9 @@ function formatDate(date, fmt = "yyyy-MM-dd hh:mm:ss") {
             html.push('</div></td>');
 
             html.push('<td class="td td-data">');
-            html.push('<a href="http://zq.win007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
-            html.push('<a href="http://vip.win007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>');
-            html.push('<a href="http://op1.win007.com/oddslist/' + match.id + '.html" target="_blank">欧</a>');
+            html.push('<a href="http://zq.titan007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
+            html.push('<a href="http://vip.titan007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>');
+            html.push('<a href="http://op1.titan007.com/oddslist/' + match.id + '.html?v=123" target="_blank">欧</a>');
             html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red" >情</a>');
 
             html.push('</td><td class="td td-pei">');
@@ -409,13 +409,13 @@ function formatDate(date, fmt = "yyyy-MM-dd hh:mm:ss") {
             var match = matchlist[key];
             html.push('<tr class="bet-tb-tr" id="m' + match.id + '">');
             html.push('<td class="td td-no"><a href="javascript:;" class="bet-evt-hide" >' + match.num + '</a></td>');
-            html.push('<td class="td td-evt"><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html" target="_blank" style="background:' + match.leagueColor + ';" >' + match.leagueName + '</a></td>');
+            html.push('<td class="td td-evt"><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html?v=123" target="_blank" style="background:' + match.leagueColor + ';" >' + match.leagueName + '</a></td>');
             html.push('<td class="td td-endtime" title="' + match.playtime + '截止">' + (match.playtime.substring(5)) + '</td>');
             html.push('<td class="td td-team">');
             html.push('<div class="team">');
-            html.push('<span class="team-l"><a href="http://zq.win007.com/cn/team/TeamSche/' + match.homeId + '.html" target="_blank" class="team-l">' + match.homeName + '</a></span>');
+            html.push('<span class="team-l"><a href="http://zq.titan007.com/cn/team/TeamSche/' + match.homeId + '.html?v=123" target="_blank" class="team-l">' + match.homeName + '</a></span>');
             html.push('<i class="team-vs">' + (match.score != "-" ? match.score + "<br/><font color=red>(" + match.halfscore + ")</font>" : "VS") + '</i>');
-            html.push('<span class="team-r"><a href="http://zq.win007.com/cn/team/TeamSche/' + match.awayId + '.html" target="_blank" class="team-r" >' + match.awayName + '</a></span>');
+            html.push('<span class="team-r"><a href="http://zq.titan007.com/cn/team/TeamSche/' + match.awayId + '.html?v=123" target="_blank" class="team-r" >' + match.awayName + '</a></span>');
             html.push('</div>');
             html.push('</td>');
             html.push('<td class="td td-rang"><p class="green  itm-rangA2"> ' + match.rq + '</p></td>');
@@ -427,9 +427,9 @@ function formatDate(date, fmt = "yyyy-MM-dd hh:mm:ss") {
             html.push('</div></td>');
 
             html.push('<td class="td td-data">');
-            html.push('<a href="http://zq.win007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
-            html.push('<a href="http://vip.win007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>');
-            html.push('<a href="http://op1.win007.com/oddslist/' + match.id + '.html" target="_blank">欧</a>');
+            html.push('<a href="http://zq.titan007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
+            html.push('<a href="http://vip.titan007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>');
+            html.push('<a href="http://op1.titan007.com/oddslist/' + match.id + '.html?v=123" target="_blank">欧</a>');
 
             html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');"  style="color:red" >情</a>');
 
@@ -500,22 +500,22 @@ function formatDate(date, fmt = "yyyy-MM-dd hh:mm:ss") {
             var match = matchlist[key];
             html.push('<tr class="bet-tb-tr" id="m' + match.id + '">');
             html.push('<td class="td td-no"><a href="javascript:;" class="bet-evt-hide" >' + match.num + '</a></td>');
-            html.push('<td class="td td-evt"><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html" target="_blank" style="background:' + match.leagueColor + ';" >' + match.leagueName + '</a></td>');
+            html.push('<td class="td td-evt"><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html?v=123" target="_blank" style="background:' + match.leagueColor + ';" >' + match.leagueName + '</a></td>');
             html.push('<td class="td td-endtime" title="' + match.playtime + '截止">' + (match.playtime.substring(5)) + '</td>');
             html.push('<td class="td td-team">');
             html.push('<div class="team">');
-            html.push('<span class="team-l"><a href="http://zq.win007.com/cn/team/TeamSche/' + match.homeId + '.html" target="_blank" class="team-l">' + match.homeName + '</a></span>');
+            html.push('<span class="team-l"><a href="http://zq.titan007.com/cn/team/TeamSche/' + match.homeId + '.html?v=123" target="_blank" class="team-l">' + match.homeName + '</a></span>');
             html.push('<i class="team-vs"> VS </i>');
-            html.push('<span class="team-r"><a href="http://zq.win007.com/cn/team/TeamSche/' + match.awayId + '.html" target="_blank" class="team-r" >' + match.awayName + '</a></span>');
+            html.push('<span class="team-r"><a href="http://zq.titan007.com/cn/team/TeamSche/' + match.awayId + '.html?v=123" target="_blank" class="team-r" >' + match.awayName + '</a></span>');
             html.push('</div>');
             html.push('</td>');
             html.push('<td class="td td-rang">--</td>');
             html.push('<td class="td td-betbtn">--</td>');
 
             html.push('<td class="td td-data">');
-            html.push('<a href="http://zq.win007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
-            html.push('<a href="http://vip.win007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>');
-            html.push('<a href="http://op1.win007.com/oddslist/' + match.id + '.html" target="_blank">欧</a>');
+            html.push('<a href="http://zq.titan007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
+            html.push('<a href="http://vip.titan007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>');
+            html.push('<a href="http://op1.titan007.com/oddslist/' + match.id + '.html?v=123" target="_blank">欧</a>');
             html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red" >情</a>');
 
             html.push('</td><td class="td td-pei">');
@@ -553,27 +553,27 @@ function formatDate(date, fmt = "yyyy-MM-dd hh:mm:ss") {
                     }
                     html.push('<tr class="bet-tb-tr" id="m' + match.id + '">');
                     html.push('<td class="td td-no"><a href="javascript:;" class="bet-evt-hide" >' + match.id + '</a></td>');
-                    html.push('<td class="td td-evt"><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html" target="_blank" style="color:#000">' + match.leagueName + '</a></td>');
+                    html.push('<td class="td td-evt"><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html?v=123" target="_blank" style="color:#000">' + match.leagueName + '</a></td>');
                     html.push('<td class="td td-endtime" title="' + match.playtime + '截止">' + (match.playtime.substring(5)) + '</td>');
                     html.push('<td class="td td-team">');
                     html.push('<div class="team">');
-                    html.push('<span class="team-l"><a href="http://zq.win007.com/cn/team/TeamSche/' + match.homeId + '.html" target="_blank" class="team-l">' + match.homeName.split("(")[0].substring(0, 5) + '</a></span>');
+                    html.push('<span class="team-l"><a href="http://zq.titan007.com/cn/team/TeamSche/' + match.homeId + '.html?v=123" target="_blank" class="team-l">' + match.homeName.split("(")[0].substring(0, 5) + '</a></span>');
                     if (match.fullscore) {
                         html.push('<i class="team-vs"> ' + (match.fullscore + "<br/><font color=red>(" + match.halfscore + ")</font>") + ' </i>');
                     } else {
 
                         html.push('<i class="team-vs"> VS </i>');
                     }
-                    html.push('<span class="team-r"><a href="http://zq.win007.com/cn/team/TeamSche/' + match.awayId + '.html" target="_blank" class="team-r" >' + match.awayName.split("(")[0].substring(0, 5) + '</a></span>');
+                    html.push('<span class="team-r"><a href="http://zq.titan007.com/cn/team/TeamSche/' + match.awayId + '.html?v=123" target="_blank" class="team-r" >' + match.awayName.split("(")[0].substring(0, 5) + '</a></span>');
                     html.push('</div>');
                     html.push('</td>');
                     html.push('<td class="td td-rang">--</td>');
                     html.push('<td class="td td-betbtn">--</td>');
 
                     html.push('<td class="td td-data">');
-                    html.push('<a href="http://zq.win007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
-                    html.push('<a href="http://vip.win007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>');
-                    html.push('<a href="http://op1.win007.com/oddslist/' + match.id + '.html" target="_blank">欧</a>');
+                    html.push('<a href="http://zq.titan007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
+                    html.push('<a href="http://vip.titan007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>');
+                    html.push('<a href="http://op1.titan007.com/oddslist/' + match.id + '.html?v=123" target="_blank">欧</a>');
                     html.push('<a class="tdQing" href="javascript:gotoBolool(' + match.id + ');" style="color:red;' + (match.s && match.s != 0 && match.h && match.h != 0 ? "display:block;" : "") + '" >情</a>');
 
                     html.push('</td><td class="td td-pei">');

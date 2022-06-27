@@ -5,9 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta charset="UTF-8" />
 	<title>菠萝足球-2代指数</title>
-	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-
-
+<link href="../res/bootstrap.min.css" rel="stylesheet">
 	<!-- 可选的Bootstrap主题文件（一般不用引入） -->
 	<link rel="stylesheet" href="../res/bootstrap-theme.min.css" />
 
@@ -26,10 +24,10 @@
 
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet"
-		href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+		href="../res/bootstrap-select.min.css">
 
 	<!-- Latest compiled and minified JavaScript -->
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+	<script src="../res/bootstrap-select.min.js"></script>
 	<style type="text/css">
 		.aRight {
 			text-align: right;
@@ -564,7 +562,7 @@
 
 
 		html.push("<td>");
-		html.push("	<a href='http://zq.win007.com/analysis/" + match.id + "cn.htm' target='_blank'>析</a></td>");
+		html.push("	<a href='http://zq.titan007.com/analysis/" + match.id + "cn.htm' target='_blank'>析</a></td>");
 		html.push('</tr>');
 
 		$("#matchtr").html(html.join(""));
@@ -647,10 +645,10 @@
 					'" data-hsection="' + match.hsection + '" data-asection="' + match.asection + '" data-hstrong="' + bolool3.hstrong + '" data-astrong="' + bolool3.astrong +
 					'" data-hscore="' + match.hscore + '" data-ascore="' + match.ascore + '" data-playtime="' + match.playtime + '">');
 				html.push('<td>' + match.id + '</td>');
-				html.push('<td><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html" target="_blank">' + match.leagueName + '</a></td>');
-				html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.homeId + "&pageNo=1&flesh=' target='_blank'>" + match.homeName + "</a></td>");
-				html.push('<td><a href="http://live.win007.com/detail/' + match.id + 'cn.htm" target="_blank"><span class="fullscore">' + match.fullscore + "</span><br/>" + match.halfscore + '</a></td>');
-				html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.awayId + "&pageNo=1&flesh=' target='_blank'>" + match.awayName + "</a></td>");
+				html.push('<td><a href="http://info.310win.com/cn/League/' + match.leagueId + '.html?v=123" target="_blank">' + match.leagueName + '</a></td>');
+				html.push("<td><a href='http://zq.titan007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.homeId + "&pageNo=1&flesh=' target='_blank'>" + match.homeName + "</a></td>");
+				html.push('<td><a href="http://live.titan007.com/detail/' + match.id + 'cn.htm" target="_blank"><span class="fullscore">' + match.fullscore + "</span><br/>" + match.halfscore + '</a></td>');
+				html.push("<td><a href='http://zq.titan007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.awayId + "&pageNo=1&flesh=' target='_blank'>" + match.awayName + "</a></td>");
 				html.push('<td title="' + match.playtime + '">' + match.playtime + '</td>');
 				if (!match.s || isNaN(match.s) || match.s == 0) {
 					html.push('<td class="' + (europe == eKey ? 'red' : '') + '" id="s_'+match.id+'"><span><a href="javascript:setOddsById(' + match.id + ')">获取赔率</a></span></td>');
@@ -701,9 +699,9 @@
 				html.push('<td>   ');
 				html.push("<a class='btn btn-link'  href='javascript:refreshOddsById("+match.id+")' style='color:red'>赔</a>");
 				html.push("<a class='btn btn-link'  href='javascript:setBoloolById(" + match.id + ")' style='color:red'>积</a>");
-				html.push('<br/><a class="ao jc-link" href="http://op1.win007.com/oddslist/' + match.id + '.html" target="_blank">欧</a>&nbsp;');
-				html.push('<a class="ao jc-link"  href="http://vip.win007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>&nbsp;');
-				html.push('<a class="ao jc-link" href="http://zq.win007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
+				html.push('<br/><a class="ao jc-link" href="http://op1.titan007.com/oddslist/' + match.id + '.html?v=123" target="_blank">欧</a>&nbsp;');
+				html.push('<a class="ao jc-link"  href="http://vip.titan007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>&nbsp;');
+				html.push('<a class="ao jc-link" href="http://zq.titan007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
 				html.push('</td>   ');
 				g_match[match.id] = match;
 				html.push('</tr>');

@@ -34,12 +34,12 @@ async function main() {
             if (!sync) {
 
                 //异步处理
-                var europeUrl = "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=" + companyIdData.e + "&company=" + companyName;
+                var europeUrl = "http://vip.titan007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=" + companyIdData.e + "&company=" + companyName;
                 var curl = 'curl ' + (proxy.data ? " -x socks5://" + proxy.data[0].ip + ":" + proxy.data[0].port : "") + '  -m 30 "' + europeUrl + '" -s | iconv -f gbk -t utf-8'
                 console.log("开始获取：" + curl);
                 var data = { id, url: europeUrl, oddsType: 1, company: companyName, len };
                 child_process.exec(curl, nResult(data));
-                var asiaUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=" + companyIdData.a + "&company=" + companyName;
+                var asiaUrl = "http://vip.titan007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=" + companyIdData.a + "&company=" + companyName;
                 curl = 'curl ' + (proxy.data ? " -x socks5://" + proxy.data[0].ip + ":" + proxy.data[0].port : "") + '  -m 30 "' + asiaUrl + '" -s | iconv -f gbk -t utf-8'
                 console.log("开始获取：" + curl);
                 data.url = asiaUrl;
@@ -50,7 +50,7 @@ async function main() {
 
                 var proxyIp = (proxy.data ? " -x socks5://" + proxy.data[0].ip + ":" + proxy.data[0].port : "");
                 //同步处理
-                var europeUrl = "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=" + companyIdData.e + "&company=" + companyName;
+                var europeUrl = "http://vip.titan007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=" + companyIdData.e + "&company=" + companyName;
                 var curl = 'curl ' + proxyIp + '  -m 30 "' + europeUrl + '" -s | iconv -f gbk -t utf-8'
                 var odata = { id, europeOdds: null, asiaOdds: false, company: companyName, len: 99999999 };
                 var response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 3);
@@ -60,7 +60,7 @@ async function main() {
                     odds = getOdds(response);
                     // console.info(odds);
                     odata.europeOdds = odds;
-                    var asiaUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=" + companyIdData.a + "&company=" + companyName;
+                    var asiaUrl = "http://vip.titan007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=" + companyIdData.a + "&company=" + companyName;
                     curl = 'curl ' + proxyIp + '  -m 30 "' + asiaUrl + '" -s | iconv -f gbk -t utf-8'
                     response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 3);
                     // response = await Utils.getByCurl(curl);
@@ -111,7 +111,7 @@ async function main1() {
         for (var companyName in companyIdMap) {
             var proxyIp = (proxy.data ? " -x socks5://" + proxy.data[0].ip + ":" + proxy.data[0].port : "");
             //同步处理
-            var europeUrl = "http://1x2d.win007.com/" + id + ".js?" + new Date().getTime();
+            var europeUrl = "http://1x2d.titan007.com/" + id + ".js?" + new Date().getTime();
             console.info(europeUrl + " 开始获取");
             var curl = 'curl  ' + proxyIp + '  -m 30 "' + europeUrl + '" -s'
             var odata = { id, europeOdds: null, asiaOdds: false, company: companyName, len: 99999999 };
@@ -135,8 +135,8 @@ async function main1() {
                     odata.europeOdds = [odds[3] || 0, odds[4] || 0, odds[5] || 0];
                 }
                 console.info(odata.europeOdds);
-                var asiaUrl = "http://vip.win007.com/AsianOdds_n.aspx?id=" + id + "&l=0";
-                // var asiaUrl = "http://www.310win.com/handicap/"+id+".html";
+                var asiaUrl = "http://vip.titan007.com/AsianOdds_n.aspx?id=" + id + "&l=0";
+                // var asiaUrl = "http://www.310win.com/handicap/"+id+".html?v=123";
                 console.info(asiaUrl + " 开始获取");
                 curl = 'curl  ' + proxyIp + ' -m 30 "' + asiaUrl + '" -s'
                 // response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 2);

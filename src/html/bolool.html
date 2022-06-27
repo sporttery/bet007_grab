@@ -186,9 +186,9 @@
 			html.push('<tr id="m' + match.id + '">');
 			html.push("<td>" + match.num + "</td>");
 			html.push("<td>" + match.leagueName + "</td>");
-			html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.homeId + "&pageNo=1&flesh=' target='_blank'>" + match.homeName + "</a></td>");
+			html.push("<td><a href='http://zq.titan007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.homeId + "&pageNo=1&flesh=' target='_blank'>" + match.homeName + "</a></td>");
 			html.push("<td>" + (match.score && match.score != '-' ? match.score : "VS") + "</td>");
-			html.push("<td><a href='http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.awayId + "&pageNo=1&flesh=' target='_blank'>" + match.awayName + "</a></td>");
+			html.push("<td><a href='http://zq.titan007.com/cn/team/TeamScheAjax.aspx?TeamID=" + match.awayId + "&pageNo=1&flesh=' target='_blank'>" + match.awayName + "</a></td>");
 			html.push("<td>" + match.playtime + "</td>");
 			if (!match.bet365_yp) {
 				match.bet365_yp = [0, 0, 0];
@@ -241,9 +241,9 @@
 			}
 			html.push("<a class='btn btn-link'  href='javascript:refreshOddsById("+match.id+")' style='color:red'>赔</a>");
 			html.push("<a class='btn btn-link'  href='javascript:setBoloolById(" + match.id + ")' style='color:red'>积</a>");
-           	html.push('<br/><a class="btn btn-link" href="http://op1.win007.com/oddslist/' + match.id + '.html" target="_blank">欧</a>&nbsp;');
-			html.push('<a class="btn btn-link"  href="http://vip.win007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>&nbsp;');
-			html.push('<a class="btn btn-link" href="http://zq.win007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
+           	html.push('<br/><a class="btn btn-link" href="http://op1.titan007.com/oddslist/' + match.id + '.html?v=123" target="_blank">欧</a>&nbsp;');
+			html.push('<a class="btn btn-link"  href="http://vip.titan007.com/AsianOdds_n.aspx?id=' + match.id + '&l=0" target="_blank">亚</a>&nbsp;');
+			html.push('<a class="btn btn-link" href="http://zq.titan007.com/analysis/' + match.id + 'cn.htm" target="_blank">析</a>');
 			html.push('</td>   ');
 			html.push('</tr>');
 		}

@@ -83,7 +83,7 @@ async function getMatchByTeam(page, teamId, nTimeStr) {
         var id = ids[i]["id"];
         Logger.info("正在获取第" + (i + 1) + "个球队ID=" + id + "的历史比赛数据,还剩" + (idsLen - i - 1));
 
-        var sdUrl = "http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=1&flesh=";
+        var sdUrl = "http://zq.titan007.com/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=1&flesh=";
         var sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
         retry = 1;
         while (sdContent == "-1" && sdContent.indexOf("System.Web.Mvc.Controller") == -1) {
@@ -120,7 +120,7 @@ async function getMatchByTeam(page, teamId, nTimeStr) {
         }
         totalCount += allMatch.length;
         for (var pageNo = 2; pageNo <= totalPage; pageNo++) {
-            sdUrl = "http://zq.win007.com/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=" + pageNo + "&flesh=";
+            sdUrl = "http://zq.titan007.com/cn/team/TeamScheAjax.aspx?TeamID=" + id + "&pageNo=" + pageNo + "&flesh=";
             sdContent = await Utils.getFromUrl(page, sdUrl + Math.random());
             retry = 1;
             while (sdContent == "-1" && sdContent.indexOf("System.Web.Mvc.Controller") == -1) {
@@ -283,7 +283,7 @@ async function getAsiaOdds(id,page) {
         return rs[0];
     }
     if(page){
-        var asiaOddsUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
+        var asiaOddsUrl = "http://vip.titan007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
         var response = await Utils.getFromUrl(page, asiaOddsUrl,(r) => { return r.indexOf('id="odds"') != -1},3);
         if (response && response.indexOf('id="odds"')!=-1) {
             console.info(asiaOddsUrl + " 获取完成");
@@ -304,7 +304,7 @@ async function getAsiaOdds(id,page) {
     do {
         var proxyIp = (proxy.data ? " -x socks5://" + proxy.data[0].ip + ":" + proxy.data[0].port : "");
         //同步处理
-        var asiaUrl = "http://vip.win007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
+        var asiaUrl = "http://vip.titan007.com/ChangeDetail/Asian_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
         var curl = 'curl ' + proxyIp + ' "' + asiaUrl + '" -s | iconv -f gbk -t utf-8'
         console.info(curl);
         response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 5);
@@ -338,7 +338,7 @@ async function getEuropeOdds(id,page) {
         return rs[0];
     }
     if(page){
-        var europeUrl = "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
+        var europeUrl = "http://vip.titan007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
         var response = await Utils.getFromUrl(page, europeUrl,(r) => { return r.indexOf('id="odds"') != -1 },3);
         if (response && response.indexOf('id="odds"')!=-1) {
             console.info(europeUrl + " 获取完成");
@@ -359,7 +359,7 @@ async function getEuropeOdds(id,page) {
     do {
         var proxyIp = (proxy.data ? " -x socks5://" + proxy.data[0].ip + ":" + proxy.data[0].port : "");
         //同步处理
-        var europeUrl = "http://vip.win007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
+        var europeUrl = "http://vip.titan007.com/ChangeDetail/Standard_all.aspx?ID=" + id + "&companyid=8&company=Bet365";
         var curl = 'curl ' + proxyIp + ' "' + europeUrl + '" -s | iconv -f gbk -t utf-8'
         // var response = await Utils.getByCurl(curl);
         var response = await Utils.getByCurl(curl, (r) => { return r.indexOf('id="odds"') != -1 }, 3);
@@ -392,7 +392,7 @@ function getOdds(stdout) {
     var h = $(tds[1]).text().trim();
     var d = $(tds[2]).text().trim();
     var a = $(tds[3]).text().trim();
-    if (company.indexOf("365") != -1 && h != "" && d != "" && a != "") {
+    if ((company.indexOf("365") != -1 || company.indexOf("36*") !=-1)&& h != "" && d != "" && a != "") {
         return [isNaN(h) ? 0 : parseFloat(h), d, isNaN(a) ? 0 : parseFloat(a)];
     } else {
         return [0, 0, 0];
