@@ -5,7 +5,8 @@
     "description": "bolool data jingcai",
     "scripts": {
         "serve": "node src/main.js",
-        "test": "node test/main.js"
+        "test": "node test/main.js",
+        "main": "node src/index.js"
     },
     "author": "zw",
     "license": "ISC",
