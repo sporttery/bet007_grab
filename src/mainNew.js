@@ -5,6 +5,8 @@ const DBHelper = require("./DBHelper")
 const Puppeteer = require('puppeteer-core');
 const program = require('commander');
 const matchUtil = require("./matchUtils");
+const fs = require("fs");
+const os = require("os");
 
 program
     .version('0.1.0')
@@ -38,20 +40,42 @@ if (!program.leagueId && args.indexOf("-l") != -1) {
 
 var g_browser, g_url_idx = 0, vipPage, zqPage;
 
+if(!program.chromePath){
+
+    var chromePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    if(!fs.existsSync(chromePath)){
+        console.error(chromePath + " not exists ") ;
+        chromePath = "C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe";
+    }
+    if(!fs.existsSync(chromePath)){
+        console.error(chromePath + " not exists ") ;
+        chromePath = "C:\\Users\\"+os.userInfo().username+"\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe";
+    }if(!fs.existsSync(chromePath)){
+        console.error(chromePath + " not exists ") ;
+        chromePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+    }
+    if(!fs.existsSync(chromePath)){
+        console.error(chromePath + " not exists ") ;
+        process.exit(1);
+    }
+    program.chromePath = chromePath;
+}
+console.log("使用 Chrome 路径：" + program.chromePath);
 (async () => {
     let urls = Config.urls;
+    console.log("共加载了 " + urls.length + " 个联赛数据");
     // Logger.info(urls);
     Logger.info("程序开始运行");
 
     await Puppeteer.launch({
-        headless: true,
+        headless: 'new',
         defaultViewport: {
             width: 1920,
             height: 966
         },
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"  ],
         ignoreHTTPSErrors: true,
-        executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        executablePath:chromePath,
         //ignoreDefaultArgs: ["--enable-automation"]
         // devtools: true
 
@@ -135,7 +159,7 @@ var g_browser, g_url_idx = 0, vipPage, zqPage;
         })
 
         Logger.info("正在打开浏览器，进入球探主页");
-        await zqPage.goto("http://zq.win007.com/");
+        await zqPage.goto("http://zq.titan007.com/");
         await vipPage.goto("http://vip.titan007.com");
         await zqPage
             .addScriptTag({

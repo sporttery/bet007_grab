@@ -14,12 +14,37 @@
 7、根据比赛id，获取赔率 
     欧盘
     http://vip.titan007.com/ChangeDetail/Standard_all.aspx?ID=1806655&company=Bet365&companyid=8
-    http://data.310win.com/changeDetail/1x2.aspx?id=2071146&companyid=8&l=0
-    http://1x2d.win007.com/1910109.js?r=007132665582558691738
+    http://data.310win.com/changeDetail/1x2.aspx?id=2071146&companyid=8&l=0。已弃用 ， 新 http://vip.titan007.com/changeDetail/1x2.aspx?id=2071146&companyid=8&l=0
+    http://1x2d.win007.com/1910109.js?r=007132665582558691738 已弃用 ，新 http://1x2d.titan007.com/2798237.js?r=007132665582558691738
     亚盘
     http://vip.titan007.com/ChangeDetail/Asian_all.aspx?ID=1806655&companyid=8&company=Bet365
-    http://data.310win.com/changeDetail/handicap.aspx?id=2071146&companyid=8&l=0
-    http://vip.titan007.com/AsianOdds_n.aspx?id=1910109&l=0
+    http://data.310win.com/changeDetail/handicap.aspx?id=2071146&companyid=8&l=0 已弃用，新 http://vip.titan007.com/changeDetail/handicap.aspx?id=2071146&companyid=8&l=0
+    http://vip.titan007.com/AsianOdds_n.aspx?id=1910109&l=0 
+    半场进球数
+    http://vip.titan007.com/ChangeDetail/overunderHalf.aspx?id=1806655&companyid=8&l=0
+    半场让球
+    http://vip.titan007.com/ChangeDetail/handicapHalf.aspx?id=1806655&companyid=8&l=0
+    进球数
+    http://vip.titan007.com/ChangeDetail/overunder.aspx?id=1806655&companyid=8&l=0
+    胜平负
+    http://vip.titan007.com/ChangeDetail/1x2.aspx?id=1806655&companyid=8&l=0
+    让球
+    http://vip.titan007.com/ChangeDetail/handicap.aspx?id=1806655&companyid=8&l=0
+    
+
+        http://zq.titan007.com/League/LeagueOddsAjax?sclassId=54&subSclassId=&matchSeason=2019-2020&round=1&flesh=0.464851099915071
+    初盘 http://zq.titan007.com/League/LeagueOddsAjax?sclassId=37&subSclassId=88&matchSeason=2019-2020&round=1&flesh=0.8966377870222806
+
+     sclassId 联赛id
+    subSclassId 分组ID
+    matchSeason 赛事信息
+    round 轮次
+    获取赔率时，
+    联赛时，当 arrSubLeague 有值时，需要指定subSclassId的参数，没有时设置为0； 轮次需要指定
+    杯赛时，不需要指定 subSclassId参数，轮次为1
+    返回的数据 oddsData["L_1231"]=[[赔率公司id,上盘，盘口，下盘],...]；
+    oddsData["O_1231"]=[[赔率公司id,主胜，平，客胜],...]；
+    oddsData["T_1231"]=[[赔率公司id,大球，盘口，小球],...]
     
 8、程序： mainNew.js
 
